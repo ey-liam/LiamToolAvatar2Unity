@@ -1,44 +1,37 @@
 # LiamToolAvatar2Unity
 
-Herramienta web (single-file HTML) para crear **avatares animados estilo Just Dance** (Ubisoft): permite importar partes PNG de un personaje, armar un rig de huesos, pintar pesos (skinning), posar y animar, y exportar para Unity.
-
-> Estado actual: **funcional**, pero la **exportación de archivos para Unity está pendiente de corregir** y aún no se integra la **creación de atlas**.
+Herramienta web (single-file HTML) y servidor **MCP (Model Context Protocol)** para crear, riggear y animar **avatares 2D en alta resolución (1536x2752)** estilo Just Dance y exportarlos listos para Unity con empaquetador de **Atlas de Texturas Inteligente**.
 
 https://sites.google.com/view/liamtoolavatar2unity/full-page-embed
 
-## Características
+## Características Principales
 
-- Editor visual en el navegador (sin instalación, abre `index.html`).
-- Importación de partes PNG (multi-parte o imagen única).
-- Presets de estructura (6 capas / 15 capas) y variantes de piernas.
-- Rig de huesos con jerarquía, roles (torso, cabeza, brazos, piernas, pendulo/falda).
-- Auto-detección de pose por silueta y plantillas de pose.
-- Skinning con pincel de pesos (sumar/restar/suavizar) y envoltura automática.
-- Mallas anti-recorte (silueta o lienzo completo) con densidad y margen configurables.
-- Anclajes anti-dislocación.
-- Timeline con clips (idle, walk, jump, wave), keyframes, reproducción y física.
-- Undo/Redo, guardar/cargar proyecto `.L2U`.
-- Exportación a Unity (en progreso).
+- **Lienzo Nativo en Alta Resolución (1536 x 2752)**: Importación 100% fiel de partes PNG sin recortes ni reducciones de resolución.
+- **Smart Texture Atlas Packer (`LiamAvatar_Atlas.png`)**: Escanea los píxeles visibles de todas las capas, elimina el espacio transparente vacío y empaqueta todas las piezas en un solo Atlas PNG compacto.
+- **Exportador Directo a Unity (`LiamAvatar.json` + `LiamAvatar2UnityRuntime.cs`)**: Exporta coordenadas `canvasRect`, `atlasRect`, puntos de anclaje anti-dislocación (`anchorWeld`) y el script de Unity libre de errores de compilación.
+- **Rigging, Puntos de Anclaje y Pincel de Pesos**: Presets de 6 y 15 capas, variantes de piernas, plantillas de pose, auto-detección por silueta, mallas anti-recorte y línea de tiempo con física.
+- **Formato de Proyecto `.L2U`**: Guardado y carga de proyectos editables completos con retrocompatibilidad automática.
+- **Servidor MCP Integrado (`mcp-server.js`)**: Permite que agentes de IA tomen capturas en tiempo real del viewport o del Atlas, inspeccionen el estado del rig, ajusten huesos/anclajes/pesos de forma inteligente y exporten los paquetes de Unity automáticamente.
 
-## Uso
+## Herramientas MCP Disponibles para IA
 
-1. Abre `index.html` en un navegador moderno (Chrome/Edge recomendado).
-2. En modo **SETUP**, importa las partes PNG del avatar.
-3. Ajusta huesos, pesos y anclajes.
-4. Cambia a modo **ANIMATE** para posar/animar.
-5. Usa **Exportar Unity** (pendiente de corrección).
+- `avatar_capture_screenshot`: Toma una captura PNG en vivo del viewport (`setup` o `animate`) o del Atlas empaquetado.
+- `avatar_get_state`: Lee el estado completo de capas, orden Z, huesos, anclajes y animación.
+- `avatar_update_bones`: Ajusta coordenadas (`nx1, ny1, nx2, ny2`), roles y envolturas de huesos y recalcula pesos.
+- `avatar_update_part`: Ajusta posición, escala, rotación, orden Z y anclaje anti-dislocación de cualquier parte.
+- `avatar_smart_auto_adjust`: Ejecuta auto-detección de pose por silueta, soldadura de anclajes y suavizado de fronteras.
+- `avatar_configure_mesh_and_anim`: Configura densidad/margen de malla y parámetros procedurales de animación.
+- `avatar_load_l2u_project`: Carga un archivo `.l2u` desde disco.
+- `avatar_export_unity_bundle`: Exporta `LiamAvatar_Atlas.png`, `LiamAvatar.json`, `LiamAvatar2UnityRuntime.cs` y `Proyecto_LiamAvatar2Unity.l2u`.
 
-## Estructura
+## Estructura del Repositorio
 
-- `index.html` — aplicación completa (HTML/CSS/JS en un solo archivo).
-- `README.md` — este archivo.
-
-## Roadmap
-
-- [ ] Corregir exportación de archivos para Unity.
-- [ ] Integrar creación de atlas de texturas.
-- [ ] Documentación de formato de exportación.
+- `index.html` — Aplicación completa auto-contenida (lista para abrir en navegador o incrustar en Google Sites).
+- `mcp-server.js` — Servidor Model Context Protocol (Stdio + puente HTTP en `127.0.0.1:17420`).
+- `LiamAvatar2UnityRuntime.cs` — Script Runtime de Unity para renderizar y animar el Atlas y el JSON.
+- `mcp_config.json` — Configuración de conexión MCP.
 
 ## Licencia
 
 Proyecto personal de Liam. Uso libre para aprendizaje; contactar al autor para otros usos.
+

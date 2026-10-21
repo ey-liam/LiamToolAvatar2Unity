@@ -837,42 +837,48 @@
         </aside>
     </div>
 
-    <div id="exportModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
-        <div class="bg-[#10141f] border border-[#28324e] rounded-lg max-w-4xl w-full max-h-[88vh] flex flex-col shadow-2xl overflow-hidden">
-            <div class="px-4 py-3 border-b border-[#22293c] flex items-center justify-between bg-[#141927]">
-                <div class="flex items-center gap-2.5">
-                    <span class="px-2 py-0.5 rounded bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 mono text-xs font-bold">UNITY 6 / SPINE 2D</span>
-                    <span class="font-bold text-white text-sm">Exportador Alta Resolucion Nativa (Sin Errores CS1003 ni Recortes)</span>
+
+    <div id="exportModal" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="bg-[#101420] border border-[#28324e] rounded-xl max-w-5xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+            <div class="px-4 py-3 border-b border-[#22293f] flex items-center justify-between bg-[#151a28]">
+                <div class="flex items-center gap-3 flex-wrap">
+                    <span class="px-2 py-1 rounded bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 mono text-xs font-bold">ATLAS + UNITY EXPORTER</span>
+                    <span class="text-sm font-bold text-white">Empaquetador de Atlas sin Espacios Vacios, JSON y Runtime C#</span>
+                    <span id="badgeAtlasStats" class="mono text-xs text-sky-300 bg-sky-500/10 px-2 py-0.5 rounded border border-sky-500/30"></span>
                 </div>
-                <button onclick="closeExportModal()" class="w-7 h-7 rounded bg-[#1c2336] text-slate-300 hover:text-white flex items-center justify-center">
-                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                </button>
+                <button onclick="closeExportModal()" class="w-7 h-7 rounded bg-[#1e2538] text-slate-300 hover:text-white flex items-center justify-center font-bold text-xs">X</button>
             </div>
 
-            <div class="px-4 pt-2.5 border-b border-[#22293c] bg-[#0d1018] flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <button id="expTab_cs" onclick="switchExportTab('cs')" class="px-3 py-1.5 text-xs font-semibold tab-active">
-                        1. Script C# Unity (LiamAvatar2UnityRuntime.cs)
-                    </button>
-                    <button id="expTab_json" onclick="switchExportTab('json')" class="px-3 py-1.5 text-xs font-semibold text-slate-400 hover:text-white">
-                        2. Archivo JSON de Capas y Mallas (LiamAvatar.json)
-                    </button>
+            <div class="px-4 pt-3 bg-[#0c1018] border-b border-[#22293f] flex flex-wrap items-center justify-between gap-2">
+                <div class="flex gap-2 pb-2 flex-wrap">
+                    <button id="expTab_atlas" onclick="switchExportTab('atlas')" class="px-3 py-1.5 rounded text-xs font-semibold mode-animate-active">Vista Previa del Atlas Unico</button>
+                    <button id="expTab_json" onclick="switchExportTab('json')" class="px-3 py-1.5 rounded text-xs font-semibold bg-[#181f30] text-slate-300 hover:text-white">Archivo LiamAvatar.json</button>
+                    <button id="expTab_cs" onclick="switchExportTab('cs')" class="px-3 py-1.5 rounded text-xs font-semibold bg-[#181f30] text-slate-300 hover:text-white">Script LiamAvatar2UnityRuntime.cs</button>
                 </div>
-                <div class="flex items-center gap-1.5 pb-1.5">
-                    <button onclick="downloadSelectedPartPNG()" class="px-2.5 py-1 rounded bg-[#182032] hover:bg-[#222d47] border border-[#2d3a5c] text-sky-300 text-[11px] font-semibold">
+                <div class="flex gap-1.5 pb-2 flex-wrap">
+                    <button onclick="downloadAtlasPng()" class="px-3 py-1.5 rounded bg-teal-600 hover:bg-teal-500 text-white text-xs font-semibold shadow">
+                        1. Descargar LiamAvatar_Atlas.png
+                    </button>
+                    <button onclick="downloadExportJson()" class="px-3 py-1.5 rounded bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold shadow">
+                        2. Descargar LiamAvatar.json
+                    </button>
+                    <button onclick="downloadExportCs()" class="px-3 py-1.5 rounded bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow">
+                        3. Descargar LiamAvatar2UnityRuntime.cs
+                    </button>
+                    <button onclick="downloadSelectedPartPNG()" class="px-2.5 py-1.5 rounded bg-[#182032] hover:bg-[#222d47] border border-[#2d3a5c] text-sky-300 text-xs font-semibold">
                         Descargar PNG Parte
                     </button>
-                    <button onclick="downloadExportFile()" class="px-2.5 py-1 rounded bg-indigo-600 hover:bg-indigo-500 text-white text-[11px] font-semibold">
-                        Descargar Archivo
-                    </button>
-                    <button id="btnCopyExport" onclick="copyExportBuffer()" class="px-3 py-1 rounded bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-semibold">
-                        Copiar Codigo
+                    <button id="btnCopyExport" onclick="copyExportBuffer()" class="px-3 py-1.5 rounded bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold">
+                        Copiar Texto
                     </button>
                 </div>
             </div>
 
-            <div class="p-4 flex-1 overflow-hidden flex flex-col">
-                <textarea id="exportCodeOutput" readonly class="w-full flex-1 bg-[#080a10] text-sky-100 mono text-[11px] p-3.5 rounded border border-[#22293c] focus:outline-none leading-relaxed"></textarea>
+            <div class="p-4 flex-1 overflow-hidden flex flex-col min-h-[420px]">
+                <div id="atlasPreviewContainer" class="flex-1 bg-[#080a10] border border-[#232b42] rounded-lg overflow-auto flex items-center justify-center p-4">
+                    <canvas id="atlasPreviewCanvas" class="max-w-full max-h-[62vh] border border-sky-500/40 shadow-lg"></canvas>
+                </div>
+                <textarea id="exportCodeOutput" readonly class="hidden w-full flex-1 bg-[#080a10] text-sky-100 mono text-xs p-3.5 rounded-lg border border-[#232b42] focus:outline-none leading-relaxed"></textarea>
             </div>
         </div>
     </div>
@@ -961,7 +967,9 @@
 
             bones: [],
             parts: [],
-            exportTab: 'cs',
+            exportTab: 'atlas',
+            packedAtlasCanvas: document.createElement('canvas'),
+            packedAtlasMeta: null,
 
             undoStack: [],
             redoStack: [],
@@ -1163,22 +1171,60 @@
 
         function restoreStudioSnapshot(snap) {
             if (!snap) return;
+            const isLegacy520 = !snap.refWidth || !snap.refHeight;
             if (snap.refWidth && snap.refHeight) {
                 RefWidth = snap.refWidth;
                 RefHeight = snap.refHeight;
-                document.getElementById('inpCanvasW').value = RefWidth;
-                document.getElementById('inpCanvasH').value = RefHeight;
+            } else {
+                RefWidth = 1536;
+                RefHeight = 2752;
             }
+            document.getElementById('inpCanvasW').value = RefWidth;
+            document.getElementById('inpCanvasH').value = RefHeight;
+
+            const legacyPadX = (520 - 1536 * (700 / 2752)) * 0.5;
+            const legacyDrawW = 1536 * (700 / 2752);
+            const remapLegacyNX = (nx) => isLegacy520 ? Math.max(0.01, Math.min(0.99, (nx * 520 - legacyPadX) / legacyDrawW)) : nx;
+
             studio.activePosePreset = snap.activePosePreset || 'dynamic';
             studio.activeLayerPreset = snap.activeLayerPreset || 'preset1';
             studio.legVariantStyle = snap.legVariantStyle || 'calcetas';
             studio.selectedBoneId = snap.selectedBoneId || 'torso';
-            studio.selectedPartId = snap.selectedPartId || (snap.parts[0] ? snap.parts[0].id : 'Cabeza');
-            studio.bones = JSON.parse(JSON.stringify(snap.bones));
-            studio.anim = JSON.parse(JSON.stringify(snap.anim));
+            studio.selectedPartId = snap.selectedPartId || (snap.parts && snap.parts[0] ? snap.parts[0].id : 'Cabeza');
+
+            studio.bones = JSON.parse(JSON.stringify(snap.bones || [])).map(b => ({
+                ...b,
+                nx1: remapLegacyNX(b.nx1),
+                nx2: remapLegacyNX(b.nx2)
+            }));
+
+            if (snap.anim) {
+                studio.anim = {
+                    ...studio.anim,
+                    ...JSON.parse(JSON.stringify(snap.anim))
+                };
+                document.getElementById('sl_animSpeed').value = studio.anim.speed;
+                document.getElementById('sl_animBreath').value = studio.anim.breath;
+                document.getElementById('sl_animHipX').value = studio.anim.hipX;
+                document.getElementById('sl_animHipY').value = studio.anim.hipY;
+                document.getElementById('sl_animArm').value = studio.anim.armSwing;
+                document.getElementById('sl_animForearm').value = studio.anim.forearmSwing;
+                document.getElementById('sl_animPendulum').value = studio.anim.pendulumSwing;
+                document.getElementById('sl_animHead').value = studio.anim.headTilt;
+                syncAnimSliders();
+            }
+
             if (snap.meshConfig) {
-                studio.meshConfig = JSON.parse(JSON.stringify(snap.meshConfig));
-                document.getElementById('chkFullRectMesh').checked = !!studio.meshConfig.fullRect;
+                studio.meshConfig = {
+                    cols: snap.meshConfig.cols || 22,
+                    paddingPct: snap.meshConfig.paddingPct !== undefined ? snap.meshConfig.paddingPct : 8,
+                    fullRect: !!snap.meshConfig.fullRect
+                };
+                document.getElementById('sl_meshDensity').value = studio.meshConfig.cols;
+                document.getElementById('val_meshDensity').textContent = studio.meshConfig.cols;
+                document.getElementById('sl_meshPadding').value = studio.meshConfig.paddingPct;
+                document.getElementById('val_meshPadding').textContent = studio.meshConfig.paddingPct + '%';
+                document.getElementById('chkFullRectMesh').checked = studio.meshConfig.fullRect;
             }
 
             const restoreParts = async () => {
@@ -1187,11 +1233,17 @@
                     const sp = snap.parts[i];
                     let rawCanvas = sp.rawCanvasRef ? cloneCanvas(sp.rawCanvasRef) : null;
                     if (!rawCanvas && sp.rawDataUrl) {
-                        rawCanvas = await dataUrlToCanvas(sp.rawDataUrl);
+                        rawCanvas = await dataUrlToCanvas(sp.rawDataUrl, isLegacy520);
                     }
                     if (!rawCanvas) {
                         rawCanvas = createDefaultPartCanvas(sp.id, studio.legVariantStyle);
                     }
+                    const rawAnc = sp.anchor ? { ...sp.anchor } : { parentBone: 'none', nx: 0.5, ny: 0.3, radiusPct: 12, strength: 0 };
+                    if (rawAnc.radiusPct === undefined) {
+                        rawAnc.radiusPct = rawAnc.radius ? Math.max(3, Math.min(35, Math.round((rawAnc.radius / 520) * 100))) : 12;
+                    }
+                    rawAnc.nx = remapLegacyNX(rawAnc.nx);
+
                     const pObj = {
                         id: sp.id,
                         name: sp.name,
@@ -1203,13 +1255,13 @@
                         scaleY: sp.scaleY || 1.0,
                         rot: sp.rot || 0,
                         allowedBones: [...(sp.allowedBones || [])],
-                        anchor: sp.anchor ? { ...sp.anchor } : { parentBone: 'none', nx: 0.5, ny: 0.3, radiusPct: 12, strength: 0 },
+                        anchor: rawAnc,
                         rawSourceCanvas: rawCanvas,
                         bakedCanvas: cloneCanvas(rawCanvas),
                         mesh: { bounds: {}, vertices: [], triangles: [], hullEdges: [], neighbors: [] }
                     };
                     buildSinglePartMesh(pObj, false);
-                    if (sp.vertexOffsetsAndWeights && sp.vertexOffsetsAndWeights.length === pObj.mesh.vertices.length) {
+                    if (!isLegacy520 && sp.vertexOffsetsAndWeights && sp.vertexOffsetsAndWeights.length === pObj.mesh.vertices.length) {
                         for (let vIdx = 0; vIdx < pObj.mesh.vertices.length; vIdx++) {
                             pObj.mesh.vertices[vIdx].ox = sp.vertexOffsetsAndWeights[vIdx].ox || 0;
                             pObj.mesh.vertices[vIdx].oy = sp.vertexOffsetsAndWeights[vIdx].oy || 0;
@@ -1221,24 +1273,35 @@
                     newParts.push(pObj);
                 }
                 studio.parts = newParts;
+                let totalTris = 0;
+                studio.parts.forEach(p => { totalTris += p.mesh.triangles.length; });
+                document.getElementById('meshStatsBadge').textContent = totalTris + ' tris totales';
                 updatePresetUIButtons();
                 renderPartTreeUI();
                 renderBoneTreeUI();
                 syncPartInspectorUI();
                 syncBoneInspectorUI();
+                resetCameraView();
             };
 
             restoreParts();
         }
 
-        function dataUrlToCanvas(dataUrl) {
+        function dataUrlToCanvas(dataUrl, unletterboxLegacy520 = false) {
             return new Promise((resolve) => {
                 const img = new Image();
                 img.onload = () => {
                     const c = document.createElement('canvas');
                     c.width = RefWidth;
                     c.height = RefHeight;
-                    c.getContext('2d').drawImage(img, 0, 0, RefWidth, RefHeight);
+                    const g = c.getContext('2d');
+                    if (unletterboxLegacy520 && img.width === 520 && img.height === 700) {
+                        const sx = (520 - 1536 * (700 / 2752)) * 0.5;
+                        const sw = 1536 * (700 / 2752);
+                        g.drawImage(img, sx, 0, sw, 700, 0, 0, RefWidth, RefHeight);
+                    } else {
+                        g.drawImage(img, 0, 0, RefWidth, RefHeight);
+                    }
                     resolve(c);
                 };
                 img.onerror = () => {
@@ -1311,9 +1374,6 @@
             event.target.value = '';
         }
 
-        // ============================================================================
-        // GENERACION ESCALADA A RESOLUCION NATIVA (1536 x 2752) DE LOS 2 PRESETS
-        // ============================================================================
         function createDefaultPartCanvas(partType, legVariant = 'calcetas') {
             const c = document.createElement('canvas');
             c.width = RefWidth;
@@ -1893,9 +1953,7 @@
             return c;
         }
 
-        // IMPORTACION 100% FIEL SIN RECORTES NI REESCALADOS DESTRUCTIVOS
         function normalizeImageToRefCanvas(img, removeWhiteBg = false) {
-            // Si la imagen subida tiene una resolucion distinta (ej. 1536x2752), sincronizamos el lienzo al 100% de la imagen
             if (img.width >= 256 && img.height >= 256 && (img.width !== RefWidth || img.height !== RefHeight)) {
                 RefWidth = img.width;
                 RefHeight = img.height;
@@ -1918,7 +1976,6 @@
             c.height = RefHeight;
             const g = c.getContext('2d');
 
-            // Dibuja el 100% del lienzo sin encoger ni cortar jamas manos, dedos o bordes
             g.drawImage(img, 0, 0, RefWidth, RefHeight);
 
             if (removeWhiteBg) {
@@ -1955,9 +2012,6 @@
             g.restore();
         }
 
-        // ============================================================================
-        // CONSTRUCCION DE MALLA DE ALTA RESOLUCION SIN RECORTAR EXTREMIDADES
-        // ============================================================================
         function pointToSegmentDist(px, py, x1, y1, x2, y2) {
             const dx = x2 - x1, dy = y2 - y1;
             const len2 = dx * dx + dy * dy;
@@ -1983,7 +2037,7 @@
                 const stepScan = Math.max(1, Math.floor(Math.min(w, h) / 350));
                 for (let y = 0; y < h; y += stepScan) {
                     for (let x = 0; x < w; x += stepScan) {
-                        if (imgData[(y * w + x) * 4 + 3] > 2) {
+                        if (imgData[(y * w + x) * 4 + 3] > 0) {
                             if (x < minX) minX = x;
                             if (x > maxX) maxX = x;
                             if (y < minY) minY = y;
@@ -2221,9 +2275,6 @@
             studio.parts.forEach(p => relaxSinglePartWeights(p, iterations));
         }
 
-        // ============================================================================
-        // PLANTILLAS DE POSE, AUTO-DETECCION Y GESTION DE HUESOS
-        // ============================================================================
         function applyPoseTemplate(presetKey, rebuild = true) {
             if (rebuild) pushUndoState();
             const tpl = POSE_TEMPLATES[presetKey];
@@ -2403,9 +2454,6 @@
             syncBoneInspectorUI();
         }
 
-        // ============================================================================
-        // GESTION DE PARTES Y ORDEN DE CAPAS (Z-ORDER)
-        // ============================================================================
         function movePartZOrder(index, direction) {
             const targetIndex = index + direction;
             if (targetIndex < 0 || targetIndex >= studio.parts.length) return;
@@ -2625,9 +2673,6 @@
             e.target.value = '';
         }
 
-        // ============================================================================
-        // CINEMATICA JERARQUICA CONECTADA + DEFORMACION PROPORCIONAL A LA RESOLUCION
-        // ============================================================================
         function rotatePointAround(px, py, ox, oy, rad) {
             const c = Math.cos(rad), s = Math.sin(rad);
             const dx = px - ox, dy = py - oy;
@@ -2873,9 +2918,6 @@
             return { posedBones, evalTorsoSpace };
         }
 
-        // ============================================================================
-        // RENDERIZADO DEL VIEWPORT MULTI-MALLA + PUNTOS DE ANCLAJE
-        // ============================================================================
         function weightToThermalColor(w, alpha = 0.52) {
             const clamped = Math.max(0, Math.min(1, w));
             let r = 0, g = 0, b = 0;
@@ -2968,6 +3010,7 @@
             ctx.lineWidth = 1.2 / z;
             ctx.strokeRect(0, 0, RefWidth, RefHeight);
 
+
             for (let pIdx = studio.parts.length - 1; pIdx >= 0; pIdx--) {
                 const part = studio.parts[pIdx];
                 if (!part.visible) continue;
@@ -2990,4 +3033,1925 @@
                     const targetB = studio.selectedBoneId;
                     for (let i = 0; i < md.triangles.length; i++) {
                         const [i0, i1, i2] = md.triangles[i];
-                        const v0 = md.vertices[i0], v1 = md.vertices[i1], v2 = md.vertices[i2
+                        const v0 = md.vertices[i0], v1 = md.vertices[i1], v2 = md.vertices[i2];
+                        const wAvg = ((v0.weights[targetB] || 0) + (v1.weights[targetB] || 0) + (v2.weights[targetB] || 0)) / 3;
+                        ctx.fillStyle = weightToThermalColor(wAvg, isSelectedPart ? 0.48 : 0.22);
+                        ctx.beginPath();
+                        ctx.moveTo(v0.dx, v0.dy);
+                        ctx.lineTo(v1.dx, v1.dy);
+                        ctx.lineTo(v2.dx, v2.dy);
+                        ctx.closePath();
+                        ctx.fill();
+                    }
+                }
+
+                if (studio.flags.showWire) {
+                    ctx.strokeStyle = isSelectedPart ? 'rgba(56, 189, 248, 0.34)' : 'rgba(148, 163, 184, 0.12)';
+                    ctx.lineWidth = (isSelectedPart ? 0.95 : 0.65) / z;
+                    ctx.beginPath();
+                    for (let i = 0; i < md.triangles.length; i++) {
+                        const [i0, i1, i2] = md.triangles[i];
+                        const v0 = md.vertices[i0], v1 = md.vertices[i1], v2 = md.vertices[i2];
+                        ctx.moveTo(v0.dx, v0.dy);
+                        ctx.lineTo(v1.dx, v1.dy);
+                        ctx.lineTo(v2.dx, v2.dy);
+                        ctx.lineTo(v0.dx, v0.dy);
+                    }
+                    ctx.stroke();
+
+                    if (isSelectedPart) {
+                        ctx.strokeStyle = part.color || '#38bdf8';
+                        ctx.lineWidth = 1.6 / z;
+                        ctx.beginPath();
+                        for (let i = 0; i < md.hullEdges.length; i++) {
+                            const [a, b] = md.hullEdges[i];
+                            ctx.moveTo(md.vertices[a].dx, md.vertices[a].dy);
+                            ctx.lineTo(md.vertices[b].dx, md.vertices[b].dy);
+                        }
+                        ctx.stroke();
+                    }
+                }
+            }
+
+            if (studio.flags.showAnchors || studio.activeTool === 'anchor') {
+                studio.parts.forEach(part => {
+                    if (!part.visible || !part.anchor || part.anchor.parentBone === 'none' || part.anchor.strength <= 0) return;
+                    const isSel = (part.id === studio.selectedPartId);
+                    const restAx = part.anchor.nx * RefWidth;
+                    const restAy = part.anchor.ny * RefHeight;
+                    const pt = frame.evalTorsoSpace ? frame.evalTorsoSpace(restAx, restAy) : { x: restAx, y: restAy };
+                    const radPx = ((part.anchor.radiusPct || 12) / 100) * RefWidth;
+
+                    if (isSel || studio.activeTool === 'anchor') {
+                        ctx.strokeStyle = 'rgba(245, 158, 11, 0.40)';
+                        ctx.lineWidth = 1.2 / z;
+                        ctx.setLineDash([4 / z, 4 / z]);
+                        ctx.beginPath();
+                        ctx.arc(pt.x, pt.y, radPx, 0, Math.PI * 2);
+                        ctx.stroke();
+                        ctx.setLineDash([]);
+                    }
+
+                    const sz = (isSel ? 7 : 5) / z;
+                    ctx.save();
+                    ctx.translate(pt.x, pt.y);
+                    ctx.rotate(Math.PI / 4);
+                    ctx.fillStyle = isSel ? '#f59e0b' : '#10b981';
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.lineWidth = 1.8 / z;
+                    ctx.fillRect(-sz * 0.5, -sz * 0.5, sz, sz);
+                    ctx.strokeRect(-sz * 0.5, -sz * 0.5, sz, sz);
+                    ctx.restore();
+                });
+            }
+
+            if (studio.flags.showBones) {
+                const drawSpineBoneDiamond = (x1, y1, x2, y2, color, isSelected) => {
+                    const dx = x2 - x1, dy = y2 - y1;
+                    const len = Math.hypot(dx, dy);
+                    if (len < 1) return;
+                    const nx = -dy / len, ny = dx / len;
+                    const halfW = Math.min(8.5 / z, len * 0.13);
+
+                    ctx.fillStyle = isSelected ? 'rgba(255, 255, 255, 0.48)' : (color + '44');
+                    ctx.strokeStyle = isSelected ? '#ffffff' : color;
+                    ctx.lineWidth = (isSelected ? 2.4 : 1.6) / z;
+
+                    ctx.beginPath();
+                    ctx.moveTo(x1, y1);
+                    ctx.lineTo(x1 + dx * 0.2 + nx * halfW, y1 + dy * 0.2 + ny * halfW);
+                    ctx.lineTo(x2, y2);
+                    ctx.lineTo(x1 + dx * 0.2 - nx * halfW, y1 + dy * 0.2 - ny * halfW);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.stroke();
+                };
+
+                frame.posedBones.forEach(pb => {
+                    const isSel = (pb.id === studio.selectedBoneId);
+                    drawSpineBoneDiamond(pb.ax1, pb.ay1, pb.ax2, pb.ay2, pb.color, isSel);
+
+                    ctx.fillStyle = isSel ? '#facc15' : '#090b10';
+                    ctx.strokeStyle = isSel ? '#ffffff' : pb.color;
+                    ctx.lineWidth = 2 / z;
+                    ctx.beginPath();
+                    ctx.arc(pb.ax1, pb.ay1, (isSel ? 6.2 : 4.6) / z, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.stroke();
+
+                    ctx.fillStyle = isSel ? '#38bdf8' : pb.color;
+                    ctx.beginPath();
+                    ctx.arc(pb.ax2, pb.ay2, (isSel ? 5.2 : 3.8) / z, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+
+                if (studio.creatingBoneOrigin && studio.creatingBoneCursor) {
+                    drawSpineBoneDiamond(
+                        studio.creatingBoneOrigin.x, studio.creatingBoneOrigin.y,
+                        studio.creatingBoneCursor.x, studio.creatingBoneCursor.y,
+                        '#facc15', true
+                    );
+                }
+            }
+
+            if (studio.activeTool === 'weights') {
+                const brushRadPx = ((studio.weightBrush.radiusPct || 8) / 100) * RefWidth;
+                ctx.strokeStyle = '#facc15';
+                ctx.fillStyle = 'rgba(250, 204, 21, 0.10)';
+                ctx.lineWidth = 1.5 / z;
+                ctx.beginPath();
+                ctx.arc(studio.pointerWorld.x, studio.pointerWorld.y, brushRadPx, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+            }
+
+            ctx.restore();
+        }
+
+        function renderTimeline() {
+            const dpr = window.devicePixelRatio || 1;
+            const w = timelineCanvas.width / dpr;
+            const h = timelineCanvas.height / dpr;
+
+            tCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            tCtx.clearRect(0, 0, w, h);
+
+            const leftPad = 120;
+            const rightPad = 24;
+            const trackW = Math.max(50, w - leftPad - rightPad);
+            const dur = studio.anim.duration;
+
+            tCtx.fillStyle = '#0c0f17';
+            tCtx.fillRect(0, 0, leftPad, h);
+
+            const tracks = [
+                { label: 'Cabeza / Cuello', color: '#38bdf8', y: 22 },
+                { label: 'Brazo 1 / Brazo 2', color: '#10b981', y: 42 },
+                { label: 'Torso / Falda',   color: '#818cf8', y: 62 },
+                { label: 'Piernas / IK',    color: '#f59e0b', y: 82 }
+            ];
+
+            tCtx.font = '600 10px Inter, sans-serif';
+            tracks.forEach(tr => {
+                tCtx.fillStyle = '#94a3b8';
+                tCtx.fillText(tr.label, 10, tr.y + 4);
+                tCtx.strokeStyle = '#171d2c';
+                tCtx.beginPath();
+                tCtx.moveTo(leftPad, tr.y);
+                tCtx.lineTo(w - rightPad, tr.y);
+                tCtx.stroke();
+            });
+
+            const kfs = studio.anim.keyframes[studio.anim.clip] || [];
+            kfs.forEach(kt => {
+                const kx = leftPad + (kt / dur) * trackW;
+                tracks.forEach(tr => {
+                    tCtx.save();
+                    tCtx.translate(kx, tr.y);
+                    tCtx.rotate(Math.PI / 4);
+                    tCtx.fillStyle = tr.color;
+                    tCtx.fillRect(-3.5, -3.5, 7, 7);
+                    tCtx.restore();
+                });
+            });
+
+            const playheadX = leftPad + (studio.anim.time / dur) * trackW;
+            tCtx.strokeStyle = '#38bdf8';
+            tCtx.lineWidth = 1.8;
+            tCtx.beginPath();
+            tCtx.moveTo(playheadX, 0);
+            tCtx.lineTo(playheadX, h);
+            tCtx.stroke();
+
+            document.getElementById('lblTimelineTime').textContent = `${studio.anim.time.toFixed(2)}s / ${dur.toFixed(2)}s`;
+        }
+
+        function mainStudioLoop(now) {
+            const dt = Math.min(0.05, (now - lastFrameTimestamp) / 1000);
+            lastFrameTimestamp = now;
+
+            if (dt > 0) {
+                fpsTracker = fpsTracker * 0.92 + (1 / dt) * 0.08;
+                if (Math.random() < 0.15) {
+                    document.getElementById('fpsBadge').textContent = Math.round(fpsTracker) + ' FPS';
+                }
+            }
+
+            const frame = solveSkeletonAndDeformParts(dt);
+            renderViewport(frame);
+            renderTimeline();
+
+            requestAnimationFrame(mainStudioLoop);
+        }
+
+        function applyWeightBrushStroke(worldX, worldY) {
+            const targetBoneId = studio.selectedBoneId;
+            if (!targetBoneId) return;
+
+            const radius = ((studio.weightBrush.radiusPct || 8) / 100) * RefWidth;
+            const strength = studio.weightBrush.strength;
+            const mode = studio.weightBrush.mode;
+            const paintAll = document.getElementById('chkPaintAllParts').checked;
+
+            studio.parts.forEach(part => {
+                if (!part.visible) return;
+                if (!paintAll && part.id !== studio.selectedPartId) return;
+
+                const verts = part.mesh.vertices;
+                const nbrs = part.mesh.neighbors;
+
+                for (let i = 0; i < verts.length; i++) {
+                    const vt = verts[i];
+                    const dist = Math.hypot(worldX - vt.dx, worldY - vt.dy);
+                    if (dist > radius) continue;
+
+                    const falloff = Math.pow(1 - dist / radius, 1.5);
+                    const delta = strength * falloff * 0.25;
+                    const current = vt.weights[targetBoneId] || 0;
+
+                    if (mode === 'add') {
+                        vt.weights[targetBoneId] = Math.min(1.0, current + delta);
+                    } else if (mode === 'sub') {
+                        vt.weights[targetBoneId] = Math.max(0.0, current - delta);
+                    } else if (mode === 'smooth') {
+                        const nList = nbrs[i] || [];
+                        if (nList.length > 0) {
+                            let avg = 0;
+                            nList.forEach(ni => { avg += (verts[ni].weights[targetBoneId] || 0); });
+                            avg /= nList.length;
+                            vt.weights[targetBoneId] = current + (avg - current) * falloff * 0.5;
+                        }
+                    }
+
+                    let otherSum = 0;
+                    Object.keys(vt.weights).forEach(k => {
+                        if (k !== targetBoneId) otherSum += vt.weights[k];
+                    });
+
+                    const pinned = Math.max(0, Math.min(1, vt.weights[targetBoneId] || 0));
+                    vt.weights[targetBoneId] = pinned;
+                    const remainder = Math.max(0, 1.0 - pinned);
+
+                    if (otherSum > 0.0001) {
+                        Object.keys(vt.weights).forEach(k => {
+                            if (k !== targetBoneId) {
+                                vt.weights[k] = (vt.weights[k] / otherSum) * remainder;
+                            }
+                        });
+                    } else if (remainder > 0.001 && studio.bones[0]) {
+                        const fb = studio.bones.find(b => b.id !== targetBoneId) || studio.bones[0];
+                        vt.weights[fb.id] = remainder;
+                    }
+                }
+            });
+        }
+
+        function setupViewportInteractions() {
+            const getMousePos = (e) => {
+                const r = viewportCanvas.getBoundingClientRect();
+                const cx = (e.touches ? e.touches[0].clientX : e.clientX) - r.left;
+                const cy = (e.touches ? e.touches[0].clientY : e.clientY) - r.top;
+                return { x: cx, y: cy };
+            };
+
+            const findNearestBoneEndpoint = (wx, wy) => {
+                const hitRadius = 12 / studio.camera.zoom;
+                const frame = solveSkeletonAndDeformParts(0);
+                for (let i = frame.posedBones.length - 1; i >= 0; i--) {
+                    const b = frame.posedBones[i];
+                    if (Math.hypot(wx - b.ax2, wy - b.ay2) <= hitRadius) {
+                        return { boneId: b.id, point: 'end' };
+                    }
+                    if (Math.hypot(wx - b.ax1, wy - b.ay1) <= hitRadius) {
+                        return { boneId: b.id, point: 'start' };
+                    }
+                }
+                for (let i = frame.posedBones.length - 1; i >= 0; i--) {
+                    const b = frame.posedBones[i];
+                    if (pointToSegmentDist(wx, wy, b.ax1, b.ay1, b.ax2, b.ay2) <= hitRadius) {
+                        return { boneId: b.id, point: 'body' };
+                    }
+                }
+                return null;
+            };
+
+            const findNearestAnchorPin = (wx, wy) => {
+                const hitRadius = 14 / studio.camera.zoom;
+                for (let i = 0; i < studio.parts.length; i++) {
+                    const p = studio.parts[i];
+                    if (!p.visible || !p.anchor || p.anchor.parentBone === 'none') continue;
+                    const ax = p.anchor.nx * RefWidth;
+                    const ay = p.anchor.ny * RefHeight;
+                    if (Math.hypot(wx - ax, wy - ay) <= hitRadius) {
+                        return p.id;
+                    }
+                }
+                return null;
+            };
+
+            viewportCanvas.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                const pos = getMousePos(e);
+                const factor = e.deltaY < 0 ? 1.12 : 0.89;
+                zoomCameraAtPoint(factor, pos.x, pos.y);
+            }, { passive: false });
+
+            window.addEventListener('contextmenu', (e) => {
+                if (e.target === viewportCanvas) e.preventDefault();
+            });
+
+            window.addEventListener('keydown', (e) => {
+                if (e.code === 'Space' && document.activeElement.tagName !== 'INPUT') {
+                    studio.camera.spacePressed = true;
+                }
+                if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+                    e.preventDefault();
+                    if (e.shiftKey) performRedo();
+                    else performUndo();
+                } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y') {
+                    e.preventDefault();
+                    performRedo();
+                }
+            });
+            window.addEventListener('keyup', (e) => {
+                if (e.code === 'Space') studio.camera.spacePressed = false;
+            });
+
+            viewportCanvas.addEventListener('mousedown', (e) => {
+                const pos = getMousePos(e);
+                const world = screenToWorld(pos.x, pos.y);
+                studio.pointerScreen = pos;
+                studio.pointerWorld = world;
+                studio.lastPointerWorld = world;
+
+                if (e.button === 2 || e.button === 1 || studio.camera.spacePressed || studio.activeTool === 'pan') {
+                    e.preventDefault();
+                    studio.camera.isPanning = true;
+                    studio.camera.panStartX = pos.x - studio.camera.x;
+                    studio.camera.panStartY = pos.y - studio.camera.y;
+                    return;
+                }
+
+                if (studio.activeTool === 'anchor') {
+                    pushUndoState();
+                    const hitAnchorPart = findNearestAnchorPin(world.x, world.y) || studio.selectedPartId;
+                    selectPartById(hitAnchorPart);
+                    studio.draggingAnchorPartId = hitAnchorPart;
+                    const p = studio.parts.find(x => x.id === hitAnchorPart);
+                    if (p && p.anchor) {
+                        p.anchor.nx = Math.max(0.02, Math.min(0.98, world.x / RefWidth));
+                        p.anchor.ny = Math.max(0.02, Math.min(0.98, world.y / RefHeight));
+                        computePartSmoothWeights(p);
+                    }
+                    return;
+                }
+
+                if (studio.activeTool === 'createBone') {
+                    pushUndoState();
+                    setSystemState('setup');
+                    studio.creatingBoneOrigin = { x: world.x, y: world.y };
+                    studio.creatingBoneCursor = { x: world.x, y: world.y };
+                    return;
+                }
+
+                if (studio.activeTool === 'weights') {
+                    pushUndoState();
+                    studio.weightBrush.isPainting = true;
+                    applyWeightBrushStroke(world.x, world.y);
+                    return;
+                }
+
+                if (studio.activeTool === 'vertex') {
+                    let bestV = null, minD = 14 / studio.camera.zoom;
+                    studio.parts.forEach(p => {
+                        if (!p.visible) return;
+                        p.mesh.vertices.forEach((vt, idx) => {
+                            const d = Math.hypot(world.x - vt.dx, world.y - vt.dy);
+                            if (d < minD) { minD = d; bestV = { partId: p.id, index: idx }; }
+                        });
+                    });
+                    if (bestV) {
+                        pushUndoState();
+                        selectPartById(bestV.partId);
+                        studio.draggingVertex = bestV;
+                    }
+                    return;
+                }
+
+                if (studio.activeTool === 'part') {
+                    pushUndoState();
+                    for (let i = 0; i < studio.parts.length; i++) {
+                        const p = studio.parts[i];
+                        if (!p.visible) return;
+                        const b = p.mesh.bounds;
+                        if (world.x >= b.minX && world.x <= b.maxX && world.y >= b.minY && world.y <= b.maxY) {
+                            selectPartById(p.id);
+                            break;
+                        }
+                    }
+                    studio.draggingPart = true;
+                    return;
+                }
+
+                const hit = findNearestBoneEndpoint(world.x, world.y);
+                if (hit) {
+                    pushUndoState();
+                    selectBoneById(hit.boneId);
+                    studio.draggingEndpoint = hit;
+                } else {
+                    triggerPhysicsImpulse();
+                }
+            });
+
+            window.addEventListener('mousemove', (e) => {
+                const pos = getMousePos(e);
+                const world = screenToWorld(pos.x, pos.y);
+                studio.pointerScreen = pos;
+                studio.pointerWorld = world;
+
+                document.getElementById('cursorWorldCoords').textContent = `X: ${Math.round(world.x)} Y: ${Math.round(world.y)}`;
+
+                if (studio.camera.isPanning) {
+                    studio.camera.x = pos.x - studio.camera.panStartX;
+                    studio.camera.y = pos.y - studio.camera.panStartY;
+                    return;
+                }
+
+                if (studio.draggingAnchorPartId) {
+                    const p = studio.parts.find(x => x.id === studio.draggingAnchorPartId);
+                    if (p && p.anchor) {
+                        p.anchor.nx = Math.max(0.02, Math.min(0.98, world.x / RefWidth));
+                        p.anchor.ny = Math.max(0.02, Math.min(0.98, world.y / RefHeight));
+                        computePartSmoothWeights(p);
+                    }
+                    return;
+                }
+
+                if (studio.creatingBoneOrigin) {
+                    studio.creatingBoneCursor = { x: world.x, y: world.y };
+                    return;
+                }
+
+                if (studio.weightBrush.isPainting) {
+                    applyWeightBrushStroke(world.x, world.y);
+                    return;
+                }
+
+                if (studio.draggingVertex) {
+                    const part = studio.parts.find(p => p.id === studio.draggingVertex.partId);
+                    if (part && part.mesh.vertices[studio.draggingVertex.index]) {
+                        const vt = part.mesh.vertices[studio.draggingVertex.index];
+                        vt.ox += (world.x - studio.lastPointerWorld.x);
+                        vt.oy += (world.y - studio.lastPointerWorld.y);
+                    }
+                    studio.lastPointerWorld = world;
+                    return;
+                }
+
+                if (studio.draggingPart) {
+                    const part = studio.parts.find(p => p.id === studio.selectedPartId);
+                    if (part) {
+                        part.x = Math.round(part.x + (world.x - studio.lastPointerWorld.x));
+                        part.y = Math.round(part.y + (world.y - studio.lastPointerWorld.y));
+                        syncPartInspectorUI();
+                        buildSinglePartMesh(part);
+                    }
+                    studio.lastPointerWorld = world;
+                    return;
+                }
+
+                if (studio.draggingEndpoint) {
+                    const b = studio.bones.find(x => x.id === studio.draggingEndpoint.boneId);
+                    if (b) {
+                        if (studio.systemState === 'setup') {
+                            const nx = Math.max(0.02, Math.min(0.98, world.x / RefWidth));
+                            const ny = Math.max(0.02, Math.min(0.98, world.y / RefHeight));
+                            if (studio.draggingEndpoint.point === 'start') {
+                                b.nx1 = nx; b.ny1 = ny;
+                            } else if (studio.draggingEndpoint.point === 'end') {
+                                b.nx2 = nx; b.ny2 = ny;
+                            } else {
+                                const dx = (world.x - studio.lastPointerWorld.x) / RefWidth;
+                                const dy = (world.y - studio.lastPointerWorld.y) / RefHeight;
+                                b.nx1 = Math.max(0.02, Math.min(0.98, b.nx1 + dx));
+                                b.ny1 = Math.max(0.02, Math.min(0.98, b.ny1 + dy));
+                                b.nx2 = Math.max(0.02, Math.min(0.98, b.nx2 + dx));
+                                b.ny2 = Math.max(0.02, Math.min(0.98, b.ny2 + dy));
+                            }
+                            syncAnchorsWithSkeleton();
+                            recomputeAllPartsWeights(false);
+                            syncBoneInspectorUI();
+                        } else {
+                            if (!studio.anim.poseOverrides[b.id]) {
+                                studio.anim.poseOverrides[b.id] = { dAngle: 0, dx: 0, dy: 0 };
+                            }
+                            const ox = b.nx1 * RefWidth;
+                            const oy = b.ny1 * RefHeight;
+                            const restAngle = Math.atan2((b.ny2 * RefHeight) - oy, (b.nx2 * RefWidth) - ox);
+                            const curAngle = Math.atan2(world.y - oy, world.x - ox);
+                            studio.anim.poseOverrides[b.id].dAngle = curAngle - restAngle;
+                        }
+                    }
+                    studio.lastPointerWorld = world;
+                }
+            });
+
+            window.addEventListener('mouseup', () => {
+                studio.camera.isPanning = false;
+                studio.weightBrush.isPainting = false;
+                studio.draggingAnchorPartId = null;
+                studio.draggingVertex = null;
+                studio.draggingPart = false;
+                studio.draggingEndpoint = null;
+
+                if (studio.creatingBoneOrigin && studio.creatingBoneCursor) {
+                    const dist = Math.hypot(
+                        studio.creatingBoneCursor.x - studio.creatingBoneOrigin.x,
+                        studio.creatingBoneCursor.y - studio.creatingBoneOrigin.y
+                    );
+                    if (dist > 10) {
+                        const newId = 'boneExtra_' + Date.now().toString().slice(-4);
+                        const role = document.getElementById('selBoneRole').value || 'pendulum';
+                        studio.bones.push({
+                            id: newId,
+                            label: 'Hueso Extra ' + (studio.bones.length + 1),
+                            color: '#f43f5e',
+                            role,
+                            nx1: Math.max(0.02, Math.min(0.98, studio.creatingBoneOrigin.x / RefWidth)),
+                            ny1: Math.max(0.02, Math.min(0.98, studio.creatingBoneOrigin.y / RefHeight)),
+                            nx2: Math.max(0.02, Math.min(0.98, studio.creatingBoneCursor.x / RefWidth)),
+                            ny2: Math.max(0.02, Math.min(0.98, studio.creatingBoneCursor.y / RefHeight)),
+                            envelope: 1.0
+                        });
+                        const selPart = studio.parts.find(p => p.id === studio.selectedPartId);
+                        if (selPart && selPart.allowedBones) selPart.allowedBones.push(newId);
+                        studio.selectedBoneId = newId;
+                        recomputeAllPartsWeights(false);
+                        renderBoneTreeUI();
+                        syncBoneInspectorUI();
+                        renderPartBoneMaskUI();
+                    }
+                    studio.creatingBoneOrigin = null;
+                    studio.creatingBoneCursor = null;
+                    setActiveTool('bone');
+                }
+            });
+        }
+
+        function setupTimelineInteractions() {
+            const scrub = (e) => {
+                const r = timelineCanvas.getBoundingClientRect();
+                const x = e.clientX - r.left;
+                const leftPad = 120, rightPad = 24;
+                const trackW = Math.max(50, r.width - leftPad - rightPad);
+                studio.anim.time = Math.max(0, Math.min(1, (x - leftPad) / trackW)) * studio.anim.duration;
+            };
+            let dragging = false;
+            timelineCanvas.addEventListener('mousedown', (e) => { dragging = true; scrub(e); });
+            window.addEventListener('mousemove', (e) => { if (dragging) scrub(e); });
+            window.addEventListener('mouseup', () => { dragging = false; });
+        }
+
+        function renderPartTreeUI() {
+            const container = document.getElementById('partTreeContainer');
+            container.innerHTML = studio.parts.map((p, idx) => {
+                const isSel = (p.id === studio.selectedPartId);
+                return `
+                    <div onclick="selectPartById('${p.id}')" class="px-2 py-1.5 rounded border border-[#22293c] bg-[#131826] hover:border-slate-600 flex items-center justify-between gap-1 cursor-pointer transition ${isSel ? 'item-selected' : ''}">
+                        <div class="flex items-center gap-1.5 truncate">
+                            <span class="mono text-[9px] text-slate-500 w-3.5">${idx + 1}</span>
+                            <span class="w-2 h-2 rounded-full shrink-0" style="background:${p.color}"></span>
+                            <span class="truncate text-[11px] font-medium">${p.name}</span>
+                        </div>
+                        <div class="flex items-center gap-1 shrink-0" onclick="event.stopPropagation()">
+                            <button onclick="movePartZOrder(${idx}, -1)" title="Subir Capa (Adelante)" class="w-5 h-5 rounded bg-[#0d1018] hover:bg-sky-500/20 text-slate-300 flex items-center justify-center">
+                                <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
+                            </button>
+                            <button onclick="movePartZOrder(${idx}, 1)" title="Bajar Capa (Atras)" class="w-5 h-5 rounded bg-[#0d1018] hover:bg-sky-500/20 text-slate-300 flex items-center justify-center">
+                                <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+                            </button>
+                            <label title="Cargar PNG en esta Parte" class="cursor-pointer px-1.5 py-0.5 rounded bg-sky-500/15 hover:bg-sky-500/30 text-sky-300 text-[9px] font-semibold">
+                                PNG
+                                <input type="file" accept="image/png,image/jpeg,image/webp" class="hidden" onchange="importTextureForPartId('${p.id}', this.files[0])">
+                            </label>
+                            <button onclick="togglePartVisibility('${p.id}')" class="px-1.5 py-0.5 rounded bg-[#0d1018] text-[9px] mono ${p.visible ? 'text-emerald-400' : 'text-slate-600'}">
+                                ${p.visible ? 'ON' : 'OFF'}
+                            </button>
+                            <button onclick="deletePartById('${p.id}')" title="Eliminar Parte" class="w-5 h-5 rounded bg-[#0d1018] hover:bg-rose-500/25 text-rose-400 flex items-center justify-center font-bold text-[10px]">
+                                X
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderBoneTreeUI() {
+            const container = document.getElementById('boneTreeContainer');
+            container.innerHTML = studio.bones.map(b => {
+                const isSel = (b.id === studio.selectedBoneId);
+                return `
+                    <div onclick="selectBoneById('${b.id}')" class="px-2 py-1.5 rounded border border-[#22293c] bg-[#131826] hover:border-slate-600 flex items-center justify-between cursor-pointer transition ${isSel ? 'item-selected' : ''}">
+                        <div class="flex items-center gap-2 truncate">
+                            <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:${b.color}"></span>
+                            <span class="truncate text-[11px] font-medium">${b.label}</span>
+                        </div>
+                        <div class="flex items-center gap-1.5 shrink-0" onclick="event.stopPropagation()">
+                            <span class="mono text-[9px] text-slate-400">${b.role}</span>
+                            <button onclick="deleteBoneById('${b.id}')" title="Eliminar Hueso" class="w-5 h-5 rounded bg-[#0d1018] hover:bg-rose-500/25 text-rose-400 flex items-center justify-center font-bold text-[10px]">
+                                X
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderPartBoneMaskUI() {
+            const part = studio.parts.find(p => p.id === studio.selectedPartId);
+            const container = document.getElementById('partBoneMaskContainer');
+            if (!part || !container) return;
+
+            container.innerHTML = studio.bones.map(b => {
+                const checked = !part.allowedBones || part.allowedBones.includes(b.id);
+                return `
+                    <label class="flex items-center justify-between px-2 py-1 rounded bg-[#101420] border border-[#22293c] cursor-pointer">
+                        <div class="flex items-center gap-1.5 truncate">
+                            <input type="checkbox" ${checked ? 'checked' : ''} onchange="toggleBoneForSelectedPart('${b.id}', this.checked)" class="accent-sky-400">
+                            <span class="w-2 h-2 rounded-full" style="background:${b.color}"></span>
+                            <span class="truncate text-slate-200">${b.label}</span>
+                        </div>
+                        <span class="mono text-[9px] text-slate-500">${b.id}</span>
+                    </label>
+                `;
+            }).join('');
+        }
+
+        function toggleBoneForSelectedPart(boneId, enabled) {
+            pushUndoState();
+            const part = studio.parts.find(p => p.id === studio.selectedPartId);
+            if (!part) return;
+            if (!part.allowedBones) part.allowedBones = studio.bones.map(b => b.id);
+
+            if (enabled && !part.allowedBones.includes(boneId)) {
+                part.allowedBones.push(boneId);
+            } else if (!enabled && part.allowedBones.length > 1) {
+                part.allowedBones = part.allowedBones.filter(id => id !== boneId);
+            }
+            computePartSmoothWeights(part);
+            renderPartBoneMaskUI();
+        }
+
+        function bindAllBonesToSelectedPart() {
+            pushUndoState();
+            const part = studio.parts.find(p => p.id === studio.selectedPartId);
+            if (!part) return;
+            part.allowedBones = studio.bones.map(b => b.id);
+            computePartSmoothWeights(part);
+            renderPartBoneMaskUI();
+        }
+
+        function selectPartById(id) {
+            studio.selectedPartId = id;
+            renderPartTreeUI();
+            syncPartInspectorUI();
+            renderPartBoneMaskUI();
+        }
+
+        function togglePartVisibility(id) {
+            pushUndoState();
+            const p = studio.parts.find(x => x.id === id);
+            if (!p) return;
+            p.visible = !p.visible;
+            renderPartTreeUI();
+        }
+
+        function renameSelectedPart(newName) {
+            const p = studio.parts.find(x => x.id === studio.selectedPartId);
+            if (!p) return;
+            p.name = newName || p.id;
+            renderPartTreeUI();
+        }
+
+        function syncPartInspectorUI() {
+            const p = studio.parts.find(x => x.id === studio.selectedPartId);
+            if (!p) return;
+            document.getElementById('lblSelectedPartId').textContent = p.name;
+            document.getElementById('inpPartName').value = p.name;
+            document.getElementById('sl_partX').value = p.x;
+            document.getElementById('sl_partY').value = p.y;
+            document.getElementById('sl_partSX').value = p.scaleX;
+            document.getElementById('sl_partSY').value = p.scaleY;
+            document.getElementById('sl_partRot').value = p.rot;
+
+            document.getElementById('val_partX').textContent = p.x + ' px';
+            document.getElementById('val_partY').textContent = p.y + ' px';
+            document.getElementById('val_partSX').textContent = Math.round(p.scaleX * 100) + '%';
+            document.getElementById('val_partSY').textContent = Math.round(p.scaleY * 100) + '%';
+            document.getElementById('val_partRot').textContent = p.rot + ' deg';
+
+            const selAnchor = document.getElementById('selPartAnchorBone');
+            const optionsHtml = studio.bones.map(b => `<option value="${b.id}">${b.id} (${b.label})</option>`).join('') + `<option value="none">Sin Anclaje Fijo</option>`;
+            selAnchor.innerHTML = optionsHtml;
+
+            const anc = p.anchor || { parentBone: 'none', nx: 0.5, ny: 0.3, radiusPct: 12, strength: 0 };
+            const radPct = anc.radiusPct !== undefined ? anc.radiusPct : 12;
+            selAnchor.value = studio.bones.some(b => b.id === anc.parentBone) ? anc.parentBone : 'none';
+            document.getElementById('sl_anchorStrength').value = Math.round((anc.strength || 0) * 100);
+            document.getElementById('val_anchorStrength').textContent = Math.round((anc.strength || 0) * 100) + '%';
+            document.getElementById('sl_anchorRadius').value = radPct;
+            document.getElementById('val_anchorRadius').textContent = radPct + '%';
+
+            renderPartBoneMaskUI();
+        }
+
+        function updateSelectedPartAnchorSettings() {
+            const p = studio.parts.find(x => x.id === studio.selectedPartId);
+            if (!p) return;
+            if (!p.anchor) p.anchor = { parentBone: 'torso', nx: 0.49, ny: 0.30, radiusPct: 12, strength: 0.85 };
+            p.anchor.parentBone = document.getElementById('selPartAnchorBone').value;
+            p.anchor.strength = parseFloat(document.getElementById('sl_anchorStrength').value) / 100;
+            p.anchor.radiusPct = parseFloat(document.getElementById('sl_anchorRadius').value);
+
+            document.getElementById('val_anchorStrength').textContent = Math.round(p.anchor.strength * 100) + '%';
+            document.getElementById('val_anchorRadius').textContent = p.anchor.radiusPct + '%';
+            computePartSmoothWeights(p);
+        }
+
+        function updateSelectedPartTransformFromSliders() {
+            const p = studio.parts.find(x => x.id === studio.selectedPartId);
+            if (!p) return;
+            p.x = parseFloat(document.getElementById('sl_partX').value);
+            p.y = parseFloat(document.getElementById('sl_partY').value);
+            p.scaleX = parseFloat(document.getElementById('sl_partSX').value);
+            p.scaleY = parseFloat(document.getElementById('sl_partSY').value);
+            p.rot = parseFloat(document.getElementById('sl_partRot').value);
+            syncPartInspectorUI();
+            buildSinglePartMesh(p);
+        }
+
+        function resetSelectedPartTransform() {
+            pushUndoState();
+            const p = studio.parts.find(x => x.id === studio.selectedPartId);
+            if (!p) return;
+            p.x = 0; p.y = 0; p.scaleX = 1.0; p.scaleY = 1.0; p.rot = 0;
+            syncPartInspectorUI();
+            buildSinglePartMesh(p);
+        }
+
+        function selectBoneById(id) {
+            studio.selectedBoneId = id;
+            document.getElementById('lblSelectedBoneId').textContent = id;
+            document.getElementById('lblWeightBoneTarget').textContent = id;
+            document.getElementById('weightActiveBoneLabel').textContent = id;
+            renderBoneTreeUI();
+            syncBoneInspectorUI();
+        }
+
+        function renameSelectedBone(val) {
+            const b = studio.bones.find(x => x.id === studio.selectedBoneId);
+            if (!b) return;
+            b.label = val || b.id;
+            renderBoneTreeUI();
+            renderPartBoneMaskUI();
+        }
+
+        function syncBoneInspectorUI() {
+            const b = studio.bones.find(x => x.id === studio.selectedBoneId);
+            if (!b) return;
+            document.getElementById('inpBoneLabel').value = b.label;
+            document.getElementById('selBoneRole').value = b.role;
+            document.getElementById('sl_boneX1').value = (b.nx1 * 100).toFixed(1);
+            document.getElementById('sl_boneY1').value = (b.ny1 * 100).toFixed(1);
+            document.getElementById('sl_boneX2').value = (b.nx2 * 100).toFixed(1);
+            document.getElementById('sl_boneY2').value = (b.ny2 * 100).toFixed(1);
+
+            document.getElementById('val_boneX1').textContent = Math.round(b.nx1 * 100) + '%';
+            document.getElementById('val_boneY1').textContent = Math.round(b.ny1 * 100) + '%';
+            document.getElementById('val_boneX2').textContent = Math.round(b.nx2 * 100) + '%';
+            document.getElementById('val_boneY2').textContent = Math.round(b.ny2 * 100) + '%';
+            document.getElementById('sl_boneEnvelope').value = b.envelope || 1.0;
+            document.getElementById('val_boneEnvelope').textContent = (b.envelope || 1.0).toFixed(2);
+        }
+
+        function updateSelectedBoneCoordsFromSliders() {
+            const b = studio.bones.find(x => x.id === studio.selectedBoneId);
+            if (!b) return;
+            b.nx1 = parseFloat(document.getElementById('sl_boneX1').value) / 100;
+            b.ny1 = parseFloat(document.getElementById('sl_boneY1').value) / 100;
+            b.nx2 = parseFloat(document.getElementById('sl_boneX2').value) / 100;
+            b.ny2 = parseFloat(document.getElementById('sl_boneY2').value) / 100;
+            syncBoneInspectorUI();
+            syncAnchorsWithSkeleton();
+            recomputeAllPartsWeights(false);
+        }
+
+        function updateSelectedBoneRole(role) {
+            const b = studio.bones.find(x => x.id === studio.selectedBoneId);
+            if (!b) return;
+            b.role = role;
+            renderBoneTreeUI();
+        }
+
+        function updateSelectedBoneEnvelope(val) {
+            const b = studio.bones.find(x => x.id === studio.selectedBoneId);
+            if (!b) return;
+            b.envelope = parseFloat(val);
+            document.getElementById('val_boneEnvelope').textContent = b.envelope.toFixed(2);
+            recomputeAllPartsWeights(false);
+        }
+
+        function setSystemState(st) {
+            studio.systemState = st;
+            const bSetup = document.getElementById('btnStateSetup');
+            const bAnim = document.getElementById('btnStateAnimate');
+            if (st === 'setup') {
+                bSetup.className = 'px-3 py-1 rounded text-[11px] transition mode-setup-active flex items-center gap-1';
+                bAnim.className = 'px-3 py-1 rounded text-[11px] transition text-slate-400 hover:text-white flex items-center gap-1';
+            } else {
+                bAnim.className = 'px-3 py-1 rounded text-[11px] transition mode-animate-active flex items-center gap-1';
+                bSetup.className = 'px-3 py-1 rounded text-[11px] transition text-slate-400 hover:text-white flex items-center gap-1';
+            }
+        }
+
+        function setActiveTool(tool) {
+            studio.activeTool = tool;
+            ['bone', 'anchor', 'createBone', 'part', 'weights', 'vertex', 'pan'].forEach(t => {
+                const btn = document.getElementById('toolBtn_' + t);
+                if (btn) {
+                    btn.className = (t === tool)
+                        ? 'w-8 h-8 rounded border flex items-center justify-center transition tool-active'
+                        : 'w-8 h-8 rounded border border-transparent flex items-center justify-center text-slate-400 hover:text-white transition';
+                }
+            });
+
+            const legend = document.getElementById('weightLegendOverlay');
+            if (tool === 'weights') {
+                switchRightTab('weights');
+                legend.classList.remove('hidden');
+            } else if (tool === 'part' || tool === 'anchor') {
+                switchRightTab('part');
+                if (!studio.flags.showWeights) legend.classList.add('hidden');
+            } else if (!studio.flags.showWeights) {
+                legend.classList.add('hidden');
+            }
+        }
+
+        function toggleViewFlag(flagKey) {
+            studio.flags[flagKey] = !studio.flags[flagKey];
+            const map = {
+                showGrid: 'toggleBtn_grid',
+                showWire: 'toggleBtn_wire',
+                showBones: 'toggleBtn_bones',
+                showAnchors: 'toggleBtn_anchors',
+                showWeights: 'toggleBtn_weights',
+                footIK: 'toggleBtn_ik'
+            };
+            const btn = document.getElementById(map[flagKey]);
+            if (btn) {
+                btn.className = studio.flags[flagKey]
+                    ? 'px-2 py-1 rounded border border-sky-500/40 bg-sky-500/15 text-sky-300 text-[10px] font-medium'
+                    : 'px-2 py-1 rounded border border-[#28324e] bg-[#161b29] text-slate-400 text-[10px] font-medium';
+            }
+            const legend = document.getElementById('weightLegendOverlay');
+            if (studio.flags.showWeights || studio.activeTool === 'weights') {
+                legend.classList.remove('hidden');
+            } else {
+                legend.classList.add('hidden');
+            }
+        }
+
+        function switchRightTab(tab) {
+            ['part', 'weights', 'anim'].forEach(t => {
+                const btn = document.getElementById('rightTab_' + t);
+                const panel = document.getElementById('rightPanel_' + t);
+                if (t === tab) {
+                    btn.className = 'py-2 text-center tab-active transition';
+                    panel.classList.remove('hidden');
+                } else {
+                    btn.className = 'py-2 text-center text-slate-400 hover:text-white transition';
+                    panel.classList.add('hidden');
+                }
+            });
+        }
+
+        function setWeightBrushMode(mode) {
+            studio.weightBrush.mode = mode;
+            ['add', 'sub', 'smooth'].forEach(m => {
+                const btn = document.getElementById('wMode_' + m);
+                if (btn) {
+                    btn.className = (m === mode)
+                        ? 'py-1.5 rounded bg-sky-500/20 border border-sky-400 text-white text-[10px] font-semibold'
+                        : 'py-1.5 rounded bg-[#101420] border border-[#252d44] text-slate-300 text-[10px] font-semibold';
+                }
+            });
+        }
+
+        function syncWeightBrushSliders() {
+            studio.weightBrush.radiusPct = parseFloat(document.getElementById('sl_brushRadius').value);
+            studio.weightBrush.strength = parseFloat(document.getElementById('sl_brushStrength').value);
+            document.getElementById('val_brushRadius').textContent = studio.weightBrush.radiusPct + '%';
+            document.getElementById('val_brushStrength').textContent = studio.weightBrush.strength.toFixed(2);
+        }
+
+        function syncAnimSliders() {
+            studio.anim.speed = parseFloat(document.getElementById('sl_animSpeed').value);
+            studio.anim.breath = parseFloat(document.getElementById('sl_animBreath').value);
+            studio.anim.hipX = parseFloat(document.getElementById('sl_animHipX').value);
+            studio.anim.hipY = parseFloat(document.getElementById('sl_animHipY').value);
+            studio.anim.armSwing = parseFloat(document.getElementById('sl_animArm').value);
+            studio.anim.forearmSwing = parseFloat(document.getElementById('sl_animForearm').value);
+            studio.anim.pendulumSwing = parseFloat(document.getElementById('sl_animPendulum').value);
+            studio.anim.headTilt = parseFloat(document.getElementById('sl_animHead').value);
+
+            document.getElementById('val_animSpeed').textContent = studio.anim.speed.toFixed(1);
+            document.getElementById('val_animBreath').textContent = studio.anim.breath.toFixed(3);
+            document.getElementById('val_animHipX').textContent = studio.anim.hipX.toFixed(1);
+            document.getElementById('val_animHipY').textContent = studio.anim.hipY.toFixed(1);
+            document.getElementById('val_animArm').textContent = studio.anim.armSwing.toFixed(1) + ' deg';
+            document.getElementById('val_animForearm').textContent = studio.anim.forearmSwing.toFixed(1) + ' deg';
+            document.getElementById('val_animPendulum').textContent = studio.anim.pendulumSwing.toFixed(1) + ' deg';
+            document.getElementById('val_animHead').textContent = studio.anim.headTilt.toFixed(1) + ' deg';
+        }
+
+        function togglePlayback() {
+            studio.anim.playing = !studio.anim.playing;
+            if (studio.anim.playing && studio.systemState === 'setup') {
+                setSystemState('animate');
+            }
+            document.getElementById('lblPlayState').textContent = studio.anim.playing ? 'Pausar' : 'Reproducir';
+        }
+
+        function stopPlayback() {
+            studio.anim.poseOverrides = {};
+            studio.anim.time = 0;
+        }
+
+        function selectAnimationClip(clip) {
+            studio.anim.clip = clip;
+            setSystemState('animate');
+            triggerPhysicsImpulse();
+        }
+
+        function recordCurrentPoseKeyframe() {
+            const list = studio.anim.keyframes[studio.anim.clip] || [];
+            const t = Number(studio.anim.time.toFixed(2));
+            if (!list.some(k => Math.abs(k - t) < 0.04)) {
+                list.push(t);
+                list.sort((a, b) => a - b);
+            }
+        }
+
+        function deleteKeyframeAtCursor() {
+            const list = studio.anim.keyframes[studio.anim.clip] || [];
+            const t = studio.anim.time;
+            studio.anim.keyframes[studio.anim.clip] = list.filter(k => Math.abs(k - t) > 0.08);
+        }
+
+        function triggerPhysicsImpulse() {
+            studio.anim.gustVel += 22;
+        }
+
+        function buildSmartTextureAtlas() {
+            const pad = 6;
+            const items = [];
+
+            studio.parts.forEach((part, orderIdx) => {
+                updatePartBakedCanvas(part);
+                const w = RefWidth;
+                const h = RefHeight;
+                const data = part.bakedCanvas.getContext('2d').getImageData(0, 0, w, h).data;
+
+                let minX = w, minY = h, maxX = 0, maxY = 0, found = false;
+                for (let y = 0; y < h; y++) {
+                    for (let x = 0; x < w; x++) {
+                        if (data[(y * w + x) * 4 + 3] > 0) {
+                            if (x < minX) minX = x;
+                            if (x > maxX) maxX = x;
+                            if (y < minY) minY = y;
+                            if (y > maxY) maxY = y;
+                            found = true;
+                        }
+                    }
+                }
+
+                if (!found) {
+                    minX = 0; minY = 0; maxX = 32; maxY = 32;
+                }
+
+                const margin = 8;
+                minX = Math.max(0, minX - margin);
+                minY = Math.max(0, minY - margin);
+                maxX = Math.min(w, maxX + margin);
+                maxY = Math.min(h, maxY + margin);
+
+                const cw = Math.max(16, maxX - minX);
+                const ch = Math.max(16, maxY - minY);
+
+                items.push({
+                    part,
+                    orderIdx,
+                    cropX: minX,
+                    cropY: minY,
+                    cropW: cw,
+                    cropH: ch,
+                    atlasX: 0,
+                    atlasY: 0
+                });
+            });
+
+            const sorted = items.slice().sort((a, b) => b.cropH - a.cropH);
+            const totalArea = sorted.reduce((acc, it) => acc + (it.cropW + pad * 2) * (it.cropH + pad * 2), 0);
+            const maxSingleW = Math.max(64, ...sorted.map(it => it.cropW + pad * 2));
+            let targetWidth = Math.max(maxSingleW, Math.ceil(Math.sqrt(totalArea * 1.15)));
+            const pow2 = Math.pow(2, Math.ceil(Math.log2(targetWidth)));
+            if (pow2 <= 4096 && pow2 / targetWidth < 1.35) targetWidth = pow2;
+
+            let curX = pad;
+            let curY = pad;
+            let rowH = 0;
+            let usedWidth = 0;
+
+            sorted.forEach(it => {
+                if (curX + it.cropW + pad > targetWidth) {
+                    curX = pad;
+                    curY += rowH + pad;
+                    rowH = 0;
+                }
+                it.atlasX = curX;
+                it.atlasY = curY;
+                curX += it.cropW + pad;
+                if (curX > usedWidth) usedWidth = curX;
+                if (it.cropH > rowH) rowH = it.cropH;
+            });
+
+            const atlasW = Math.max(64, usedWidth + pad);
+            const atlasH = Math.max(64, curY + rowH + pad);
+
+            studio.packedAtlasCanvas.width = atlasW;
+            studio.packedAtlasCanvas.height = atlasH;
+            const actx = studio.packedAtlasCanvas.getContext('2d');
+            actx.clearRect(0, 0, atlasW, atlasH);
+
+            items.forEach(it => {
+                actx.drawImage(
+                    it.part.bakedCanvas,
+                    it.cropX, it.cropY, it.cropW, it.cropH,
+                    it.atlasX, it.atlasY, it.cropW, it.cropH
+                );
+            });
+
+            const rawSeparatePixels = Math.max(1, studio.parts.length * RefWidth * RefHeight);
+            const atlasPixels = atlasW * atlasH;
+            const savedPercent = Math.max(0, Math.round((1 - atlasPixels / rawSeparatePixels) * 100));
+
+            studio.packedAtlasMeta = {
+                atlasW,
+                atlasH,
+                savedPercent,
+                items
+            };
+
+            return studio.packedAtlasMeta;
+        }
+
+        function buildSpineUnityJSON() {
+            const meta = buildSmartTextureAtlas();
+            const w = RefWidth;
+            const h = RefHeight;
+
+            const layersData = meta.items.map((it, idx) => {
+                const p = it.part;
+                const anc = p.anchor || { parentBone: 'torso', nx: 0.49, ny: 0.30, radiusPct: 12, strength: 0.85 };
+
+                const u0 = it.atlasX / meta.atlasW;
+                const u1 = (it.atlasX + it.cropW) / meta.atlasW;
+                const v0 = 1.0 - (it.atlasY + it.cropH) / meta.atlasH;
+                const v1 = 1.0 - it.atlasY / meta.atlasH;
+
+                const cx0 = it.cropX / w;
+                const cx1 = (it.cropX + it.cropW) / w;
+                const cy0 = 1.0 - (it.cropY + it.cropH) / h;
+                const cy1 = 1.0 - it.cropY / h;
+
+                return {
+                    zOrderIndex: idx,
+                    slotName: p.name,
+                    id: p.id,
+                    visible: p.visible,
+                    mainBone: (p.allowedBones && p.allowedBones[0]) || 'torso',
+                    parentBone: anc.parentBone || 'torso',
+                    allowedBones: p.allowedBones || [],
+                    anchorWeld: {
+                        parentBone: anc.parentBone || 'torso',
+                        nx: Number((anc.nx !== undefined ? anc.nx : 0.49).toFixed(4)),
+                        ny: Number((anc.ny !== undefined ? anc.ny : 0.30).toFixed(4)),
+                        radiusPct: anc.radiusPct !== undefined ? anc.radiusPct : 12,
+                        strength: Number((anc.strength !== undefined ? anc.strength : 0.85).toFixed(3))
+                    },
+                    canvasRect: {
+                        xMin: Number(cx0.toFixed(5)),
+                        yMin: Number(cy0.toFixed(5)),
+                        xMax: Number(cx1.toFixed(5)),
+                        yMax: Number(cy1.toFixed(5))
+                    },
+                    atlasRect: {
+                        uMin: Number(u0.toFixed(5)),
+                        vMin: Number(v0.toFixed(5)),
+                        uMax: Number(u1.toFixed(5)),
+                        vMax: Number(v1.toFixed(5))
+                    }
+                };
+            });
+
+            const exportData = {
+                exporter: 'LiamToolAvatar2Unity V2',
+                preset: studio.activeLayerPreset,
+                skeleton: {
+                    width: w,
+                    height: h,
+                    atlasWidth: meta.atlasW,
+                    atlasHeight: meta.atlasH,
+                    fps: 60
+                },
+                animation: {
+                    cycleSpeed: studio.anim.speed,
+                    breathAmount: studio.anim.breath,
+                    hipSwayX: Number((studio.anim.hipX * 0.004).toFixed(4)),
+                    hipBounceY: Number((studio.anim.hipY * 0.004).toFixed(4)),
+                    armSwingDeg: studio.anim.armSwing,
+                    forearmSwingDeg: studio.anim.forearmSwing,
+                    pendulumSwingDeg: studio.anim.pendulumSwing,
+                    headTiltDeg: studio.anim.headTilt,
+                    lockFeetIK: studio.flags.footIK
+                },
+                bones: studio.bones.map(b => ({
+                    name: b.id,
+                    label: b.label,
+                    role: b.role,
+                    restStart: { x: Number(b.nx1.toFixed(4)), y: Number((1 - b.ny1).toFixed(4)) },
+                    restEnd: { x: Number(b.nx2.toFixed(4)), y: Number((1 - b.ny2).toFixed(4)) },
+                    envelope: b.envelope
+                })),
+                layers: layersData,
+                animations: studio.anim.keyframes
+            };
+
+            return JSON.stringify(exportData, null, 2);
+        }
+
+        function buildUnityCSharpScript() {
+            const meta = buildSmartTextureAtlas();
+            const w = RefWidth;
+            const h = RefHeight;
+            const cols = studio.meshConfig.cols || 22;
+            const rows = Math.round(cols * 1.35);
+
+            const defaultLayersCode = meta.items.map(it => {
+                const p = it.part;
+                const anc = p.anchor || { parentBone: 'torso', nx: 0.49, ny: 0.30, radiusPct: 12, strength: 0.85 };
+                const safeName = (p.name || p.id).replace(/"/g, '');
+                const ax = (anc.nx !== undefined ? anc.nx : 0.49).toFixed(4);
+                const ay = (1.0 - (anc.ny !== undefined ? anc.ny : 0.30)).toFixed(4);
+                const str = (anc.strength !== undefined ? anc.strength : 0.85).toFixed(3);
+
+                const u0 = (it.atlasX / meta.atlasW).toFixed(5);
+                const u1 = ((it.atlasX + it.cropW) / meta.atlasW).toFixed(5);
+                const v0 = (1.0 - (it.atlasY + it.cropH) / meta.atlasH).toFixed(5);
+                const v1 = (1.0 - it.atlasY / meta.atlasH).toFixed(5);
+
+                const cx0 = (it.cropX / w).toFixed(5);
+                const cx1 = ((it.cropX + it.cropW) / w).toFixed(5);
+                const cy0 = (1.0 - (it.cropY + it.cropH) / h).toFixed(5);
+                const cy1 = (1.0 - it.cropY / h).toFixed(5);
+
+                return `            new AvatarPartLayer { partName = "${safeName}", visible = ${p.visible ? 'true' : 'false'}, anchorUV = new Vector2(${ax}f, ${ay}f), seamWeldStrength = ${str}f, canvasRect = new Vector4(${cx0}f, ${cy0}f, ${cx1}f, ${cy1}f), atlasRect = new Vector4(${u0}f, ${v0}f, ${u1}f, ${v1}f) }`;
+            }).join(',\n');
+
+            const cleanPartNames = studio.parts.map(p => (p.name || p.id).replace(/"/g, "'")).join(', ');
+
+            return `using UnityEngine;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Text.RegularExpressions;
+
+public class LiamAvatar2UnityRuntime : MonoBehaviour
+{
+    [System.Serializable]
+    public class AvatarPartLayer
+    {
+        public string partName;
+        public bool visible = true;
+        public Texture2D partTexture;
+        public Vector2 anchorUV = new Vector2(0.49f, 0.72f);
+        [Range(0f, 1f)] public float seamWeldStrength = 0.85f;
+        public Vector4 canvasRect = new Vector4(0f, 0f, 1f, 1f);
+        public Vector4 atlasRect = new Vector4(0f, 0f, 1f, 1f);
+
+        [HideInInspector] public Mesh runtimeMesh;
+        [HideInInspector] public Vector3[] restVerts;
+        [HideInInspector] public Vector3[] deformedVerts;
+        [HideInInspector] public Vector2[] canvasUVs;
+        [HideInInspector] public Vector2[] meshUVs;
+    }
+
+    [Header("1. Atlas Unico y Archivo JSON (Alta Resolucion ${w}x${h})")]
+    public TextAsset jsonFile;
+    public Texture2D sharedAtlasTexture;
+    public float canvasWidth = ${w}f;
+    public float canvasHeight = ${h}f;
+
+    [Header("2. Capas en Orden Z (${cleanPartNames})")]
+    public List<AvatarPartLayer> avatarParts = new List<AvatarPartLayer>();
+
+    [Header("3. Parametros de Malla y Animacion")]
+    public int gridColumns = ${cols};
+    public int gridRows = ${rows};
+    public float worldScale = 5.0f;
+    public float cycleSpeed = ${studio.anim.speed.toFixed(2)}f;
+    public float breathAmount = ${studio.anim.breath.toFixed(3)}f;
+    public float hipSwayX = ${(studio.anim.hipX * 0.004).toFixed(4)}f;
+    public float hipBounceY = ${(studio.anim.hipY * 0.004).toFixed(4)}f;
+    public float armSwingDeg = ${studio.anim.armSwing.toFixed(2)}f;
+    public float headTiltDeg = ${studio.anim.headTilt.toFixed(2)}f;
+    public float legSwingAmount = 0.015f;
+    public bool lockFeetIK = ${studio.flags.footIK ? 'true' : 'false'};
+
+    [ContextMenu("Cargar Datos desde JSON")]
+    public void LoadFromJsonInEditor()
+    {
+        if (jsonFile == null)
+        {
+            EnsureDefaultLayers();
+            return;
+        }
+        ParseJsonData(jsonFile.text);
+    }
+
+    private void EnsureDefaultLayers()
+    {
+        if (avatarParts != null && avatarParts.Count > 0) return;
+        avatarParts = new List<AvatarPartLayer>
+        {
+${defaultLayersCode}
+        };
+    }
+
+    void Start()
+    {
+        if (jsonFile != null)
+        {
+            ParseJsonData(jsonFile.text);
+        }
+        else
+        {
+            EnsureDefaultLayers();
+        }
+
+        float aspect = canvasWidth / Mathf.Max(1f, canvasHeight);
+
+        for (int pIdx = 0; pIdx < avatarParts.Count; pIdx++)
+        {
+            AvatarPartLayer layer = avatarParts[pIdx];
+            GameObject child = new GameObject("Part_" + layer.partName);
+            child.transform.SetParent(transform, false);
+            child.SetActive(layer.visible);
+
+            MeshFilter mf = child.AddComponent<MeshFilter>();
+            MeshRenderer mr = child.AddComponent<MeshRenderer>();
+
+            Shader spriteShader = Shader.Find("Sprites/Default");
+            if (spriteShader == null) spriteShader = Shader.Find("Unlit/Transparent");
+            mr.material = new Material(spriteShader);
+            mr.sortingOrder = (avatarParts.Count - pIdx) * 10;
+
+            bool useAtlas = (layer.partTexture == null && sharedAtlasTexture != null);
+            if (layer.partTexture != null)
+            {
+                mr.material.mainTexture = layer.partTexture;
+            }
+            else if (sharedAtlasTexture != null)
+            {
+                mr.material.mainTexture = sharedAtlasTexture;
+            }
+
+            layer.runtimeMesh = new Mesh { name = "Mesh_" + layer.partName };
+            mf.mesh = layer.runtimeMesh;
+
+            int vCount = (gridColumns + 1) * (gridRows + 1);
+            layer.restVerts = new Vector3[vCount];
+            layer.deformedVerts = new Vector3[vCount];
+            layer.canvasUVs = new Vector2[vCount];
+            layer.meshUVs = new Vector2[vCount];
+
+            Vector4 cRect = useAtlas ? layer.canvasRect : new Vector4(0f, 0f, 1f, 1f);
+            Vector4 aRect = useAtlas ? layer.atlasRect : new Vector4(0f, 0f, 1f, 1f);
+
+            int idx = 0;
+            for (int r = 0; r <= gridRows; r++)
+            {
+                float ty = (float)r / gridRows;
+                float cy = Mathf.Lerp(cRect.y, cRect.w, ty);
+                float vy = Mathf.Lerp(aRect.y, aRect.w, ty);
+
+                for (int c = 0; c <= gridColumns; c++)
+                {
+                    float tx = (float)c / gridColumns;
+                    float cx = Mathf.Lerp(cRect.x, cRect.z, tx);
+                    float ux = Mathf.Lerp(aRect.x, aRect.z, tx);
+
+                    layer.canvasUVs[idx] = new Vector2(cx, cy);
+                    layer.meshUVs[idx] = new Vector2(ux, vy);
+                    layer.restVerts[idx] = new Vector3((cx - 0.5f) * worldScale * aspect, (cy - 0.5f) * worldScale, 0f);
+                    idx++;
+                }
+            }
+
+            int[] tris = new int[gridColumns * gridRows * 6];
+            int t = 0;
+            for (int r = 0; r < gridRows; r++)
+            {
+                for (int c = 0; c < gridColumns; c++)
+                {
+                    int i0 = r * (gridColumns + 1) + c;
+                    int i1 = i0 + 1;
+                    int i2 = i0 + (gridColumns + 1);
+                    int i3 = i2 + 1;
+                    tris[t++] = i0; tris[t++] = i2; tris[t++] = i1;
+                    tris[t++] = i1; tris[t++] = i2; tris[t++] = i3;
+                }
+            }
+
+            layer.runtimeMesh.vertices = layer.restVerts;
+            layer.runtimeMesh.uv = layer.meshUVs;
+            layer.runtimeMesh.triangles = tris;
+            layer.runtimeMesh.RecalculateBounds();
+        }
+    }
+
+    void Update()
+    {
+        float phase = Time.time * cycleSpeed;
+        float sinP = Mathf.Sin(phase);
+        float cosP = Mathf.Cos(phase);
+        float aspect = canvasWidth / Mathf.Max(1f, canvasHeight);
+
+        foreach (AvatarPartLayer layer in avatarParts)
+        {
+            if (layer.runtimeMesh == null || !layer.visible) continue;
+            string n = (layer.partName ?? "").ToLower();
+
+            Vector3 anchorWorld = new Vector3(
+                (layer.anchorUV.x - 0.5f) * worldScale * aspect,
+                (layer.anchorUV.y - 0.5f) * worldScale,
+                0f
+            );
+
+            for (int i = 0; i < layer.restVerts.Length; i++)
+            {
+                Vector3 p = layer.restVerts[i];
+                Vector2 cuv = layer.canvasUVs[i];
+
+                float groundLock = lockFeetIK ? Mathf.Clamp01((cuv.y - 0.05f) * 2.2f) : 1.0f;
+                float distToAnchor = Vector2.Distance(cuv, layer.anchorUV);
+                float mobileFactor = Mathf.Clamp01(distToAnchor / 0.12f) * (1f - layer.seamWeldStrength * Mathf.Exp(-distToAnchor * 15f));
+
+                if (n.Contains("cabeza") || n.Contains("head") || n.Contains("cabello") || n.Contains("lentes") || n.Contains("ojos"))
+                {
+                    float rad = Mathf.Sin(phase - 0.5f) * headTiltDeg * Mathf.Deg2Rad * mobileFactor;
+                    p = RotateAround2D(p, anchorWorld, rad);
+                }
+                else if (n.Contains("brazo") || n.Contains("arm"))
+                {
+                    float dir = (n.Contains("2") || n.Contains("der")) ? -1f : 1f;
+                    float rad = -Mathf.Sin(phase - 0.35f) * dir * armSwingDeg * Mathf.Deg2Rad * mobileFactor;
+                    p = RotateAround2D(p, anchorWorld, rad);
+                }
+                else if (n.Contains("falda") || n.Contains("skirt") || n.Contains("correa"))
+                {
+                    p.x += Mathf.Sin(phase - 0.4f) * (hipSwayX * 1.1f) * mobileFactor;
+                }
+                else if (n.Contains("pierna") || n.Contains("leg") || n.Contains("muslo") || n.Contains("calceta") || n.Contains("pantalon"))
+                {
+                    p.x += cosP * legSwingAmount * mobileFactor * groundLock;
+                }
+
+                p.x += cosP * hipSwayX * groundLock;
+                p.y -= Mathf.Abs(sinP) * hipBounceY * groundLock;
+                p.y += sinP * breathAmount * Mathf.Clamp01(cuv.y - 0.48f);
+
+                layer.deformedVerts[i] = p;
+            }
+
+            layer.runtimeMesh.vertices = layer.deformedVerts;
+        }
+    }
+
+    private Vector3 RotateAround2D(Vector3 pt, Vector3 pivot, float rad)
+    {
+        float c = Mathf.Cos(rad);
+        float s = Mathf.Sin(rad);
+        float dx = pt.x - pivot.x;
+        float dy = pt.y - pivot.y;
+        return new Vector3(pivot.x + dx * c - dy * s, pivot.y + dx * s + dy * c, pt.z);
+    }
+
+    public void ParseJsonData(string jsonText)
+    {
+        if (string.IsNullOrEmpty(jsonText)) return;
+
+        Match wMatch = Regex.Match(jsonText, @"""width""\\s*:\\s*(\\d+)");
+        Match hMatch = Regex.Match(jsonText, @"""height""\\s*:\\s*(\\d+)");
+        if (wMatch.Success) canvasWidth = float.Parse(wMatch.Groups[1].Value, CultureInfo.InvariantCulture);
+        if (hMatch.Success) canvasHeight = float.Parse(hMatch.Groups[1].Value, CultureInfo.InvariantCulture);
+
+        cycleSpeed = ParseFloatKey(jsonText, "cycleSpeed", cycleSpeed);
+        breathAmount = ParseFloatKey(jsonText, "breathAmount", breathAmount);
+        hipSwayX = ParseFloatKey(jsonText, "hipSwayX", hipSwayX);
+        hipBounceY = ParseFloatKey(jsonText, "hipBounceY", hipBounceY);
+        armSwingDeg = ParseFloatKey(jsonText, "armSwingDeg", armSwingDeg);
+        headTiltDeg = ParseFloatKey(jsonText, "headTiltDeg", headTiltDeg);
+
+        Dictionary<string, Texture2D> savedTextures = new Dictionary<string, Texture2D>();
+        foreach (AvatarPartLayer existing in avatarParts)
+        {
+            if (!string.IsNullOrEmpty(existing.partName) && existing.partTexture != null)
+            {
+                savedTextures[existing.partName] = existing.partTexture;
+            }
+        }
+
+        List<AvatarPartLayer> parsed = new List<AvatarPartLayer>();
+        string[] blocks = jsonText.Split(new string[] { "\\"slotName\\"" }, System.StringSplitOptions.RemoveEmptyEntries);
+
+        for (int s = 1; s < blocks.Length; s++)
+        {
+            string b = blocks[s];
+            AvatarPartLayer layer = new AvatarPartLayer();
+
+            Match mName = Regex.Match(b, @"^\\s*:\\s*""([^""]+)""");
+            if (mName.Success) layer.partName = mName.Groups[1].Value;
+
+            Match mVis = Regex.Match(b, @"""visible""\\s*:\\s*(true|false)");
+            if (mVis.Success) layer.visible = (mVis.Groups[1].Value == "true");
+
+            Match mNx = Regex.Match(b, @"""nx""\\s*:\\s*([-+]?[0-9]*\\.?[0-9]+)");
+            Match mNy = Regex.Match(b, @"""ny""\\s*:\\s*([-+]?[0-9]*\\.?[0-9]+)");
+            if (mNx.Success && mNy.Success)
+            {
+                float nx = float.Parse(mNx.Groups[1].Value, CultureInfo.InvariantCulture);
+                float ny = float.Parse(mNy.Groups[1].Value, CultureInfo.InvariantCulture);
+                layer.anchorUV = new Vector2(nx, 1f - ny);
+            }
+
+            Match mStr = Regex.Match(b, @"""strength""\\s*:\\s*([-+]?[0-9]*\\.?[0-9]+)");
+            if (mStr.Success) layer.seamWeldStrength = float.Parse(mStr.Groups[1].Value, CultureInfo.InvariantCulture);
+
+            layer.canvasRect = new Vector4(
+                ParseFloatKey(b, "xMin", 0f),
+                ParseFloatKey(b, "yMin", 0f),
+                ParseFloatKey(b, "xMax", 1f),
+                ParseFloatKey(b, "yMax", 1f)
+            );
+
+            layer.atlasRect = new Vector4(
+                ParseFloatKey(b, "uMin", 0f),
+                ParseFloatKey(b, "vMin", 0f),
+                ParseFloatKey(b, "uMax", 1f),
+                ParseFloatKey(b, "vMax", 1f)
+            );
+
+            if (!string.IsNullOrEmpty(layer.partName) && savedTextures.TryGetValue(layer.partName, out Texture2D tex))
+            {
+                layer.partTexture = tex;
+            }
+
+            parsed.Add(layer);
+        }
+
+        if (parsed.Count > 0) avatarParts = parsed;
+    }
+
+    private float ParseFloatKey(string text, string key, float fallback)
+    {
+        Match m = Regex.Match(text, "\\"" + key + "\\"\\\\s*:\\\\s*([-+]?[0-9]*\\\\.?[0-9]+)");
+        if (m.Success) return float.Parse(m.Groups[1].Value, CultureInfo.InvariantCulture);
+        return fallback;
+    }
+}`;
+        }
+
+        function openExportModal() {
+            const meta = buildSmartTextureAtlas();
+            document.getElementById('badgeAtlasStats').textContent = `Atlas: ${meta.atlasW}x${meta.atlasH} px (${meta.savedPercent}% espacio vacio ahorrado)`;
+
+            const prevCanvas = document.getElementById('atlasPreviewCanvas');
+            prevCanvas.width = meta.atlasW;
+            prevCanvas.height = meta.atlasH;
+            const pctx = prevCanvas.getContext('2d');
+            pctx.clearRect(0, 0, meta.atlasW, meta.atlasH);
+            pctx.drawImage(studio.packedAtlasCanvas, 0, 0);
+
+            pctx.strokeStyle = 'rgba(56, 189, 248, 0.75)';
+            pctx.lineWidth = 2;
+            pctx.font = 'bold 20px JetBrains Mono, monospace';
+            pctx.fillStyle = '#38bdf8';
+            meta.items.forEach(it => {
+                pctx.strokeRect(it.atlasX, it.atlasY, it.cropW, it.cropH);
+                pctx.fillText(it.part.name, it.atlasX + 6, it.atlasY + 24);
+            });
+
+            const modal = document.getElementById('exportModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            switchExportTab(studio.exportTab || 'atlas');
+        }
+
+        function closeExportModal() {
+            const modal = document.getElementById('exportModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function switchExportTab(tab) {
+            studio.exportTab = tab;
+            const bAtlas = document.getElementById('expTab_atlas');
+            const bJson = document.getElementById('expTab_json');
+            const bCs = document.getElementById('expTab_cs');
+            const prevBox = document.getElementById('atlasPreviewContainer');
+            const out = document.getElementById('exportCodeOutput');
+
+            bAtlas.className = tab === 'atlas' ? 'px-3 py-1.5 rounded text-xs font-semibold mode-animate-active' : 'px-3 py-1.5 rounded text-xs font-semibold bg-[#181f30] text-slate-300 hover:text-white';
+            bJson.className = tab === 'json' ? 'px-3 py-1.5 rounded text-xs font-semibold mode-animate-active' : 'px-3 py-1.5 rounded text-xs font-semibold bg-[#181f30] text-slate-300 hover:text-white';
+            bCs.className = tab === 'cs' ? 'px-3 py-1.5 rounded text-xs font-semibold mode-animate-active' : 'px-3 py-1.5 rounded text-xs font-semibold bg-[#181f30] text-slate-300 hover:text-white';
+
+            if (tab === 'atlas') {
+                prevBox.classList.remove('hidden');
+                out.classList.add('hidden');
+            } else {
+                prevBox.classList.add('hidden');
+                out.classList.remove('hidden');
+                out.value = tab === 'json' ? buildSpineUnityJSON() : buildUnityCSharpScript();
+            }
+        }
+
+        function downloadAtlasPng() {
+            buildSmartTextureAtlas();
+            const a = document.createElement('a');
+            a.download = 'LiamAvatar_Atlas.png';
+            a.href = studio.packedAtlasCanvas.toDataURL('image/png');
+            a.click();
+        }
+
+        function downloadExportJson() {
+            const content = buildSpineUnityJSON();
+            const blob = new Blob([content], { type: 'application/json;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'LiamAvatar.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function downloadExportCs() {
+            const content = buildUnityCSharpScript();
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'LiamAvatar2UnityRuntime.cs';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function copyExportBuffer() {
+            const out = document.getElementById('exportCodeOutput');
+            if (out.classList.contains('hidden')) {
+                out.value = buildUnityCSharpScript();
+            }
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(out.value).catch(() => {});
+            }
+            const wasHidden = out.classList.contains('hidden');
+            if (wasHidden) out.classList.remove('hidden');
+            out.select();
+            try { document.execCommand('copy'); } catch (e) {}
+            if (wasHidden) out.classList.add('hidden');
+
+            const btn = document.getElementById('btnCopyExport');
+            btn.textContent = 'Copiado';
+            setTimeout(() => { btn.textContent = 'Copiar Texto'; }, 1800);
+        }
+
+        function downloadSelectedPartPNG() {
+            const part = studio.parts.find(p => p.id === studio.selectedPartId) || studio.parts[0];
+            if (!part) return;
+            const url = part.bakedCanvas.toDataURL('image/png');
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${part.name}.png`;
+            a.click();
+        }
+
+        function getMcpStudioStateSummary() {
+            return {
+                refWidth: RefWidth,
+                refHeight: RefHeight,
+                systemState: studio.systemState,
+                activeTool: studio.activeTool,
+                activePosePreset: studio.activePosePreset,
+                activeLayerPreset: studio.activeLayerPreset,
+                legVariantStyle: studio.legVariantStyle,
+                selectedBoneId: studio.selectedBoneId,
+                selectedPartId: studio.selectedPartId,
+                flags: { ...studio.flags },
+                meshConfig: { ...studio.meshConfig },
+                anim: {
+                    playing: studio.anim.playing,
+                    clip: studio.anim.clip,
+                    time: studio.anim.time,
+                    duration: studio.anim.duration,
+                    speed: studio.anim.speed,
+                    breath: studio.anim.breath,
+                    hipX: studio.anim.hipX,
+                    hipY: studio.anim.hipY,
+                    armSwing: studio.anim.armSwing,
+                    forearmSwing: studio.anim.forearmSwing,
+                    pendulumSwing: studio.anim.pendulumSwing,
+                    headTilt: studio.anim.headTilt
+                },
+                bones: studio.bones.map(b => ({ ...b })),
+                parts: studio.parts.map((p, idx) => ({
+                    zOrderIndex: idx,
+                    id: p.id,
+                    name: p.name,
+                    visible: p.visible,
+                    x: p.x,
+                    y: p.y,
+                    scaleX: p.scaleX,
+                    scaleY: p.scaleY,
+                    rot: p.rot,
+                    allowedBones: [...(p.allowedBones || [])],
+                    anchor: p.anchor ? { ...p.anchor } : null,
+                    bounds: p.mesh && p.mesh.bounds ? { ...p.mesh.bounds } : null,
+                    vertexCount: p.mesh && p.mesh.vertices ? p.mesh.vertices.length : 0,
+                    triangleCount: p.mesh && p.mesh.triangles ? p.mesh.triangles.length : 0
+                }))
+            };
+        }
+
+        function captureMcpScreenshot(target = 'viewport') {
+            if (target === 'atlas') {
+                const meta = buildSmartTextureAtlas();
+                return {
+                    target: 'atlas',
+                    width: meta.atlasW,
+                    height: meta.atlasH,
+                    savedPercent: meta.savedPercent,
+                    dataUrl: studio.packedAtlasCanvas.toDataURL('image/png')
+                };
+            }
+            const frame = solveSkeletonAndDeformParts(0);
+            renderViewport(frame);
+            return {
+                target: 'viewport',
+                width: viewportCanvas.width,
+                height: viewportCanvas.height,
+                dataUrl: viewportCanvas.toDataURL('image/png')
+            };
+        }
+
+        async function executeMcpCommand(cmd) {
+            if (!cmd || !cmd.action) return { ok: false, error: 'Missing action' };
+            const act = cmd.action;
+            const p = cmd.params || {};
+
+            if (act === 'get_state') {
+                return { ok: true, state: getMcpStudioStateSummary() };
+            }
+
+            if (act === 'capture_screenshot') {
+                if (p.systemState) setSystemState(p.systemState);
+                if (typeof p.showGrid === 'boolean' && studio.flags.showGrid !== p.showGrid) toggleViewFlag('showGrid');
+                if (typeof p.showWire === 'boolean' && studio.flags.showWire !== p.showWire) toggleViewFlag('showWire');
+                if (typeof p.showBones === 'boolean' && studio.flags.showBones !== p.showBones) toggleViewFlag('showBones');
+                if (typeof p.showAnchors === 'boolean' && studio.flags.showAnchors !== p.showAnchors) toggleViewFlag('showAnchors');
+                if (typeof p.showWeights === 'boolean' && studio.flags.showWeights !== p.showWeights) toggleViewFlag('showWeights');
+                if (p.fitCamera) resetCameraView();
+                const shot = captureMcpScreenshot(p.target || 'viewport');
+                return { ok: true, screenshot: shot, state: getMcpStudioStateSummary() };
+            }
+
+            if (act === 'update_bones') {
+                pushUndoState();
+                const list = Array.isArray(p.bones) ? p.bones : [];
+                list.forEach(ub => {
+                    const target = studio.bones.find(b => b.id === ub.id);
+                    if (target) {
+                        if (typeof ub.nx1 === 'number') target.nx1 = Math.max(0.01, Math.min(0.99, ub.nx1));
+                        if (typeof ub.ny1 === 'number') target.ny1 = Math.max(0.01, Math.min(0.99, ub.ny1));
+                        if (typeof ub.nx2 === 'number') target.nx2 = Math.max(0.01, Math.min(0.99, ub.nx2));
+                        if (typeof ub.ny2 === 'number') target.ny2 = Math.max(0.01, Math.min(0.99, ub.ny2));
+                        if (typeof ub.envelope === 'number') target.envelope = ub.envelope;
+                        if (typeof ub.role === 'string') target.role = ub.role;
+                        if (typeof ub.label === 'string') target.label = ub.label;
+                    }
+                });
+                if (p.syncAnchors !== false) syncAnchorsWithSkeleton();
+                recomputeAllPartsWeights(false);
+                renderBoneTreeUI();
+                syncBoneInspectorUI();
+                renderPartBoneMaskUI();
+                return {
+                    ok: true,
+                    state: getMcpStudioStateSummary(),
+                    screenshot: p.includeScreenshot ? captureMcpScreenshot('viewport') : null
+                };
+            }
+
+            if (act === 'update_part') {
+                pushUndoState();
+                const part = studio.parts.find(x => x.id === p.id || x.name === p.id);
+                if (!part) return { ok: false, error: 'Part not found: ' + p.id };
+                if (typeof p.name === 'string') part.name = p.name;
+                if (typeof p.visible === 'boolean') part.visible = p.visible;
+                if (typeof p.x === 'number') part.x = p.x;
+                if (typeof p.y === 'number') part.y = p.y;
+                if (typeof p.scaleX === 'number') part.scaleX = p.scaleX;
+                if (typeof p.scaleY === 'number') part.scaleY = p.scaleY;
+                if (typeof p.rot === 'number') part.rot = p.rot;
+                if (Array.isArray(p.allowedBones)) part.allowedBones = [...p.allowedBones];
+                if (p.anchor && typeof p.anchor === 'object') {
+                    part.anchor = { ...(part.anchor || {}), ...p.anchor };
+                }
+                if (typeof p.zOrderIndex === 'number') {
+                    const curIdx = studio.parts.indexOf(part);
+                    const destIdx = Math.max(0, Math.min(studio.parts.length - 1, p.zOrderIndex));
+                    if (curIdx !== -1 && curIdx !== destIdx) {
+                        studio.parts.splice(curIdx, 1);
+                        studio.parts.splice(destIdx, 0, part);
+                    }
+                }
+                buildSinglePartMesh(part, true);
+                selectPartById(part.id);
+                return {
+                    ok: true,
+                    state: getMcpStudioStateSummary(),
+                    screenshot: p.includeScreenshot ? captureMcpScreenshot('viewport') : null
+                };
+            }
+
+            if (act === 'smart_auto_adjust') {
+                if (p.poseTemplate && POSE_TEMPLATES[p.poseTemplate]) {
+                    applyPoseTemplate(p.poseTemplate, false);
+                }
+                if (p.autoDetectSilhouette !== false) {
+                    autoDetectPoseFromAllParts();
+                }
+                if (typeof p.relaxIterations === 'number' && p.relaxIterations > 0) {
+                    relaxAllPartWeights(p.relaxIterations);
+                }
+                const atlasMeta = buildSmartTextureAtlas();
+                return {
+                    ok: true,
+                    atlasStats: {
+                        atlasWidth: atlasMeta.atlasW,
+                        atlasHeight: atlasMeta.atlasH,
+                        savedPercent: atlasMeta.savedPercent
+                    },
+                    state: getMcpStudioStateSummary(),
+                    screenshot: captureMcpScreenshot('viewport')
+                };
+            }
+
+            if (act === 'configure_mesh_and_anim') {
+                pushUndoState();
+                let rebuild = false;
+                if (typeof p.cols === 'number') {
+                    document.getElementById('sl_meshDensity').value = p.cols;
+                    rebuild = true;
+                }
+                if (typeof p.paddingPct === 'number') {
+                    document.getElementById('sl_meshPadding').value = p.paddingPct;
+                    rebuild = true;
+                }
+                if (typeof p.fullRect === 'boolean') {
+                    document.getElementById('chkFullRectMesh').checked = p.fullRect;
+                    rebuild = true;
+                }
+                if (rebuild) rebuildAllPartMeshes();
+
+                if (p.systemState) setSystemState(p.systemState);
+                if (p.clip) selectAnimationClip(p.clip);
+                if (typeof p.playing === 'boolean') {
+                    studio.anim.playing = p.playing;
+                    document.getElementById('lblPlayState').textContent = studio.anim.playing ? 'Pausar' : 'Reproducir';
+                }
+                if (typeof p.speed === 'number') document.getElementById('sl_animSpeed').value = p.speed;
+                if (typeof p.breath === 'number') document.getElementById('sl_animBreath').value = p.breath;
+                if (typeof p.hipX === 'number') document.getElementById('sl_animHipX').value = p.hipX;
+                if (typeof p.hipY === 'number') document.getElementById('sl_animHipY').value = p.hipY;
+                if (typeof p.armSwing === 'number') document.getElementById('sl_animArm').value = p.armSwing;
+                if (typeof p.forearmSwing === 'number') document.getElementById('sl_animForearm').value = p.forearmSwing;
+                if (typeof p.pendulumSwing === 'number') document.getElementById('sl_animPendulum').value = p.pendulumSwing;
+                if (typeof p.headTilt === 'number') document.getElementById('sl_animHead').value = p.headTilt;
+                if (typeof p.footIK === 'boolean' && studio.flags.footIK !== p.footIK) toggleViewFlag('footIK');
+                syncAnimSliders();
+
+                return {
+                    ok: true,
+                    state: getMcpStudioStateSummary(),
+                    screenshot: p.includeScreenshot ? captureMcpScreenshot('viewport') : null
+                };
+            }
+
+            if (act === 'load_l2u_json') {
+                if (!p.projectData) return { ok: false, error: 'Missing projectData' };
+                pushUndoState();
+                restoreStudioSnapshot(p.projectData);
+                await new Promise(r => setTimeout(r, 250));
+                return {
+                    ok: true,
+                    state: getMcpStudioStateSummary(),
+                    screenshot: captureMcpScreenshot('viewport')
+                };
+            }
+
+            if (act === 'export_unity_bundle') {
+                const meta = buildSmartTextureAtlas();
+                const jsonContent = buildSpineUnityJSON();
+                const csContent = buildUnityCSharpScript();
+                const l2uContent = JSON.stringify(serializeStudioSnapshot(true), null, 2);
+                const atlasPngDataUrl = studio.packedAtlasCanvas.toDataURL('image/png');
+                return {
+                    ok: true,
+                    atlasMeta: {
+                        atlasW: meta.atlasW,
+                        atlasH: meta.atlasH,
+                        savedPercent: meta.savedPercent
+                    },
+                    atlasPngDataUrl,
+                    jsonContent,
+                    csContent,
+                    l2uContent
+                };
+            }
+
+            return { ok: false, error: 'Unknown action: ' + act };
+        }
+
+        function initMcpAgentBridge() {
+            window.LiamAvatarMCP = {
+                execute: executeMcpCommand,
+                getState: getMcpStudioStateSummary,
+                capture: captureMcpScreenshot
+            };
+
+            window.addEventListener('message', async (ev) => {
+                const d = ev && ev.data;
+                if (d && d.type === 'LIAM_AVATAR_MCP_CMD' && d.command) {
+                    const result = await executeMcpCommand(d.command);
+                    if (ev.source) {
+                        ev.source.postMessage({ type: 'LIAM_AVATAR_MCP_RES', id: d.id, result }, '*');
+                    }
+                }
+            });
+
+            const bridgeBase = 'http://127.0.0.1:17420';
+            let active = false;
+
+            const pollLoop = async () => {
+                try {
+                    const res = await fetch(bridgeBase + '/bridge/poll', { method: 'GET', mode: 'cors' });
+                    if (res.ok) {
+                        active = true;
+                        const payload = await res.json();
+                        if (payload && payload.id && payload.command) {
+                            const result = await executeMcpCommand(payload.command);
+                            await fetch(bridgeBase + '/bridge/result', {
+                                method: 'POST',
+                                mode: 'cors',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ id: payload.id, result })
+                            });
+                        }
+                        setTimeout(pollLoop, 120);
+                        return;
+                    }
+                } catch (e) {
+                    active = false;
+                }
+                setTimeout(pollLoop, active ? 300 : 3000);
+            };
+
+            setTimeout(pollLoop, 500);
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initApplication();
+            initMcpAgentBridge();
+        });
+    </script>
+</body>
+</html>

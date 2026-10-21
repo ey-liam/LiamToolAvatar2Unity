@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "liam-avatar2unity": {
+      "command": "node",
+      "args": [
+        "C:/Users/liamc/Documents/LiamToolAvatar2Unity/mcp-server.js"
+      ]
+    }
+  }
+}
