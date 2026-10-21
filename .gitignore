@@ -1,0 +1,15 @@
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editors
+.vscode/
+.idea/
+
+# Temp
+*.tmp
+*.log
+
+# Project files (optional, descomenta si no quieres subir proyectos .L2U)
+# *.l2u

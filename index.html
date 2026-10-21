@@ -1,0 +1,2993 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LiamToolAvatar2Unity V2</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #090b10;
+            --bg-panel: #11151f;
+            --bg-elevated: #171c29;
+            --border-color: #232a3d;
+            --accent-blue: #0ea5e9;
+            --accent-cyan: #22d3ee;
+            --accent-amber: #f59e0b;
+            --accent-emerald: #10b981;
+        }
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-user-drag: none;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            background-color: var(--bg-main);
+            color: #e2e8f0;
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+        }
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0b0e15;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #262f45;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3b4869;
+        }
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 4px;
+            background: #22293c;
+            border-radius: 2px;
+            outline: none;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #38bdf8;
+            border: 2px solid #090b10;
+            cursor: pointer;
+        }
+        input[type="range"]::-webkit-slider-thumb:hover {
+            background: #7dd3fc;
+            transform: scale(1.12);
+        }
+        .tool-active {
+            background-color: rgba(14, 165, 233, 0.22);
+            border-color: #38bdf8 !important;
+            color: #ffffff !important;
+            box-shadow: inset 0 0 0 1px rgba(56, 189, 248, 0.35);
+        }
+        .mode-setup-active {
+            background: linear-gradient(135deg, #d97706, #f59e0b);
+            color: #090b10;
+            font-weight: 700;
+        }
+        .mode-animate-active {
+            background: linear-gradient(135deg, #0284c7, #2563eb);
+            color: #ffffff;
+            font-weight: 700;
+        }
+        .tab-active {
+            border-bottom: 2px solid #38bdf8;
+            color: #ffffff;
+            background-color: rgba(56, 189, 248, 0.08);
+        }
+        .item-selected {
+            background-color: rgba(14, 165, 233, 0.18) !important;
+            border-color: rgba(56, 189, 248, 0.75) !important;
+            color: #ffffff !important;
+        }
+        .preset-active {
+            background-color: rgba(14, 165, 233, 0.22) !important;
+            border-color: #38bdf8 !important;
+            color: #ffffff !important;
+        }
+    </style>
+</head>
+<body class="flex flex-col select-none">
+
+    <header class="h-11 bg-[#0d1018] border-b border-[#22293c] px-2.5 flex items-center justify-between shrink-0 z-30 gap-2">
+        <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2">
+                <div class="w-7 h-7 rounded bg-gradient-to-br from-sky-500 to-indigo-600 flex items-center justify-center shadow">
+                    <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <circle cx="6" cy="6" r="3"/>
+                        <circle cx="18" cy="18" r="3"/>
+                        <path d="M8.12 8.12L15.88 15.88"/>
+                        <circle cx="18" cy="6" r="2.5"/>
+                        <path d="M8.5 6H15.5"/>
+                    </svg>
+                </div>
+                <div class="flex items-center gap-1.5">
+                    <span class="font-bold tracking-tight text-white text-xs sm:text-sm">LiamToolAvatar2Unity</span>
+                    <span class="mono text-[10px] font-semibold px-1.5 py-0.5 rounded bg-sky-500/15 text-sky-300 border border-sky-500/30">V2 HD</span>
+                </div>
+            </div>
+
+            <div class="h-5 w-px bg-[#22293c]"></div>
+
+            <div class="flex items-center gap-1 bg-[#141926] px-2 py-0.5 rounded border border-[#242c42]" title="Resolucion Nativa del Lienzo">
+                <span class="text-[10px] text-slate-400">Lienzo:</span>
+                <input type="number" id="inpCanvasW" value="1536" min="256" max="8192" onchange="changeCanvasResolution()" class="w-14 bg-[#0b0e16] border border-[#26304a] rounded px-1 py-0.5 text-[10px] mono text-sky-300 text-center">
+                <span class="text-[10px] text-slate-500">x</span>
+                <input type="number" id="inpCanvasH" value="2752" min="256" max="8192" onchange="changeCanvasResolution()" class="w-14 bg-[#0b0e16] border border-[#26304a] rounded px-1 py-0.5 text-[10px] mono text-sky-300 text-center">
+            </div>
+
+            <div class="h-5 w-px bg-[#22293c]"></div>
+
+            <div class="flex items-center gap-1">
+                <button id="btnUndo" onclick="performUndo()" disabled class="px-2 py-1 rounded bg-[#151a28] hover:bg-[#1e263a] disabled:opacity-35 border border-[#26304a] text-slate-200 text-[11px] font-medium flex items-center gap-1 transition" title="Ctrl+Z">
+                    <svg class="w-3.5 h-3.5 text-sky-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/>
+                    </svg>
+                    <span>Deshacer</span>
+                </button>
+                <button id="btnRedo" onclick="performRedo()" disabled class="px-2 py-1 rounded bg-[#151a28] hover:bg-[#1e263a] disabled:opacity-35 border border-[#26304a] text-slate-200 text-[11px] font-medium flex items-center gap-1 transition" title="Ctrl+Y">
+                    <svg class="w-3.5 h-3.5 text-sky-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 7v6h-6"/><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"/>
+                    </svg>
+                    <span>Rehacer</span>
+                </button>
+            </div>
+
+            <div class="h-5 w-px bg-[#22293c]"></div>
+
+            <div class="flex items-center gap-1">
+                <button onclick="saveProjectToFile()" class="px-2 py-1 rounded bg-[#151a28] hover:bg-[#1e263a] border border-emerald-500/40 text-emerald-300 text-[11px] font-semibold flex items-center gap-1 transition">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                        <polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>
+                    </svg>
+                    <span>Guardar (.L2U)</span>
+                </button>
+
+                <label class="cursor-pointer px-2 py-1 rounded bg-[#151a28] hover:bg-[#1e263a] border border-amber-500/40 text-amber-300 text-[11px] font-semibold flex items-center gap-1 transition">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+                    </svg>
+                    <span>Cargar (.L2U)</span>
+                    <input type="file" id="fileLoadProject" accept=".l2u,.json,application/json" class="hidden" onchange="loadProjectFromFile(event)">
+                </label>
+            </div>
+
+            <div class="h-5 w-px bg-[#22293c]"></div>
+
+            <div class="flex items-center gap-1">
+                <label class="cursor-pointer px-2 py-1 rounded bg-[#181f30] hover:bg-[#202940] border border-[#2c3654] text-slate-200 text-[11px] font-medium flex items-center gap-1 transition">
+                    <svg class="w-3.5 h-3.5 text-sky-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+                    </svg>
+                    <span>Subir Partes PNG</span>
+                    <input type="file" id="fileImportPartsMulti" accept="image/png,image/jpeg,image/webp" multiple class="hidden" onchange="importMultiplePartFiles(event)">
+                </label>
+
+                <label class="cursor-pointer px-2 py-1 rounded bg-[#181f30] hover:bg-[#202940] border border-[#2c3654] text-slate-200 text-[11px] font-medium flex items-center gap-1 transition">
+                    <svg class="w-3.5 h-3.5 text-indigo-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2"/>
+                        <circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+                    </svg>
+                    <span>Imagen Unica</span>
+                    <input type="file" id="fileImportSingleFull" accept="image/png,image/jpeg,image/webp" class="hidden" onchange="importSingleFullAvatar(event)">
+                </label>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+            <div class="flex items-center bg-[#141926] p-0.5 rounded border border-[#242c42]">
+                <button id="btnStateSetup" onclick="setSystemState('setup')" class="px-3 py-1 rounded text-[11px] transition mode-setup-active flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+                    </svg>
+                    <span>SETUP</span>
+                </button>
+                <button id="btnStateAnimate" onclick="setSystemState('animate')" class="px-3 py-1 rounded text-[11px] transition text-slate-400 hover:text-white flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <polygon points="5 3 19 12 5 21 5 3"/>
+                    </svg>
+                    <span>ANIMATE</span>
+                </button>
+            </div>
+
+            <button onclick="openExportModal()" class="px-3 py-1.5 rounded bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-[11px] font-semibold flex items-center gap-1.5 shadow transition">
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                    <polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>
+                </svg>
+                <span>Exportar Unity</span>
+            </button>
+        </div>
+    </header>
+
+    <div class="flex-1 flex min-h-0 overflow-hidden">
+
+        <aside class="w-11 bg-[#0d1018] border-r border-[#22293c] flex flex-col items-center py-2 gap-1.5 shrink-0 z-20">
+            <button id="toolBtn_bone" onclick="setActiveTool('bone')" title="Mover o Posar Huesos" class="w-8 h-8 rounded border border-transparent flex items-center justify-center text-slate-400 hover:text-white transition tool-active">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 10c.7-.7 1.69 0 2.5 0a2.5 2.5 0 1 0 0-5 .5.5 0 0 1-.5-.5 2.5 2.5 0 1 0-5 0c0 .81.7 1.8 0 2.5l-7 7c-.7.7-1.69 0-2.5 0a2.5 2.5 0 0 0 0 5c.28 0 .5.22.5.5a2.5 2.5 0 1 0 5 0c0-.81-.7-1.8 0-2.5Z"/>
+                </svg>
+            </button>
+
+            <button id="toolBtn_anchor" onclick="setActiveTool('anchor')" title="Mover Puntos de Anclaje Anti-Dislocacion" class="w-8 h-8 rounded border border-transparent flex items-center justify-center text-slate-400 hover:text-white transition">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="5" r="3"/>
+                    <line x1="12" y1="22" x2="12" y2="8"/>
+                    <path d="M5 12H2a10 10 0 0 0 20 0h-3"/>
+                </svg>
+            </button>
+
+            <button id="toolBtn_createBone" onclick="setActiveTool('createBone')" title="Dibujar Nuevo Hueso" class="w-8 h-8 rounded border border-transparent flex items-center justify-center text-slate-400 hover:text-white transition">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="9"/>
+                    <line x1="12" y1="8" x2="12" y2="16"/>
+                    <line x1="8" y1="12" x2="16" y2="12"/>
+                </svg>
+            </button>
+
+            <button id="toolBtn_part" onclick="setActiveTool('part')" title="Mover Parte Seleccionada" class="w-8 h-8 rounded border border-transparent flex items-center justify-center text-slate-400 hover:text-white transition">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="5 9 2 12 5 15"/>
+                    <polyline points="9 5 12 2 15 5"/>
+                    <polyline points="15 19 12 22 9 19"/>
+                    <polyline points="19 9 22 12 19 15"/>
+                    <line x1="2" y1="12" x2="22" y2="12"/>
+                    <line x1="12" y1="2" x2="12" y2="22"/>
+                </svg>
+            </button>
+
+            <button id="toolBtn_weights" onclick="setActiveTool('weights')" title="Pincel de Pesos" class="w-8 h-8 rounded border border-transparent flex items-center justify-center text-slate-400 hover:text-white transition">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18.37 2.63 14 7l-1.59-1.59a2 2 0 0 0-2.82 0L8 7l9 9 1.59-1.59a2 2 0 0 0 0-2.82L17 10l4.37-4.37a2.12 2.12 0 1 0-3-3Z"/>
+                    <path d="M9 8c-2 3-4 3.5-7 4l8 10c2-1 6-5 6-7"/>
+                </svg>
+            </button>
+
+            <button id="toolBtn_vertex" onclick="setActiveTool('vertex')" title="Deformar Vertice" class="w-8 h-8 rounded border border-transparent flex items-center justify-center text-slate-400 hover:text-white transition">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+                    <polyline points="2 17 12 22 22 17"/>
+                    <polyline points="2 12 12 17 22 12"/>
+                </svg>
+            </button>
+
+            <button id="toolBtn_pan" onclick="setActiveTool('pan')" title="Mover Camara" class="w-8 h-8 rounded border border-transparent flex items-center justify-center text-slate-400 hover:text-white transition">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"/>
+                    <path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v2"/>
+                    <path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8"/>
+                    <path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/>
+                </svg>
+            </button>
+
+            <div class="h-px w-6 bg-[#22293c] my-1"></div>
+
+            <button onclick="autoDetectPoseFromAllParts()" title="Auto-Detectar Pose por Silueta" class="w-8 h-8 rounded border border-[#28324e] bg-[#141926] flex items-center justify-center text-sky-400 hover:bg-sky-500/20 transition">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 7V5a2 2 0 0 1 2-2h2"/>
+                    <path d="M17 3h2a2 2 0 0 1 2 2v2"/>
+                    <path d="M21 17v2a2 2 0 0 1-2 2h-2"/>
+                    <path d="M7 21H5a2 2 0 0 1-2-2v-2"/>
+                    <circle cx="12" cy="12" r="3"/>
+                </svg>
+            </button>
+
+            <button onclick="recomputeAllPartsWeights(true)" title="Recalcular Pesos y Soldar Anclajes" class="w-8 h-8 rounded border border-[#28324e] bg-[#141926] flex items-center justify-center text-amber-400 hover:bg-amber-500/20 transition">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+                </svg>
+            </button>
+        </aside>
+
+        <aside class="w-72 bg-[#10141f] border-r border-[#22293c] flex flex-col min-h-0 shrink-0 z-10">
+
+            <div class="p-2.5 border-b border-[#22293c] space-y-2">
+                <div class="flex items-center justify-between">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-sky-400">Presets de Estructura</span>
+                    <span id="lblActivePresetName" class="mono text-[9px] text-emerald-400">Preset 1 (Principal)</span>
+                </div>
+                <div class="grid grid-cols-2 gap-1.5">
+                    <button id="btnPreset1" onclick="loadLayerPreset('preset1', true)" class="py-1.5 px-2 rounded border border-[#28324e] bg-[#141926] text-left transition preset-active">
+                        <div class="text-[10px] font-bold">Preset 1 (Principal)</div>
+                        <div class="text-[9px] text-slate-300 truncate">Cabeza, Brazo1, Torso, Brazo2, Falda, Piernas</div>
+                    </button>
+                    <button id="btnPreset2" onclick="loadLayerPreset('preset2', true)" class="py-1.5 px-2 rounded border border-[#28324e] bg-[#141926] text-left text-slate-300 hover:text-white transition">
+                        <div class="text-[10px] font-bold">Preset 2 (15 Capas)</div>
+                        <div class="text-[9px] text-slate-400 truncate">Full Segmented + Layer Falda</div>
+                    </button>
+                </div>
+                <div class="flex items-center justify-between bg-[#151a28] px-2 py-1 rounded border border-[#242d44]">
+                    <span class="text-[10px] text-slate-300">Variante Piernas:</span>
+                    <div class="flex gap-1">
+                        <button id="btnLegStyleCalcetas" onclick="setLegVariantStyle('calcetas')" class="px-2 py-0.5 rounded text-[9px] font-semibold bg-sky-500/20 text-sky-300 border border-sky-500/40">
+                            Calcetas + Tenis
+                        </button>
+                        <button id="btnLegStylePantalon" onclick="setLegVariantStyle('pantalon')" class="px-2 py-0.5 rounded text-[9px] font-semibold bg-[#0e121b] text-slate-400 border border-[#252e45]">
+                            Pantalon + Tenis
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-2.5 border-b border-[#22293c] flex flex-col min-h-[210px] max-h-[44%]">
+                <div class="flex items-center justify-between mb-1.5">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-sky-400">Partes / Capas (Orden Z)</span>
+                    <div class="flex items-center gap-1">
+                        <button onclick="createNewEmptyPart()" class="px-2 py-0.5 rounded bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 border border-sky-500/40 text-[10px] font-semibold transition">
+                            + Parte
+                        </button>
+                        <button onclick="deletePartById(studio.selectedPartId)" class="px-2 py-0.5 rounded bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/30 text-[10px] font-semibold transition">
+                            Eliminar
+                        </button>
+                    </div>
+                </div>
+
+                <div id="partTreeContainer" class="space-y-1 flex-1 overflow-y-auto pr-0.5"></div>
+            </div>
+
+            <div class="p-2.5 flex-1 flex flex-col min-h-0">
+                <div class="bg-[#161b29] border border-[#252d44] rounded p-2 mb-2 space-y-1.5">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-amber-400">Plantillas de Pose</span>
+                        <button onclick="autoDetectPoseFromAllParts()" class="px-2 py-0.5 rounded bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 border border-sky-500/40 text-[10px] font-semibold">
+                            Auto-Pose
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-2 gap-1">
+                        <button id="poseBtn_dynamic" onclick="applyPoseTemplate('dynamic', true)" class="px-2 py-1 rounded bg-[#101420] border border-sky-500/60 text-left text-[10px] font-medium text-white">
+                            Dinamica
+                        </button>
+                        <button id="poseBtn_casual" onclick="applyPoseTemplate('casual', true)" class="px-2 py-1 rounded bg-[#101420] border border-[#252d44] text-left text-[10px] font-medium text-slate-300">
+                            Casual Recta
+                        </button>
+                        <button id="poseBtn_apose" onclick="applyPoseTemplate('apose', true)" class="px-2 py-1 rounded bg-[#101420] border border-[#252d44] text-left text-[10px] font-medium text-slate-300">
+                            Simetrica A
+                        </button>
+                        <button id="poseBtn_compact" onclick="applyPoseTemplate('compact', true)" class="px-2 py-1 rounded bg-[#101420] border border-[#252d44] text-left text-[10px] font-medium text-slate-300">
+                            Compacta
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between mb-1.5">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-300">Jerarquia de Huesos</span>
+                    <div class="flex items-center gap-1">
+                        <button onclick="addNewBoneImmediate()" class="px-2 py-0.5 rounded bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-[10px] font-semibold transition">
+                            + Hueso
+                        </button>
+                        <button onclick="deleteBoneById(studio.selectedBoneId)" class="px-2 py-0.5 rounded bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/30 text-[10px] font-semibold transition">
+                            Eliminar
+                        </button>
+                    </div>
+                </div>
+
+                <div id="boneTreeContainer" class="space-y-1 flex-1 overflow-y-auto pr-0.5"></div>
+            </div>
+
+        </aside>
+
+        <main class="flex-1 flex flex-col bg-[#080a0f] relative min-w-0 min-h-0">
+
+            <div class="h-9 bg-[#10141f] border-b border-[#22293c] px-2.5 flex items-center justify-between gap-2 z-10">
+                <div class="flex items-center gap-1">
+                    <button onclick="zoomCameraStep(1.2)" class="px-2 py-1 rounded bg-[#171d2c] hover:bg-[#222b42] border border-[#26304a] text-slate-200 text-[11px] flex items-center gap-1">
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/>
+                        </svg>
+                    </button>
+                    <button onclick="zoomCameraStep(0.833)" class="px-2 py-1 rounded bg-[#171d2c] hover:bg-[#222b42] border border-[#26304a] text-slate-200 text-[11px] flex items-center gap-1">
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/>
+                        </svg>
+                    </button>
+                    <span id="zoomReadout" class="mono text-[11px] text-sky-400 px-2 py-0.5 rounded bg-[#0c0f18] border border-[#22293c] min-w-[54px] text-center">100%</span>
+                    <button onclick="resetCameraView()" class="px-2 py-1 rounded bg-[#171d2c] hover:bg-[#222b42] border border-[#26304a] text-slate-300 text-[10px] font-medium">
+                        Encajar Camara
+                    </button>
+                </div>
+
+                <div class="flex items-center gap-1">
+                    <button id="toggleBtn_grid" onclick="toggleViewFlag('showGrid')" class="px-2 py-1 rounded border border-sky-500/40 bg-sky-500/15 text-sky-300 text-[10px] font-medium">
+                        Cuadricula
+                    </button>
+                    <button id="toggleBtn_wire" onclick="toggleViewFlag('showWire')" class="px-2 py-1 rounded border border-sky-500/40 bg-sky-500/15 text-sky-300 text-[10px] font-medium">
+                        Mallas
+                    </button>
+                    <button id="toggleBtn_bones" onclick="toggleViewFlag('showBones')" class="px-2 py-1 rounded border border-sky-500/40 bg-sky-500/15 text-sky-300 text-[10px] font-medium">
+                        Huesos
+                    </button>
+                    <button id="toggleBtn_anchors" onclick="toggleViewFlag('showAnchors')" class="px-2 py-1 rounded border border-amber-500/40 bg-amber-500/15 text-amber-300 text-[10px] font-medium">
+                        Anclajes
+                    </button>
+                    <button id="toggleBtn_weights" onclick="toggleViewFlag('showWeights')" class="px-2 py-1 rounded border border-[#28324e] bg-[#161b29] text-slate-400 text-[10px] font-medium">
+                        Mapa Pesos
+                    </button>
+                    <button id="toggleBtn_ik" onclick="toggleViewFlag('footIK')" class="px-2 py-1 rounded border border-emerald-500/40 bg-emerald-500/15 text-emerald-300 text-[10px] font-medium">
+                        Pies IK
+                    </button>
+                </div>
+
+                <div class="flex items-center gap-2 mono text-[10px] text-slate-400">
+                    <span id="cursorWorldCoords">X: 0 Y: 0</span>
+                    <span id="fpsBadge" class="text-emerald-400">60 FPS</span>
+                </div>
+            </div>
+
+            <div id="viewportContainer" class="flex-1 relative overflow-hidden bg-[#0a0d14]">
+                <canvas id="viewportCanvas" class="w-full h-full block"></canvas>
+
+                <div id="weightLegendOverlay" class="hidden absolute top-3 right-3 bg-[#10141f]/95 border border-[#26304a] rounded p-2.5 w-52 space-y-1.5 pointer-events-none shadow-xl">
+                    <div class="flex items-center justify-between text-[10px] font-semibold">
+                        <span class="text-slate-300">Peso Hueso:</span>
+                        <span id="weightActiveBoneLabel" class="mono text-sky-300">torso</span>
+                    </div>
+                    <div class="h-2.5 w-full rounded" style="background: linear-gradient(90deg, #1d4ed8 0%, #06b6d4 28%, #10b981 55%, #facc15 78%, #ef4444 100%);"></div>
+                    <div class="flex justify-between mono text-[9px] text-slate-400">
+                        <span>0.00</span>
+                        <span>0.25</span>
+                        <span>0.50</span>
+                        <span>0.75</span>
+                        <span>1.00</span>
+                    </div>
+                </div>
+            </div>
+
+            <section class="h-32 bg-[#0e121c] border-t border-[#22293c] flex flex-col shrink-0 z-20">
+                <div class="h-8 px-3 border-b border-[#1d2436] flex items-center justify-between bg-[#111623]">
+                    <div class="flex items-center gap-1.5">
+                        <button id="btnPlayTimeline" onclick="togglePlayback()" class="px-2.5 py-1 rounded bg-sky-500/20 border border-sky-500/40 text-sky-300 text-[10px] font-semibold flex items-center gap-1">
+                            <svg class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                            <span id="lblPlayState">Pausar</span>
+                        </button>
+                        <button onclick="stopPlayback()" class="px-2 py-1 rounded bg-[#181f30] border border-[#28324e] text-slate-300 hover:text-white text-[10px]">
+                            Reset Pose
+                        </button>
+                        <div class="h-4 w-px bg-[#22293c] mx-1"></div>
+                        <span class="text-[10px] text-slate-400">Clip:</span>
+                        <select id="selAnimClip" onchange="selectAnimationClip(this.value)" class="bg-[#151b29] border border-[#28324e] rounded px-2 py-0.5 text-[10px] text-white">
+                            <option value="idle">Idle Respiracion + Brisa</option>
+                            <option value="walk">Walk Ciclo Caminata</option>
+                            <option value="jump">Jump Impulso Salto</option>
+                            <option value="wave">Wave Saludo Brazo</option>
+                        </select>
+                        <span id="lblTimelineTime" class="mono text-[10px] text-sky-400 ml-2">0.00s / 2.00s</span>
+                    </div>
+
+                    <div class="flex items-center gap-1.5">
+                        <button onclick="recordCurrentPoseKeyframe()" class="px-2.5 py-1 rounded bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 text-[10px] font-semibold">
+                            Guardar Keyframe
+                        </button>
+                        <button onclick="deleteKeyframeAtCursor()" class="px-2 py-1 rounded bg-[#181f30] hover:bg-rose-500/20 border border-[#28324e] text-slate-300 hover:text-rose-300 text-[10px]">
+                            Borrar Keyframe
+                        </button>
+                        <button onclick="triggerPhysicsImpulse()" class="px-2 py-1 rounded bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 text-[10px] font-semibold">
+                            Impulso Fisica
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex-1 relative overflow-hidden flex flex-col">
+                    <canvas id="timelineCanvas" class="w-full h-full block cursor-pointer"></canvas>
+                </div>
+            </section>
+        </main>
+
+        <aside class="w-80 bg-[#10141f] border-l border-[#22293c] flex flex-col min-h-0 shrink-0 z-10">
+            <div class="grid grid-cols-3 border-b border-[#22293c] bg-[#0d1018] text-[10px] font-semibold">
+                <button id="rightTab_part" onclick="switchRightTab('part')" class="py-2 text-center tab-active transition">
+                    Parte y Anclaje
+                </button>
+                <button id="rightTab_weights" onclick="switchRightTab('weights')" class="py-2 text-center text-slate-400 hover:text-white transition">
+                    Hueso y Pesos
+                </button>
+                <button id="rightTab_anim" onclick="switchRightTab('anim')" class="py-2 text-center text-slate-400 hover:text-white transition">
+                    Animacion
+                </button>
+            </div>
+
+            <div class="flex-1 overflow-y-auto p-3 space-y-3">
+
+                <div id="rightPanel_part" class="space-y-3">
+                    <div class="bg-[#161b29] border border-[#252d44] rounded p-2.5 space-y-2.5">
+                        <div class="flex items-center justify-between border-b border-[#22293c] pb-1.5">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-400">Parte Seleccionada</span>
+                            <span id="lblSelectedPartId" class="mono text-[10px] text-white bg-emerald-500/20 px-1.5 py-0.5 rounded border border-emerald-500/40">Brazo 1</span>
+                        </div>
+
+                        <div>
+                            <label class="text-[10px] text-slate-400 block mb-1">Nombre de la Parte / Capa</label>
+                            <input type="text" id="inpPartName" onchange="pushUndoState()" oninput="renameSelectedPart(this.value)" class="w-full bg-[#0e121b] border border-[#262f47] rounded px-2 py-1 text-white text-[11px]">
+                        </div>
+
+                        <div class="flex gap-1.5">
+                            <label class="flex-1 cursor-pointer py-1.5 px-2 rounded bg-sky-500/20 hover:bg-sky-500/30 border border-sky-500/40 text-center text-[10px] text-sky-300 font-semibold transition">
+                                Subir PNG a esta Parte
+                                <input type="file" accept="image/png,image/jpeg,image/webp" class="hidden" onchange="importTextureForSelectedPart(event)">
+                            </label>
+                            <button onclick="resetSelectedPartTransform()" class="py-1.5 px-2.5 rounded bg-[#101420] hover:bg-rose-500/20 border border-[#28324e] text-[10px] text-rose-300 font-medium">
+                                Reset Pos
+                            </button>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2 pt-1">
+                            <div>
+                                <div class="flex justify-between text-[10px] mb-1">
+                                    <span class="text-slate-400">Posicion X</span>
+                                    <span id="val_partX" class="mono text-emerald-300">0 px</span>
+                                </div>
+                                <input type="range" id="sl_partX" min="-600" max="600" step="1" value="0" onchange="pushUndoState()" oninput="updateSelectedPartTransformFromSliders()">
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-[10px] mb-1">
+                                    <span class="text-slate-400">Posicion Y</span>
+                                    <span id="val_partY" class="mono text-emerald-300">0 px</span>
+                                </div>
+                                <input type="range" id="sl_partY" min="-600" max="600" step="1" value="0" onchange="pushUndoState()" oninput="updateSelectedPartTransformFromSliders()">
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-[10px] mb-1">
+                                    <span class="text-slate-400">Escala X</span>
+                                    <span id="val_partSX" class="mono text-emerald-300">100%</span>
+                                </div>
+                                <input type="range" id="sl_partSX" min="0.15" max="2.5" step="0.01" value="1.0" onchange="pushUndoState()" oninput="updateSelectedPartTransformFromSliders()">
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-[10px] mb-1">
+                                    <span class="text-slate-400">Escala Y</span>
+                                    <span id="val_partSY" class="mono text-emerald-300">100%</span>
+                                </div>
+                                <input type="range" id="sl_partSY" min="0.15" max="2.5" step="0.01" value="1.0" onchange="pushUndoState()" oninput="updateSelectedPartTransformFromSliders()">
+                            </div>
+                            <div class="col-span-2">
+                                <div class="flex justify-between text-[10px] mb-1">
+                                    <span class="text-slate-400">Rotacion de la Parte</span>
+                                    <span id="val_partRot" class="mono text-emerald-300">0°</span>
+                                </div>
+                                <input type="range" id="sl_partRot" min="-180" max="180" step="1" value="0" onchange="pushUndoState()" oninput="updateSelectedPartTransformFromSliders()">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-[#161b29] border border-amber-500/40 rounded p-2.5 space-y-2">
+                        <div class="flex items-center justify-between border-b border-[#22293c] pb-1.5">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-amber-400">Anclaje Anti-Dislocacion</span>
+                            <button onclick="setActiveTool('anchor')" class="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[9px] font-semibold">
+                                Mover Pin en Lienzo
+                            </button>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="text-[10px] text-slate-400 block mb-1">Hueso Padre de Anclaje</label>
+                                <select id="selPartAnchorBone" onchange="updateSelectedPartAnchorSettings()" class="w-full bg-[#0e121b] border border-[#262f47] rounded px-2 py-1 text-[10px] text-white">
+                                    <option value="torso">torso (Torso Central)</option>
+                                    <option value="neck">neck (Cuello)</option>
+                                    <option value="none">Sin Anclaje Fijo</option>
+                                </select>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-[10px] mb-1">
+                                    <span class="text-slate-400">Fuerza Costura</span>
+                                    <span id="val_anchorStrength" class="mono text-amber-300">85%</span>
+                                </div>
+                                <input type="range" id="sl_anchorStrength" min="0" max="100" step="5" value="85" onchange="pushUndoState()" oninput="updateSelectedPartAnchorSettings()">
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between text-[10px] mb-1">
+                                <span class="text-slate-400">Radio de Soldadura (%)</span>
+                                <span id="val_anchorRadius" class="mono text-amber-300">12%</span>
+                            </div>
+                            <input type="range" id="sl_anchorRadius" min="3" max="35" step="1" value="12" onchange="pushUndoState()" oninput="updateSelectedPartAnchorSettings()">
+                        </div>
+                    </div>
+
+                    <div class="bg-[#161b29] border border-[#252d44] rounded p-2.5 space-y-2">
+                        <div class="flex items-center justify-between border-b border-[#22293c] pb-1.5">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-sky-400">Huesos que Deforman esta Parte</span>
+                            <button onclick="bindAllBonesToSelectedPart()" class="text-[9px] text-sky-300 hover:underline">Activar Todos</button>
+                        </div>
+                        <div id="partBoneMaskContainer" class="max-h-32 overflow-y-auto space-y-1 pr-1 text-[10px]"></div>
+                    </div>
+
+                    <div class="bg-[#161b29] border border-[#252d44] rounded p-2.5 space-y-2">
+                        <div class="flex items-center justify-between border-b border-[#22293c] pb-1.5">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-300">Malla Anti-Recorte (Full / Silueta)</span>
+                            <span id="meshStatsBadge" class="mono text-[9px] text-slate-400">0 tris</span>
+                        </div>
+
+                        <label class="flex items-center justify-between bg-[#101420] p-1.5 rounded border border-indigo-500/40 cursor-pointer">
+                            <span class="text-[10px] font-semibold text-indigo-200">Malla Lienzo Completo (Sin Recortes)</span>
+                            <input type="checkbox" id="chkFullRectMesh" onchange="pushUndoState(); rebuildAllPartMeshes()" class="accent-indigo-400">
+                        </label>
+
+                        <div>
+                            <div class="flex justify-between text-[10px] mb-1">
+                                <span class="text-slate-400">Resolucion Subdivison</span>
+                                <span id="val_meshDensity" class="mono text-indigo-300">22</span>
+                            </div>
+                            <input type="range" id="sl_meshDensity" min="12" max="36" step="2" value="22" onchange="pushUndoState()" oninput="rebuildAllPartMeshes()">
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between text-[10px] mb-1">
+                                <span class="text-slate-400">Margen Extra Silueta (%)</span>
+                                <span id="val_meshPadding" class="mono text-indigo-300">8%</span>
+                            </div>
+                            <input type="range" id="sl_meshPadding" min="2" max="25" step="1" value="8" onchange="pushUndoState()" oninput="rebuildAllPartMeshes()">
+                        </div>
+
+                        <div class="flex items-center justify-between pt-1">
+                            <label class="flex items-center gap-1.5 text-[10px] text-slate-300 cursor-pointer">
+                                <input type="checkbox" id="chkAutoRemoveWhite" class="accent-sky-400">
+                                <span>Quitar Fondo Blanco al Subir PNG</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="rightPanel_weights" class="hidden space-y-3">
+                    <div class="bg-[#161b29] border border-[#252d44] rounded p-2.5 space-y-2.5">
+                        <div class="flex items-center justify-between border-b border-[#22293c] pb-1.5">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-sky-400">Inspector de Hueso</span>
+                            <span id="lblSelectedBoneId" class="mono text-[10px] text-white bg-sky-500/20 px-1.5 py-0.5 rounded border border-sky-500/40">torso</span>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="text-[10px] text-slate-400 block mb-1">Nombre</label>
+                                <input type="text" id="inpBoneLabel" onchange="pushUndoState()" oninput="renameSelectedBone(this.value)" class="w-full bg-[#0e121b] border border-[#262f47] rounded px-2 py-1 text-white text-[10px]">
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-slate-400 block mb-1">Comportamiento</label>
+                                <select id="selBoneRole" onchange="pushUndoState(); updateSelectedBoneRole(this.value)" class="w-full bg-[#0e121b] border border-[#262f47] rounded px-2 py-1 text-[10px] text-white">
+                                    <option value="breath">Torso / Respiracion</option>
+                                    <option value="head">Cabeza / Rotacion</option>
+                                    <option value="armR">Brazo 1 (Izq Pantalla)</option>
+                                    <option value="armL">Brazo 2 (Der Pantalla)</option>
+                                    <option value="pendulum">Pendulo / Falda / Tela</option>
+                                    <option value="legR">Pierna Izq (Pantalla)</option>
+                                    <option value="legL">Pierna Der (Pantalla)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <div class="flex justify-between text-[10px] mb-1">
+                                    <span class="text-slate-400">Origen X</span>
+                                    <span id="val_boneX1" class="mono text-sky-300">50%</span>
+                                </div>
+                                <input type="range" id="sl_boneX1" min="1" max="99" step="0.5" value="50" onchange="pushUndoState()" oninput="updateSelectedBoneCoordsFromSliders()">
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-[10px] mb-1">
+                                    <span class="text-slate-400">Origen Y</span>
+                                    <span id="val_boneY1" class="mono text-sky-300">50%</span>
+                                </div>
+                                <input type="range" id="sl_boneY1" min="1" max="99" step="0.5" value="50" onchange="pushUndoState()" oninput="updateSelectedBoneCoordsFromSliders()">
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-[10px] mb-1">
+                                    <span class="text-slate-400">Punta X</span>
+                                    <span id="val_boneX2" class="mono text-sky-300">50%</span>
+                                </div>
+                                <input type="range" id="sl_boneX2" min="1" max="99" step="0.5" value="50" onchange="pushUndoState()" oninput="updateSelectedBoneCoordsFromSliders()">
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-[10px] mb-1">
+                                    <span class="text-slate-400">Punta Y</span>
+                                    <span id="val_boneY2" class="mono text-sky-300">30%</span>
+                                </div>
+                                <input type="range" id="sl_boneY2" min="1" max="99" step="0.5" value="30" onchange="pushUndoState()" oninput="updateSelectedBoneCoordsFromSliders()">
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between text-[10px] mb-1">
+                                <span class="text-slate-400">Envoltura de Peso Automatico</span>
+                                <span id="val_boneEnvelope" class="mono text-sky-300">1.00</span>
+                            </div>
+                            <input type="range" id="sl_boneEnvelope" min="0.3" max="2.5" step="0.05" value="1.0" onchange="pushUndoState()" oninput="updateSelectedBoneEnvelope(this.value)">
+                        </div>
+                    </div>
+
+                    <div class="bg-[#161b29] border border-[#252d44] rounded p-2.5 space-y-2.5">
+                        <div class="flex items-center justify-between border-b border-[#22293c] pb-1.5">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-amber-400">Pincel de Pesos (Skinning)</span>
+                            <span id="lblWeightBoneTarget" class="mono text-[10px] text-amber-300">torso</span>
+                        </div>
+
+                        <div class="grid grid-cols-3 gap-1">
+                            <button id="wMode_add" onclick="setWeightBrushMode('add')" class="py-1.5 rounded bg-sky-500/20 border border-sky-400 text-white text-[10px] font-semibold">
+                                Pintar / Sumar
+                            </button>
+                            <button id="wMode_sub" onclick="setWeightBrushMode('sub')" class="py-1.5 rounded bg-[#101420] border border-[#252d44] text-slate-300 text-[10px] font-semibold">
+                                Sustraer
+                            </button>
+                            <button id="wMode_smooth" onclick="setWeightBrushMode('smooth')" class="py-1.5 rounded bg-[#101420] border border-[#252d44] text-slate-300 text-[10px] font-semibold">
+                                Suavizar
+                            </button>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between text-[10px] mb-1">
+                                <span class="text-slate-400">Radio del Pincel (%)</span>
+                                <span id="val_brushRadius" class="mono text-amber-300">8%</span>
+                            </div>
+                            <input type="range" id="sl_brushRadius" min="2" max="25" step="1" value="8" oninput="syncWeightBrushSliders()">
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between text-[10px] mb-1">
+                                <span class="text-slate-400">Intensidad</span>
+                                <span id="val_brushStrength" class="mono text-amber-300">0.40</span>
+                            </div>
+                            <input type="range" id="sl_brushStrength" min="0.05" max="1.0" step="0.05" value="0.40" oninput="syncWeightBrushSliders()">
+                        </div>
+
+                        <label class="flex items-center gap-1.5 text-[10px] text-slate-300 cursor-pointer pt-0.5">
+                            <input type="checkbox" id="chkPaintAllParts" checked class="accent-amber-400">
+                            <span>Pintar sobre todas las partes visibles</span>
+                        </label>
+
+                        <div class="grid grid-cols-2 gap-1.5 pt-1">
+                            <button onclick="recomputeAllPartsWeights(true)" class="py-1.5 px-2 rounded bg-sky-500/20 hover:bg-sky-500/30 border border-sky-500/40 text-sky-300 text-[10px] font-semibold">
+                                Auto-Pesos + Anclaje
+                            </button>
+                            <button onclick="pushUndoState(); relaxAllPartWeights(3)" class="py-1.5 px-2 rounded bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 text-[10px] font-semibold">
+                                Suavizar Fronteras
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="rightPanel_anim" class="hidden space-y-3">
+                    <div class="bg-[#161b29] border border-[#252d44] rounded p-2.5 space-y-2.5">
+                        <div class="flex items-center justify-between border-b border-[#22293c] pb-1.5">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-sky-400">Parametros Procedurales</span>
+                            <span class="mono text-[9px] text-emerald-400">Estabilizado</span>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <div class="flex justify-between text-[10px] mb-1">
+                                    <span class="text-slate-400">Velocidad</span>
+                                    <span id="val_animSpeed" class="mono text-sky-300">2.0</span>
+                                </div>
+                                <input type="range" id="sl_animSpeed" min="0.2" max="5.0" step="0.1" value="2.0" oninput="syncAnimSliders()">
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-[10px] mb-1">
+                                    <span class="text-slate-400">Respiracion</span>
+                                    <span id="val_animBreath" class="mono text-sky-300">0.020</span>
+                                </div>
+                                <input type="range" id="sl_animBreath" min="0" max="0.06" step="0.002" value="0.020" oninput="syncAnimSliders()">
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-[10px] mb-1">
+                                    <span class="text-slate-400">Cadera X</span>
+                                    <span id="val_animHipX" class="mono text-sky-300">3.5</span>
+                                </div>
+                                <input type="range" id="sl_animHipX" min="0" max="15" step="0.5" value="3.5" oninput="syncAnimSliders()">
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-[10px] mb-1">
+                                    <span class="text-slate-400">Cadera Y</span>
+                                    <span id="val_animHipY" class="mono text-sky-300">2.0</span>
+                                </div>
+                                <input type="range" id="sl_animHipY" min="0" max="12" step="0.5" value="2.0" oninput="syncAnimSliders()">
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-[10px] mb-1">
+                                    <span class="text-slate-400">Hombros</span>
+                                    <span id="val_animArm" class="mono text-emerald-300">3.2°</span>
+                                </div>
+                                <input type="range" id="sl_animArm" min="0" max="16" step="0.2" value="3.2" oninput="syncAnimSliders()">
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-[10px] mb-1">
+                                    <span class="text-slate-400">Antebrazos</span>
+                                    <span id="val_animForearm" class="mono text-emerald-300">4.5°</span>
+                                </div>
+                                <input type="range" id="sl_animForearm" min="0" max="20" step="0.5" value="4.5" oninput="syncAnimSliders()">
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-[10px] mb-1">
+                                    <span class="text-slate-400">Falda / Tela</span>
+                                    <span id="val_animPendulum" class="mono text-purple-300">8.0°</span>
+                                </div>
+                                <input type="range" id="sl_animPendulum" min="0" max="25" step="0.5" value="8.0" oninput="syncAnimSliders()">
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-[10px] mb-1">
+                                    <span class="text-slate-400">Cabeza</span>
+                                    <span id="val_animHead" class="mono text-sky-300">2.2°</span>
+                                </div>
+                                <input type="range" id="sl_animHead" min="0" max="10" step="0.2" value="2.2" oninput="syncAnimSliders()">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </aside>
+    </div>
+
+    <div id="exportModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="bg-[#10141f] border border-[#28324e] rounded-lg max-w-4xl w-full max-h-[88vh] flex flex-col shadow-2xl overflow-hidden">
+            <div class="px-4 py-3 border-b border-[#22293c] flex items-center justify-between bg-[#141927]">
+                <div class="flex items-center gap-2.5">
+                    <span class="px-2 py-0.5 rounded bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 mono text-xs font-bold">UNITY 6 / SPINE 2D</span>
+                    <span class="font-bold text-white text-sm">Exportador Alta Resolucion Nativa (Sin Errores CS1003 ni Recortes)</span>
+                </div>
+                <button onclick="closeExportModal()" class="w-7 h-7 rounded bg-[#1c2336] text-slate-300 hover:text-white flex items-center justify-center">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+
+            <div class="px-4 pt-2.5 border-b border-[#22293c] bg-[#0d1018] flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <button id="expTab_cs" onclick="switchExportTab('cs')" class="px-3 py-1.5 text-xs font-semibold tab-active">
+                        1. Script C# Unity (LiamAvatar2UnityRuntime.cs)
+                    </button>
+                    <button id="expTab_json" onclick="switchExportTab('json')" class="px-3 py-1.5 text-xs font-semibold text-slate-400 hover:text-white">
+                        2. Archivo JSON de Capas y Mallas (LiamAvatar.json)
+                    </button>
+                </div>
+                <div class="flex items-center gap-1.5 pb-1.5">
+                    <button onclick="downloadSelectedPartPNG()" class="px-2.5 py-1 rounded bg-[#182032] hover:bg-[#222d47] border border-[#2d3a5c] text-sky-300 text-[11px] font-semibold">
+                        Descargar PNG Parte
+                    </button>
+                    <button onclick="downloadExportFile()" class="px-2.5 py-1 rounded bg-indigo-600 hover:bg-indigo-500 text-white text-[11px] font-semibold">
+                        Descargar Archivo
+                    </button>
+                    <button id="btnCopyExport" onclick="copyExportBuffer()" class="px-3 py-1 rounded bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-semibold">
+                        Copiar Codigo
+                    </button>
+                </div>
+            </div>
+
+            <div class="p-4 flex-1 overflow-hidden flex flex-col">
+                <textarea id="exportCodeOutput" readonly class="w-full flex-1 bg-[#080a10] text-sky-100 mono text-[11px] p-3.5 rounded border border-[#22293c] focus:outline-none leading-relaxed"></textarea>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let RefWidth = 1536;
+        let RefHeight = 2752;
+
+        const studio = {
+            systemState: 'setup',
+            activeTool: 'bone',
+            activePosePreset: 'dynamic',
+            activeLayerPreset: 'preset1',
+            legVariantStyle: 'calcetas',
+
+            camera: {
+                x: 0,
+                y: 0,
+                zoom: 0.25,
+                minZoom: 0.05,
+                maxZoom: 6.5,
+                isPanning: false,
+                panStartX: 0,
+                panStartY: 0,
+                spacePressed: false
+            },
+
+            flags: {
+                showGrid: true,
+                showWire: true,
+                showBones: true,
+                showAnchors: true,
+                showWeights: false,
+                footIK: true
+            },
+
+            weightBrush: {
+                mode: 'add',
+                radiusPct: 8,
+                strength: 0.40,
+                isPainting: false
+            },
+
+            anim: {
+                playing: true,
+                clip: 'idle',
+                time: 0,
+                duration: 2.0,
+                speed: 2.0,
+                breath: 0.020,
+                hipX: 3.5,
+                hipY: 2.0,
+                armSwing: 3.2,
+                forearmSwing: 4.5,
+                pendulumSwing: 8.0,
+                headTilt: 2.2,
+                gust: 0,
+                gustVel: 0,
+                keyframes: {
+                    idle: [0.0, 0.5, 1.0, 1.5, 2.0],
+                    walk: [0.0, 0.4, 0.8, 1.2, 1.6, 2.0],
+                    jump: [0.0, 0.35, 0.9, 1.45, 2.0],
+                    wave: [0.0, 0.5, 1.0, 1.5, 2.0]
+                },
+                poseOverrides: {}
+            },
+
+            meshConfig: {
+                cols: 22,
+                paddingPct: 8,
+                fullRect: false
+            },
+
+            selectedBoneId: 'upperArmR',
+            selectedPartId: 'Brazo1',
+            draggingEndpoint: null,
+            draggingAnchorPartId: null,
+            draggingVertex: null,
+            draggingPart: false,
+            creatingBoneOrigin: null,
+            creatingBoneCursor: null,
+
+            pointerWorld: { x: 0, y: 0 },
+            pointerScreen: { x: 0, y: 0 },
+            lastPointerWorld: { x: 0, y: 0 },
+
+            bones: [],
+            parts: [],
+            exportTab: 'cs',
+
+            undoStack: [],
+            redoStack: [],
+            maxHistory: 25
+        };
+
+        const POSE_TEMPLATES = {
+            dynamic: {
+                torso:     { x1: 0.49, y1: 0.48, x2: 0.49, y2: 0.29, color: '#e2e8f0', role: 'breath', label: 'Torso Central' },
+                neck:      { x1: 0.49, y1: 0.29, x2: 0.47, y2: 0.22, color: '#38bdf8', role: 'head', label: 'Cuello' },
+                head:      { x1: 0.47, y1: 0.22, x2: 0.46, y2: 0.11, color: '#0ea5e9', role: 'head', label: 'Cabeza' },
+                upperArmR: { x1: 0.41, y1: 0.28, x2: 0.26, y2: 0.36, color: '#10b981', role: 'armR', label: 'Brazo 1 Sup (Izq)' },
+                forearmR:  { x1: 0.26, y1: 0.36, x2: 0.12, y2: 0.45, color: '#34d399', role: 'armR', label: 'Brazo 1 Inf (Izq)' },
+                upperArmL: { x1: 0.57, y1: 0.28, x2: 0.72, y2: 0.35, color: '#10b981', role: 'armL', label: 'Brazo 2 Sup (Der)' },
+                forearmL:  { x1: 0.72, y1: 0.35, x2: 0.88, y2: 0.28, color: '#34d399', role: 'armL', label: 'Brazo 2 Inf (Der)' },
+                strap:     { x1: 0.49, y1: 0.48, x2: 0.49, y2: 0.58, color: '#c084fc', role: 'pendulum', label: 'Falda / Correa' },
+                upperLegR: { x1: 0.43, y1: 0.49, x2: 0.42, y2: 0.67, color: '#f59e0b', role: 'legR', label: 'Muslo Izq' },
+                lowerLegR: { x1: 0.42, y1: 0.67, x2: 0.36, y2: 0.85, color: '#fbbf24', role: 'legR', label: 'Pantorrilla Izq' },
+                upperLegL: { x1: 0.52, y1: 0.49, x2: 0.58, y2: 0.64, color: '#f59e0b', role: 'legL', label: 'Muslo Der' },
+                lowerLegL: { x1: 0.58, y1: 0.64, x2: 0.48, y2: 0.81, color: '#fbbf24', role: 'legL', label: 'Pantorrilla Der' }
+            },
+            casual: {
+                torso:     { x1: 0.50, y1: 0.50, x2: 0.50, y2: 0.29, color: '#e2e8f0', role: 'breath', label: 'Torso Central' },
+                neck:      { x1: 0.50, y1: 0.29, x2: 0.50, y2: 0.21, color: '#38bdf8', role: 'head', label: 'Cuello' },
+                head:      { x1: 0.50, y1: 0.21, x2: 0.50, y2: 0.08, color: '#0ea5e9', role: 'head', label: 'Cabeza' },
+                upperArmR: { x1: 0.39, y1: 0.27, x2: 0.33, y2: 0.39, color: '#10b981', role: 'armR', label: 'Brazo 1 Sup (Izq)' },
+                forearmR:  { x1: 0.33, y1: 0.39, x2: 0.36, y2: 0.50, color: '#34d399', role: 'armR', label: 'Brazo 1 Inf (Izq)' },
+                upperArmL: { x1: 0.61, y1: 0.27, x2: 0.67, y2: 0.39, color: '#10b981', role: 'armL', label: 'Brazo 2 Sup (Der)' },
+                forearmL:  { x1: 0.67, y1: 0.39, x2: 0.64, y2: 0.50, color: '#34d399', role: 'armL', label: 'Brazo 2 Inf (Der)' },
+                strap:     { x1: 0.50, y1: 0.49, x2: 0.50, y2: 0.59, color: '#c084fc', role: 'pendulum', label: 'Falda / Correa' },
+                upperLegR: { x1: 0.43, y1: 0.52, x2: 0.41, y2: 0.71, color: '#f59e0b', role: 'legR', label: 'Muslo Izq' },
+                lowerLegR: { x1: 0.41, y1: 0.71, x2: 0.39, y2: 0.90, color: '#fbbf24', role: 'legR', label: 'Pantorrilla Izq' },
+                upperLegL: { x1: 0.57, y1: 0.52, x2: 0.59, y2: 0.71, color: '#f59e0b', role: 'legL', label: 'Muslo Der' },
+                lowerLegL: { x1: 0.59, y1: 0.71, x2: 0.61, y2: 0.90, color: '#fbbf24', role: 'legL', label: 'Pantorrilla Der' }
+            },
+            apose: {
+                torso:     { x1: 0.50, y1: 0.50, x2: 0.50, y2: 0.29, color: '#e2e8f0', role: 'breath', label: 'Torso Central' },
+                neck:      { x1: 0.50, y1: 0.29, x2: 0.50, y2: 0.21, color: '#38bdf8', role: 'head', label: 'Cuello' },
+                head:      { x1: 0.50, y1: 0.21, x2: 0.50, y2: 0.08, color: '#0ea5e9', role: 'head', label: 'Cabeza' },
+                upperArmR: { x1: 0.39, y1: 0.27, x2: 0.24, y2: 0.36, color: '#10b981', role: 'armR', label: 'Brazo 1 Sup (Izq)' },
+                forearmR:  { x1: 0.24, y1: 0.36, x2: 0.10, y2: 0.46, color: '#34d399', role: 'armR', label: 'Brazo 1 Inf (Izq)' },
+                upperArmL: { x1: 0.61, y1: 0.27, x2: 0.76, y2: 0.36, color: '#10b981', role: 'armL', label: 'Brazo 2 Sup (Der)' },
+                forearmL:  { x1: 0.76, y1: 0.36, x2: 0.90, y2: 0.46, color: '#34d399', role: 'armL', label: 'Brazo 2 Inf (Der)' },
+                strap:     { x1: 0.50, y1: 0.49, x2: 0.50, y2: 0.59, color: '#c084fc', role: 'pendulum', label: 'Falda / Correa' },
+                upperLegR: { x1: 0.43, y1: 0.52, x2: 0.41, y2: 0.71, color: '#f59e0b', role: 'legR', label: 'Muslo Izq' },
+                lowerLegR: { x1: 0.41, y1: 0.71, x2: 0.39, y2: 0.90, color: '#fbbf24', role: 'legR', label: 'Pantorrilla Izq' },
+                upperLegL: { x1: 0.57, y1: 0.52, x2: 0.59, y2: 0.71, color: '#f59e0b', role: 'legL', label: 'Muslo Der' },
+                lowerLegL: { x1: 0.59, y1: 0.71, x2: 0.61, y2: 0.90, color: '#fbbf24', role: 'legL', label: 'Pantorrilla Der' }
+            },
+            compact: {
+                torso:     { x1: 0.50, y1: 0.49, x2: 0.50, y2: 0.30, color: '#e2e8f0', role: 'breath', label: 'Torso Central' },
+                neck:      { x1: 0.50, y1: 0.30, x2: 0.49, y2: 0.21, color: '#38bdf8', role: 'head', label: 'Cuello' },
+                head:      { x1: 0.49, y1: 0.21, x2: 0.48, y2: 0.08, color: '#0ea5e9', role: 'head', label: 'Cabeza' },
+                upperArmR: { x1: 0.39, y1: 0.27, x2: 0.33, y2: 0.37, color: '#10b981', role: 'armR', label: 'Brazo 1 Sup (Izq)' },
+                forearmR:  { x1: 0.33, y1: 0.37, x2: 0.44, y2: 0.35, color: '#34d399', role: 'armR', label: 'Brazo 1 Inf (Izq)' },
+                upperArmL: { x1: 0.61, y1: 0.27, x2: 0.67, y2: 0.37, color: '#10b981', role: 'armL', label: 'Brazo 2 Sup (Der)' },
+                forearmL:  { x1: 0.67, y1: 0.37, x2: 0.56, y2: 0.35, color: '#34d399', role: 'armL', label: 'Brazo 2 Inf (Der)' },
+                strap:     { x1: 0.50, y1: 0.49, x2: 0.50, y2: 0.59, color: '#c084fc', role: 'pendulum', label: 'Falda / Correa' },
+                upperLegR: { x1: 0.44, y1: 0.51, x2: 0.42, y2: 0.71, color: '#f59e0b', role: 'legR', label: 'Muslo Izq' },
+                lowerLegR: { x1: 0.42, y1: 0.71, x2: 0.43, y2: 0.90, color: '#fbbf24', role: 'legR', label: 'Pantorrilla Izq' },
+                upperLegL: { x1: 0.56, y1: 0.51, x2: 0.55, y2: 0.71, color: '#f59e0b', role: 'legL', label: 'Muslo Der' },
+                lowerLegL: { x1: 0.55, y1: 0.71, x2: 0.52, y2: 0.90, color: '#fbbf24', role: 'legL', label: 'Pantorrilla Der' }
+            }
+        };
+
+        const viewportCanvas = document.getElementById('viewportCanvas');
+        const ctx = viewportCanvas.getContext('2d');
+        const timelineCanvas = document.getElementById('timelineCanvas');
+        const tCtx = timelineCanvas.getContext('2d');
+
+        let lastFrameTimestamp = performance.now();
+        let fpsTracker = 60;
+
+        function initApplication() {
+            applyPoseTemplate('dynamic', false);
+            loadLayerPreset('preset1', false);
+
+            resizeAllCanvases();
+            window.addEventListener('resize', resizeAllCanvases);
+
+            resetCameraView();
+            setupViewportInteractions();
+            setupTimelineInteractions();
+
+            renderPartTreeUI();
+            renderBoneTreeUI();
+            syncPartInspectorUI();
+            syncBoneInspectorUI();
+            syncWeightBrushSliders();
+            syncAnimSliders();
+            setSystemState('setup');
+            updateUndoRedoButtons();
+
+            requestAnimationFrame(mainStudioLoop);
+        }
+
+        function changeCanvasResolution() {
+            const nw = Math.max(256, Math.min(8192, parseInt(document.getElementById('inpCanvasW').value, 10) || 1536));
+            const nh = Math.max(256, Math.min(8192, parseInt(document.getElementById('inpCanvasH').value, 10) || 2752));
+            if (nw === RefWidth && nh === RefHeight) return;
+            pushUndoState();
+            RefWidth = nw;
+            RefHeight = nh;
+            document.getElementById('inpCanvasW').value = RefWidth;
+            document.getElementById('inpCanvasH').value = RefHeight;
+
+            studio.parts.forEach(p => {
+                const resized = document.createElement('canvas');
+                resized.width = RefWidth;
+                resized.height = RefHeight;
+                resized.getContext('2d').drawImage(p.rawSourceCanvas, 0, 0, RefWidth, RefHeight);
+                p.rawSourceCanvas = resized;
+                p.bakedCanvas = cloneCanvas(resized);
+            });
+
+            rebuildAllPartMeshes();
+            resetCameraView();
+        }
+
+        function resizeAllCanvases() {
+            const vpRect = document.getElementById('viewportContainer').getBoundingClientRect();
+            const dpr = window.devicePixelRatio || 1;
+            viewportCanvas.width = Math.max(1, Math.floor(vpRect.width * dpr));
+            viewportCanvas.height = Math.max(1, Math.floor(vpRect.height * dpr));
+
+            const tlRect = timelineCanvas.parentElement.getBoundingClientRect();
+            timelineCanvas.width = Math.max(1, Math.floor(tlRect.width * dpr));
+            timelineCanvas.height = Math.max(1, Math.floor(tlRect.height * dpr));
+        }
+
+        function screenToWorld(sx, sy) {
+            return {
+                x: (sx - studio.camera.x) / studio.camera.zoom,
+                y: (sy - studio.camera.y) / studio.camera.zoom
+            };
+        }
+
+        function resetCameraView() {
+            const vpRect = document.getElementById('viewportContainer').getBoundingClientRect();
+            const fitZoom = Math.min((vpRect.width * 0.84) / RefWidth, (vpRect.height * 0.88) / RefHeight);
+            studio.camera.zoom = Math.max(studio.camera.minZoom, Math.min(studio.camera.maxZoom, fitZoom || 0.25));
+            studio.camera.x = (vpRect.width - RefWidth * studio.camera.zoom) * 0.5;
+            studio.camera.y = (vpRect.height - RefHeight * studio.camera.zoom) * 0.5;
+            updateCameraReadout();
+        }
+
+        function zoomCameraAtPoint(factor, screenX, screenY) {
+            const before = screenToWorld(screenX, screenY);
+            const nextZoom = Math.max(studio.camera.minZoom, Math.min(studio.camera.maxZoom, studio.camera.zoom * factor));
+            studio.camera.zoom = nextZoom;
+            studio.camera.x = screenX - before.x * nextZoom;
+            studio.camera.y = screenY - before.y * nextZoom;
+            updateCameraReadout();
+        }
+
+        function zoomCameraStep(factor) {
+            const vpRect = document.getElementById('viewportContainer').getBoundingClientRect();
+            zoomCameraAtPoint(factor, vpRect.width * 0.5, vpRect.height * 0.5);
+        }
+
+        function updateCameraReadout() {
+            document.getElementById('zoomReadout').textContent = Math.round(studio.camera.zoom * 100) + '%';
+        }
+
+        function serializeStudioSnapshot(includeImages = false) {
+            return {
+                refWidth: RefWidth,
+                refHeight: RefHeight,
+                activePosePreset: studio.activePosePreset,
+                activeLayerPreset: studio.activeLayerPreset,
+                legVariantStyle: studio.legVariantStyle,
+                selectedBoneId: studio.selectedBoneId,
+                selectedPartId: studio.selectedPartId,
+                bones: JSON.parse(JSON.stringify(studio.bones)),
+                anim: JSON.parse(JSON.stringify(studio.anim)),
+                meshConfig: JSON.parse(JSON.stringify(studio.meshConfig)),
+                parts: studio.parts.map(p => ({
+                    id: p.id,
+                    name: p.name,
+                    color: p.color,
+                    visible: p.visible,
+                    x: p.x,
+                    y: p.y,
+                    scaleX: p.scaleX,
+                    scaleY: p.scaleY,
+                    rot: p.rot,
+                    allowedBones: [...(p.allowedBones || [])],
+                    anchor: p.anchor ? { ...p.anchor } : { parentBone: 'none', nx: 0.5, ny: 0.3, radiusPct: 12, strength: 0 },
+                    rawDataUrl: includeImages ? p.rawSourceCanvas.toDataURL('image/png') : null,
+                    rawCanvasRef: includeImages ? null : cloneCanvas(p.rawSourceCanvas),
+                    vertexOffsetsAndWeights: p.mesh.vertices.map(v => ({
+                        ox: v.ox,
+                        oy: v.oy,
+                        weights: { ...v.weights }
+                    }))
+                }))
+            };
+        }
+
+        function restoreStudioSnapshot(snap) {
+            if (!snap) return;
+            if (snap.refWidth && snap.refHeight) {
+                RefWidth = snap.refWidth;
+                RefHeight = snap.refHeight;
+                document.getElementById('inpCanvasW').value = RefWidth;
+                document.getElementById('inpCanvasH').value = RefHeight;
+            }
+            studio.activePosePreset = snap.activePosePreset || 'dynamic';
+            studio.activeLayerPreset = snap.activeLayerPreset || 'preset1';
+            studio.legVariantStyle = snap.legVariantStyle || 'calcetas';
+            studio.selectedBoneId = snap.selectedBoneId || 'torso';
+            studio.selectedPartId = snap.selectedPartId || (snap.parts[0] ? snap.parts[0].id : 'Cabeza');
+            studio.bones = JSON.parse(JSON.stringify(snap.bones));
+            studio.anim = JSON.parse(JSON.stringify(snap.anim));
+            if (snap.meshConfig) {
+                studio.meshConfig = JSON.parse(JSON.stringify(snap.meshConfig));
+                document.getElementById('chkFullRectMesh').checked = !!studio.meshConfig.fullRect;
+            }
+
+            const restoreParts = async () => {
+                const newParts = [];
+                for (let i = 0; i < snap.parts.length; i++) {
+                    const sp = snap.parts[i];
+                    let rawCanvas = sp.rawCanvasRef ? cloneCanvas(sp.rawCanvasRef) : null;
+                    if (!rawCanvas && sp.rawDataUrl) {
+                        rawCanvas = await dataUrlToCanvas(sp.rawDataUrl);
+                    }
+                    if (!rawCanvas) {
+                        rawCanvas = createDefaultPartCanvas(sp.id, studio.legVariantStyle);
+                    }
+                    const pObj = {
+                        id: sp.id,
+                        name: sp.name,
+                        color: sp.color || '#38bdf8',
+                        visible: sp.visible !== false,
+                        x: sp.x || 0,
+                        y: sp.y || 0,
+                        scaleX: sp.scaleX || 1.0,
+                        scaleY: sp.scaleY || 1.0,
+                        rot: sp.rot || 0,
+                        allowedBones: [...(sp.allowedBones || [])],
+                        anchor: sp.anchor ? { ...sp.anchor } : { parentBone: 'none', nx: 0.5, ny: 0.3, radiusPct: 12, strength: 0 },
+                        rawSourceCanvas: rawCanvas,
+                        bakedCanvas: cloneCanvas(rawCanvas),
+                        mesh: { bounds: {}, vertices: [], triangles: [], hullEdges: [], neighbors: [] }
+                    };
+                    buildSinglePartMesh(pObj, false);
+                    if (sp.vertexOffsetsAndWeights && sp.vertexOffsetsAndWeights.length === pObj.mesh.vertices.length) {
+                        for (let vIdx = 0; vIdx < pObj.mesh.vertices.length; vIdx++) {
+                            pObj.mesh.vertices[vIdx].ox = sp.vertexOffsetsAndWeights[vIdx].ox || 0;
+                            pObj.mesh.vertices[vIdx].oy = sp.vertexOffsetsAndWeights[vIdx].oy || 0;
+                            pObj.mesh.vertices[vIdx].weights = { ...sp.vertexOffsetsAndWeights[vIdx].weights };
+                        }
+                    } else {
+                        computePartSmoothWeights(pObj);
+                    }
+                    newParts.push(pObj);
+                }
+                studio.parts = newParts;
+                updatePresetUIButtons();
+                renderPartTreeUI();
+                renderBoneTreeUI();
+                syncPartInspectorUI();
+                syncBoneInspectorUI();
+            };
+
+            restoreParts();
+        }
+
+        function dataUrlToCanvas(dataUrl) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => {
+                    const c = document.createElement('canvas');
+                    c.width = RefWidth;
+                    c.height = RefHeight;
+                    c.getContext('2d').drawImage(img, 0, 0, RefWidth, RefHeight);
+                    resolve(c);
+                };
+                img.onerror = () => {
+                    const c = document.createElement('canvas');
+                    c.width = RefWidth;
+                    c.height = RefHeight;
+                    resolve(c);
+                };
+                img.src = dataUrl;
+            });
+        }
+
+        function pushUndoState() {
+            const snap = serializeStudioSnapshot(false);
+            studio.undoStack.push(snap);
+            if (studio.undoStack.length > studio.maxHistory) {
+                studio.undoStack.shift();
+            }
+            studio.redoStack = [];
+            updateUndoRedoButtons();
+        }
+
+        function performUndo() {
+            if (studio.undoStack.length === 0) return;
+            const current = serializeStudioSnapshot(false);
+            studio.redoStack.push(current);
+            const prev = studio.undoStack.pop();
+            restoreStudioSnapshot(prev);
+            updateUndoRedoButtons();
+        }
+
+        function performRedo() {
+            if (studio.redoStack.length === 0) return;
+            const current = serializeStudioSnapshot(false);
+            studio.undoStack.push(current);
+            const next = studio.redoStack.pop();
+            restoreStudioSnapshot(next);
+            updateUndoRedoButtons();
+        }
+
+        function updateUndoRedoButtons() {
+            document.getElementById('btnUndo').disabled = (studio.undoStack.length === 0);
+            document.getElementById('btnRedo').disabled = (studio.redoStack.length === 0);
+        }
+
+        function saveProjectToFile() {
+            const fullProject = serializeStudioSnapshot(true);
+            const jsonStr = JSON.stringify(fullProject, null, 2);
+            const blob = new Blob([jsonStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'Proyecto_LiamAvatar2Unity.l2u';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function loadProjectFromFile(event) {
+            const file = event.target.files && event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                try {
+                    const parsed = JSON.parse(ev.target.result);
+                    pushUndoState();
+                    restoreStudioSnapshot(parsed);
+                } catch (err) {}
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
+        // ============================================================================
+        // GENERACION ESCALADA A RESOLUCION NATIVA (1536 x 2752) DE LOS 2 PRESETS
+        // ============================================================================
+        function createDefaultPartCanvas(partType, legVariant = 'calcetas') {
+            const c = document.createElement('canvas');
+            c.width = RefWidth;
+            c.height = RefHeight;
+            const g = c.getContext('2d');
+            g.save();
+            g.scale(RefWidth / 520, RefHeight / 700);
+            g.lineCap = 'round';
+            g.lineJoin = 'round';
+
+            if (partType === 'Cabeza') {
+                g.save();
+                g.translate(245, 130);
+                g.fillStyle = '#181622';
+                g.strokeStyle = '#0d0c14';
+                g.lineWidth = 2.5;
+                g.beginPath();
+                g.arc(0, -10, 46, 0, Math.PI * 2);
+                g.fill();
+                g.stroke();
+
+                g.fillStyle = '#e7d4fa';
+                g.strokeStyle = '#4a355f';
+                g.lineWidth = 2.2;
+                g.beginPath();
+                g.roundRect(-13, 18, 26, 32, 6);
+                g.fill();
+                g.stroke();
+
+                g.fillStyle = '#f8f0ff';
+                g.beginPath();
+                g.arc(0, 0, 35, 0, Math.PI * 2);
+                g.fill();
+                g.stroke();
+
+                g.strokeStyle = '#23192e';
+                g.fillStyle = '#23192e';
+                g.lineWidth = 2.4;
+                g.beginPath();
+                g.moveTo(-20, -2);
+                g.quadraticCurveTo(-13, -9, -6, -1);
+                g.stroke();
+                g.beginPath();
+                g.arc(14, -2, 4.5, 0, Math.PI * 2);
+                g.fill();
+
+                g.fillStyle = '#ffffff';
+                g.strokeStyle = '#4a355f';
+                g.lineWidth = 2;
+                g.beginPath();
+                g.moveTo(-10, 12);
+                g.quadraticCurveTo(2, 20, 12, 12);
+                g.closePath();
+                g.fill();
+                g.stroke();
+
+                g.strokeStyle = '#2c2238';
+                g.lineWidth = 2.1;
+                g.fillStyle = 'rgba(255,255,255,0.14)';
+                g.beginPath();
+                g.arc(-13, -1, 12, 0, Math.PI * 2);
+                g.moveTo(26, -1);
+                g.arc(14, -1, 12, 0, Math.PI * 2);
+                g.fill();
+                g.stroke();
+
+                g.fillStyle = '#1d1a27';
+                g.beginPath();
+                g.moveTo(-40, -10);
+                g.bezierCurveTo(-44, -44, 44, -44, 40, -10);
+                g.quadraticCurveTo(18, -24, 10, -4);
+                g.quadraticCurveTo(0, -22, -12, -6);
+                g.quadraticCurveTo(-24, -20, -40, -10);
+                g.closePath();
+                g.fill();
+                g.restore();
+
+            } else if (partType === 'Brazo1') {
+                g.save();
+                g.fillStyle = '#f5ebff';
+                g.strokeStyle = '#4a355f';
+                g.lineWidth = 2.2;
+                g.beginPath();
+                g.arc(98, 315, 16, 0, Math.PI * 2);
+                g.fill();
+                g.stroke();
+
+                const grad = g.createLinearGradient(215, 185, 95, 315);
+                grad.addColorStop(0, '#96919c');
+                grad.addColorStop(1, '#75707c');
+                g.fillStyle = grad;
+                g.strokeStyle = '#2d2836';
+                g.lineWidth = 2.6;
+                g.beginPath();
+                g.moveTo(216, 178);
+                g.quadraticCurveTo(155, 222, 96, 294);
+                g.lineTo(116, 316);
+                g.quadraticCurveTo(175, 252, 226, 212);
+                g.closePath();
+                g.fill();
+                g.stroke();
+                g.restore();
+
+            } else if (partType === 'Torso') {
+                g.save();
+                const tGrad = g.createLinearGradient(200, 165, 310, 345);
+                tGrad.addColorStop(0, '#9a95a0');
+                tGrad.addColorStop(1, '#6f6a76');
+                g.fillStyle = tGrad;
+                g.strokeStyle = '#2d2836';
+                g.lineWidth = 2.6;
+                g.beginPath();
+                g.roundRect(202, 168, 106, 168, 22);
+                g.fill();
+                g.stroke();
+
+                g.fillStyle = '#8b8691';
+                g.beginPath();
+                g.ellipse(255, 168, 46, 18, 0, 0, Math.PI * 2);
+                g.fill();
+                g.stroke();
+
+                g.fillStyle = '#797480';
+                g.beginPath();
+                g.moveTo(224, 272);
+                g.lineTo(286, 272);
+                g.lineTo(296, 314);
+                g.lineTo(214, 314);
+                g.closePath();
+                g.fill();
+                g.stroke();
+
+                g.strokeStyle = '#1b1922';
+                g.lineWidth = 4.8;
+                g.beginPath();
+                g.moveTo(242, 176);
+                g.lineTo(244, 242);
+                g.moveTo(268, 176);
+                g.lineTo(272, 246);
+                g.stroke();
+                g.restore();
+
+            } else if (partType === 'Brazo2') {
+                g.save();
+                g.fillStyle = '#f5ebff';
+                g.strokeStyle = '#4a355f';
+                g.lineWidth = 2.2;
+                g.beginPath();
+                g.arc(386, 192, 15, 0, Math.PI * 2);
+                g.fill();
+                g.stroke();
+
+                g.fillStyle = '#85808b';
+                g.strokeStyle = '#2d2836';
+                g.lineWidth = 2.5;
+                g.beginPath();
+                g.moveTo(292, 184);
+                g.lineTo(342, 236);
+                g.lineTo(382, 198);
+                g.lineTo(368, 178);
+                g.lineTo(338, 204);
+                g.lineTo(298, 168);
+                g.closePath();
+                g.fill();
+                g.stroke();
+                g.restore();
+
+            } else if (partType === 'Falda') {
+                g.save();
+                g.strokeStyle = '#181620';
+                g.lineWidth = 6.2;
+                g.beginPath();
+                g.moveTo(212, 330);
+                g.bezierCurveTo(175, 355, 175, 405, 206, 396);
+                g.stroke();
+
+                g.fillStyle = '#282630';
+                g.strokeStyle = '#121117';
+                g.lineWidth = 2.6;
+                g.beginPath();
+                g.moveTo(204, 322);
+                g.lineTo(306, 322);
+                g.lineTo(336, 404);
+                g.lineTo(176, 404);
+                g.closePath();
+                g.fill();
+                g.stroke();
+
+                g.strokeStyle = '#16151c';
+                g.lineWidth = 2;
+                for (let i = 1; i <= 5; i++) {
+                    const tx = 204 + i * 17;
+                    const bx = 176 + i * 26.5;
+                    g.beginPath();
+                    g.moveTo(tx, 326);
+                    g.lineTo(bx, 402);
+                    g.stroke();
+                }
+                g.restore();
+
+            } else if (partType === 'Piernas') {
+                g.save();
+                if (legVariant === 'calcetas') {
+                    g.strokeStyle = '#f5ebff';
+                    g.lineWidth = 34;
+                    g.beginPath();
+                    g.moveTo(222, 342);
+                    g.lineTo(210, 455);
+                    g.moveTo(286, 342);
+                    g.lineTo(318, 438);
+                    g.stroke();
+
+                    g.strokeStyle = '#24222c';
+                    g.lineWidth = 32;
+                    g.beginPath();
+                    g.moveTo(210, 448);
+                    g.lineTo(192, 582);
+                    g.moveTo(318, 435);
+                    g.lineTo(256, 542);
+                    g.stroke();
+                } else {
+                    g.fillStyle = '#24222b';
+                    g.strokeStyle = '#111016';
+                    g.lineWidth = 2.6;
+                    g.beginPath();
+                    g.moveTo(205, 326);
+                    g.lineTo(306, 326);
+                    g.lineTo(342, 445);
+                    g.lineTo(272, 548);
+                    g.lineTo(242, 532);
+                    g.lineTo(288, 442);
+                    g.lineTo(254, 386);
+                    g.lineTo(214, 588);
+                    g.lineTo(176, 580);
+                    g.lineTo(202, 455);
+                    g.closePath();
+                    g.fill();
+                    g.stroke();
+
+                    g.fillStyle = '#f46d75';
+                    g.fillRect(202, 412, 24, 4.5);
+                    g.fillRect(306, 404, 22, 4.5);
+                }
+
+                g.fillStyle = '#f8f5ff';
+                g.strokeStyle = '#534168';
+                g.lineWidth = 2.2;
+                g.beginPath();
+                g.roundRect(168, 576, 46, 52, 14);
+                g.fill();
+                g.stroke();
+
+                g.save();
+                g.translate(252, 542);
+                g.rotate(0.24);
+                g.beginPath();
+                g.roundRect(-20, -12, 44, 50, 14);
+                g.fill();
+                g.stroke();
+                g.restore();
+                g.restore();
+            }
+
+            g.restore();
+            return c;
+        }
+
+        function createSegmentedSubPartCanvas(subType) {
+            const c = document.createElement('canvas');
+            c.width = RefWidth;
+            c.height = RefHeight;
+            const g = c.getContext('2d');
+            g.save();
+            g.scale(RefWidth / 520, RefHeight / 700);
+            g.lineCap = 'round';
+            g.lineJoin = 'round';
+
+            if (subType === 'CabelloFrontal') {
+                g.fillStyle = '#1d1a27';
+                g.beginPath();
+                g.arc(245, 118, 42, Math.PI * 0.95, Math.PI * 2.05);
+                g.fill();
+            } else if (subType === 'Lentes') {
+                g.strokeStyle = '#2c2238';
+                g.lineWidth = 2.2;
+                g.beginPath();
+                g.arc(232, 129, 12, 0, Math.PI * 2);
+                g.moveTo(244, 129);
+                g.arc(259, 129, 12, 0, Math.PI * 2);
+                g.stroke();
+            } else if (subType === 'OjosBoca') {
+                g.strokeStyle = '#23192e';
+                g.fillStyle = '#23192e';
+                g.lineWidth = 2.4;
+                g.beginPath();
+                g.moveTo(225, 128);
+                g.quadraticCurveTo(232, 121, 239, 129);
+                g.stroke();
+                g.beginPath();
+                g.arc(259, 128, 4.5, 0, Math.PI * 2);
+                g.fill();
+                g.beginPath();
+                g.moveTo(236, 143);
+                g.quadraticCurveTo(246, 150, 256, 143);
+                g.stroke();
+            } else if (subType === 'CabezaBase') {
+                g.fillStyle = '#e7d4fa';
+                g.strokeStyle = '#4a355f';
+                g.lineWidth = 2.2;
+                g.beginPath();
+                g.roundRect(232, 148, 26, 32, 6);
+                g.fill();
+                g.stroke();
+                g.fillStyle = '#f8f0ff';
+                g.beginPath();
+                g.arc(245, 130, 35, 0, Math.PI * 2);
+                g.fill();
+                g.stroke();
+            } else if (subType === 'Cordones') {
+                g.strokeStyle = '#1b1922';
+                g.lineWidth = 4.8;
+                g.beginPath();
+                g.moveTo(242, 176);
+                g.lineTo(244, 242);
+                g.moveTo(268, 176);
+                g.lineTo(272, 246);
+                g.stroke();
+            } else if (subType === 'Brazo1Antebrazo') {
+                g.strokeStyle = '#75707c';
+                g.lineWidth = 26;
+                g.beginPath();
+                g.moveTo(155, 248);
+                g.lineTo(104, 308);
+                g.stroke();
+                g.fillStyle = '#f5ebff';
+                g.beginPath();
+                g.arc(98, 315, 15, 0, Math.PI * 2);
+                g.fill();
+            } else if (subType === 'Brazo1Hombro') {
+                g.strokeStyle = '#908b96';
+                g.lineWidth = 28;
+                g.beginPath();
+                g.moveTo(214, 194);
+                g.lineTo(155, 248);
+                g.stroke();
+            } else if (subType === 'Brazo2Antebrazo') {
+                g.strokeStyle = '#75707c';
+                g.lineWidth = 25;
+                g.beginPath();
+                g.moveTo(338, 224);
+                g.lineTo(380, 194);
+                g.stroke();
+                g.fillStyle = '#f5ebff';
+                g.beginPath();
+                g.arc(386, 190, 14, 0, Math.PI * 2);
+                g.fill();
+            } else if (subType === 'Brazo2Hombro') {
+                g.strokeStyle = '#88838e';
+                g.lineWidth = 27;
+                g.beginPath();
+                g.moveTo(296, 186);
+                g.lineTo(338, 224);
+                g.stroke();
+            } else if (subType === 'Correa') {
+                g.strokeStyle = '#181620';
+                g.lineWidth = 6.2;
+                g.beginPath();
+                g.moveTo(212, 330);
+                g.bezierCurveTo(175, 355, 175, 405, 206, 396);
+                g.stroke();
+            } else if (subType === 'Muslos') {
+                g.strokeStyle = '#f5ebff';
+                g.lineWidth = 34;
+                g.beginPath();
+                g.moveTo(222, 342);
+                g.lineTo(210, 455);
+                g.moveTo(286, 342);
+                g.lineTo(318, 438);
+                g.stroke();
+            } else if (subType === 'PiernasTenis') {
+                g.strokeStyle = '#24222c';
+                g.lineWidth = 32;
+                g.beginPath();
+                g.moveTo(210, 448);
+                g.lineTo(192, 582);
+                g.moveTo(318, 435);
+                g.lineTo(256, 542);
+                g.stroke();
+                g.fillStyle = '#f8f5ff';
+                g.strokeStyle = '#534168';
+                g.lineWidth = 2.2;
+                g.beginPath();
+                g.roundRect(168, 576, 46, 52, 14);
+                g.roundRect(234, 532, 44, 50, 14);
+                g.fill();
+                g.stroke();
+            } else if (subType === 'CabelloTrasero') {
+                g.fillStyle = '#181622';
+                g.beginPath();
+                g.arc(245, 122, 48, 0, Math.PI * 2);
+                g.fill();
+            }
+
+            g.restore();
+            return c;
+        }
+
+        function loadLayerPreset(presetName, recordUndo = false) {
+            if (recordUndo) pushUndoState();
+            studio.activeLayerPreset = presetName;
+
+            if (presetName === 'preset1') {
+                const defs = [
+                    {
+                        id: 'Cabeza',
+                        name: 'Cabeza',
+                        color: '#38bdf8',
+                        allowedBones: ['head', 'neck'],
+                        anchor: { parentBone: 'torso', nx: 0.48, ny: 0.28, radiusPct: 12, strength: 0.85 },
+                        sourceCanvas: createDefaultPartCanvas('Cabeza', studio.legVariantStyle)
+                    },
+                    {
+                        id: 'Brazo1',
+                        name: 'Brazo 1 (Izq Pantalla)',
+                        color: '#10b981',
+                        allowedBones: ['upperArmR', 'forearmR'],
+                        anchor: { parentBone: 'torso', nx: 0.41, ny: 0.28, radiusPct: 14, strength: 0.90 },
+                        sourceCanvas: createDefaultPartCanvas('Brazo1', studio.legVariantStyle)
+                    },
+                    {
+                        id: 'Torso',
+                        name: 'Torso',
+                        color: '#818cf8',
+                        allowedBones: ['torso', 'neck'],
+                        anchor: { parentBone: 'none', nx: 0.49, ny: 0.48, radiusPct: 10, strength: 0.0 },
+                        sourceCanvas: createDefaultPartCanvas('Torso', studio.legVariantStyle)
+                    },
+                    {
+                        id: 'Brazo2',
+                        name: 'Brazo 2 (Der Pantalla)',
+                        color: '#34d399',
+                        allowedBones: ['upperArmL', 'forearmL'],
+                        anchor: { parentBone: 'torso', nx: 0.57, ny: 0.28, radiusPct: 14, strength: 0.90 },
+                        sourceCanvas: createDefaultPartCanvas('Brazo2', studio.legVariantStyle)
+                    },
+                    {
+                        id: 'Falda',
+                        name: 'Falda',
+                        color: '#c084fc',
+                        allowedBones: ['torso', 'strap'],
+                        anchor: { parentBone: 'torso', nx: 0.49, ny: 0.48, radiusPct: 13, strength: 0.85 },
+                        sourceCanvas: createDefaultPartCanvas('Falda', studio.legVariantStyle)
+                    },
+                    {
+                        id: 'Piernas',
+                        name: studio.legVariantStyle === 'calcetas' ? 'PiernasConCalcetasYTenis' : 'PiernasConPantalonYTenis',
+                        color: '#f59e0b',
+                        allowedBones: ['torso', 'upperLegR', 'lowerLegR', 'upperLegL', 'lowerLegL'],
+                        anchor: { parentBone: 'torso', nx: 0.49, ny: 0.49, radiusPct: 12, strength: 0.85 },
+                        sourceCanvas: createDefaultPartCanvas('Piernas', studio.legVariantStyle)
+                    }
+                ];
+
+                studio.parts = defs.map(d => ({
+                    id: d.id,
+                    name: d.name,
+                    color: d.color,
+                    visible: true,
+                    x: 0,
+                    y: 0,
+                    scaleX: 1.0,
+                    scaleY: 1.0,
+                    rot: 0,
+                    allowedBones: [...d.allowedBones],
+                    anchor: { ...d.anchor },
+                    rawSourceCanvas: d.sourceCanvas,
+                    bakedCanvas: cloneCanvas(d.sourceCanvas),
+                    mesh: { bounds: {}, vertices: [], triangles: [], hullEdges: [], neighbors: [] }
+                }));
+
+                studio.selectedPartId = 'Brazo1';
+            } else {
+                const defs2 = [
+                    { id: 'CabelloFrontal', name: 'Cabello Frontal', color: '#38bdf8', allowedBones: ['head'], anchor: { parentBone: 'head', nx: 0.46, ny: 0.16, radiusPct: 10, strength: 0.85 }, canvas: createSegmentedSubPartCanvas('CabelloFrontal') },
+                    { id: 'Lentes', name: 'Lentes', color: '#38bdf8', allowedBones: ['head'], anchor: { parentBone: 'head', nx: 0.46, ny: 0.18, radiusPct: 10, strength: 0.90 }, canvas: createSegmentedSubPartCanvas('Lentes') },
+                    { id: 'OjosBoca', name: 'Ojos y Expresion', color: '#c084fc', allowedBones: ['head'], anchor: { parentBone: 'head', nx: 0.46, ny: 0.19, radiusPct: 10, strength: 0.90 }, canvas: createSegmentedSubPartCanvas('OjosBoca') },
+                    { id: 'CabezaBase', name: 'Cabeza y Cuello', color: '#0ea5e9', allowedBones: ['head', 'neck'], anchor: { parentBone: 'torso', nx: 0.48, ny: 0.28, radiusPct: 12, strength: 0.88 }, canvas: createSegmentedSubPartCanvas('CabezaBase') },
+                    { id: 'Cordones', name: 'Cordones Sudadera', color: '#22d3ee', allowedBones: ['torso', 'neck'], anchor: { parentBone: 'torso', nx: 0.49, ny: 0.28, radiusPct: 11, strength: 0.85 }, canvas: createSegmentedSubPartCanvas('Cordones') },
+                    { id: 'Brazo1Antebrazo', name: 'Brazo 1 Antebrazo + Mano', color: '#34d399', allowedBones: ['forearmR', 'upperArmR'], anchor: { parentBone: 'upperArmR', nx: 0.26, ny: 0.36, radiusPct: 11, strength: 0.85 }, canvas: createSegmentedSubPartCanvas('Brazo1Antebrazo') },
+                    { id: 'Brazo1Hombro', name: 'Brazo 1 Hombro', color: '#10b981', allowedBones: ['upperArmR'], anchor: { parentBone: 'torso', nx: 0.41, ny: 0.28, radiusPct: 14, strength: 0.90 }, canvas: createSegmentedSubPartCanvas('Brazo1Hombro') },
+                    { id: 'Torso', name: 'Torso Sudadera', color: '#818cf8', allowedBones: ['torso', 'neck'], anchor: { parentBone: 'none', nx: 0.49, ny: 0.48, radiusPct: 10, strength: 0.0 }, canvas: createDefaultPartCanvas('Torso', studio.legVariantStyle) },
+                    { id: 'Correa', name: 'Correa Colgante', color: '#c084fc', allowedBones: ['strap', 'torso'], anchor: { parentBone: 'torso', nx: 0.41, ny: 0.47, radiusPct: 11, strength: 0.85 }, canvas: createSegmentedSubPartCanvas('Correa') },
+                    { id: 'Brazo2Antebrazo', name: 'Brazo 2 Antebrazo + Mano', color: '#34d399', allowedBones: ['forearmL', 'upperArmL'], anchor: { parentBone: 'upperArmL', nx: 0.72, ny: 0.35, radiusPct: 11, strength: 0.85 }, canvas: createSegmentedSubPartCanvas('Brazo2Antebrazo') },
+                    { id: 'Brazo2Hombro', name: 'Brazo 2 Hombro', color: '#10b981', allowedBones: ['upperArmL'], anchor: { parentBone: 'torso', nx: 0.57, ny: 0.28, radiusPct: 14, strength: 0.90 }, canvas: createSegmentedSubPartCanvas('Brazo2Hombro') },
+                    { id: 'FaldaExtra', name: 'Falda (Layer Extra)', color: '#e879f9', allowedBones: ['torso', 'strap'], anchor: { parentBone: 'torso', nx: 0.49, ny: 0.48, radiusPct: 13, strength: 0.85 }, canvas: createDefaultPartCanvas('Falda', studio.legVariantStyle) },
+                    { id: 'Muslos', name: 'Muslos', color: '#f59e0b', allowedBones: ['upperLegR', 'upperLegL'], anchor: { parentBone: 'torso', nx: 0.49, ny: 0.49, radiusPct: 12, strength: 0.85 }, canvas: createSegmentedSubPartCanvas('Muslos') },
+                    { id: 'PiernasTenis', name: 'Piernas y Tenis', color: '#fbbf24', allowedBones: ['lowerLegR', 'lowerLegL'], anchor: { parentBone: 'upperLegR', nx: 0.42, ny: 0.67, radiusPct: 11, strength: 0.80 }, canvas: createSegmentedSubPartCanvas('PiernasTenis') },
+                    { id: 'CabelloTrasero', name: 'Cabello Trasero', color: '#60a5fa', allowedBones: ['head', 'neck'], anchor: { parentBone: 'torso', nx: 0.48, ny: 0.26, radiusPct: 12, strength: 0.85 }, canvas: createSegmentedSubPartCanvas('CabelloTrasero') }
+                ];
+
+                studio.parts = defs2.map(d => ({
+                    id: d.id,
+                    name: d.name,
+                    color: d.color,
+                    visible: true,
+                    x: 0,
+                    y: 0,
+                    scaleX: 1.0,
+                    scaleY: 1.0,
+                    rot: 0,
+                    allowedBones: [...d.allowedBones],
+                    anchor: { ...d.anchor },
+                    rawSourceCanvas: d.canvas,
+                    bakedCanvas: cloneCanvas(d.canvas),
+                    mesh: { bounds: {}, vertices: [], triangles: [], hullEdges: [], neighbors: [] }
+                }));
+
+                studio.selectedPartId = 'Brazo1Hombro';
+            }
+
+            rebuildAllPartMeshes();
+            updatePresetUIButtons();
+            renderPartTreeUI();
+            syncPartInspectorUI();
+        }
+
+        function updatePresetUIButtons() {
+            const b1 = document.getElementById('btnPreset1');
+            const b2 = document.getElementById('btnPreset2');
+            const lbl = document.getElementById('lblActivePresetName');
+            if (studio.activeLayerPreset === 'preset1') {
+                b1.className = 'py-1.5 px-2 rounded border border-[#28324e] bg-[#141926] text-left transition preset-active';
+                b2.className = 'py-1.5 px-2 rounded border border-[#28324e] bg-[#141926] text-left text-slate-300 hover:text-white transition';
+                lbl.textContent = 'Preset 1 (Principal)';
+            } else {
+                b2.className = 'py-1.5 px-2 rounded border border-[#28324e] bg-[#141926] text-left transition preset-active';
+                b1.className = 'py-1.5 px-2 rounded border border-[#28324e] bg-[#141926] text-left text-slate-300 hover:text-white transition';
+                lbl.textContent = 'Preset 2 (15 Capas)';
+            }
+
+            const bCalc = document.getElementById('btnLegStyleCalcetas');
+            const bPant = document.getElementById('btnLegStylePantalon');
+            if (studio.legVariantStyle === 'calcetas') {
+                bCalc.className = 'px-2 py-0.5 rounded text-[9px] font-semibold bg-sky-500/20 text-sky-300 border border-sky-500/40';
+                bPant.className = 'px-2 py-0.5 rounded text-[9px] font-semibold bg-[#0e121b] text-slate-400 border border-[#252e45]';
+            } else {
+                bPant.className = 'px-2 py-0.5 rounded text-[9px] font-semibold bg-sky-500/20 text-sky-300 border border-sky-500/40';
+                bCalc.className = 'px-2 py-0.5 rounded text-[9px] font-semibold bg-[#0e121b] text-slate-400 border border-[#252e45]';
+            }
+        }
+
+        function setLegVariantStyle(style) {
+            pushUndoState();
+            studio.legVariantStyle = style;
+            const legPart = studio.parts.find(p => p.id === 'Piernas');
+            const faldaPart = studio.parts.find(p => p.id === 'Falda');
+            if (legPart) {
+                legPart.name = style === 'calcetas' ? 'PiernasConCalcetasYTenis' : 'PiernasConPantalonYTenis';
+                legPart.rawSourceCanvas = createDefaultPartCanvas('Piernas', style);
+                buildSinglePartMesh(legPart);
+            }
+            if (faldaPart && style === 'pantalon') {
+                faldaPart.visible = false;
+            } else if (faldaPart && style === 'calcetas') {
+                faldaPart.visible = true;
+            }
+            updatePresetUIButtons();
+            renderPartTreeUI();
+            syncPartInspectorUI();
+        }
+
+        function cloneCanvas(src) {
+            const c = document.createElement('canvas');
+            c.width = src.width;
+            c.height = src.height;
+            c.getContext('2d').drawImage(src, 0, 0);
+            return c;
+        }
+
+        // IMPORTACION 100% FIEL SIN RECORTES NI REESCALADOS DESTRUCTIVOS
+        function normalizeImageToRefCanvas(img, removeWhiteBg = false) {
+            // Si la imagen subida tiene una resolucion distinta (ej. 1536x2752), sincronizamos el lienzo al 100% de la imagen
+            if (img.width >= 256 && img.height >= 256 && (img.width !== RefWidth || img.height !== RefHeight)) {
+                RefWidth = img.width;
+                RefHeight = img.height;
+                document.getElementById('inpCanvasW').value = RefWidth;
+                document.getElementById('inpCanvasH').value = RefHeight;
+                studio.parts.forEach(p => {
+                    if (p.rawSourceCanvas.width !== RefWidth || p.rawSourceCanvas.height !== RefHeight) {
+                        const rc = document.createElement('canvas');
+                        rc.width = RefWidth;
+                        rc.height = RefHeight;
+                        rc.getContext('2d').drawImage(p.rawSourceCanvas, 0, 0, RefWidth, RefHeight);
+                        p.rawSourceCanvas = rc;
+                        p.bakedCanvas = cloneCanvas(rc);
+                    }
+                });
+            }
+
+            const c = document.createElement('canvas');
+            c.width = RefWidth;
+            c.height = RefHeight;
+            const g = c.getContext('2d');
+
+            // Dibuja el 100% del lienzo sin encoger ni cortar jamas manos, dedos o bordes
+            g.drawImage(img, 0, 0, RefWidth, RefHeight);
+
+            if (removeWhiteBg) {
+                const imgData = g.getImageData(0, 0, RefWidth, RefHeight);
+                const d = imgData.data;
+                for (let i = 0; i < d.length; i += 4) {
+                    if (d[i] > 240 && d[i + 1] > 240 && d[i + 2] > 240) {
+                        d[i + 3] = 0;
+                    }
+                }
+                g.putImageData(imgData, 0, 0);
+            }
+            return c;
+        }
+
+        function updatePartBakedCanvas(part) {
+            if (part.bakedCanvas.width !== RefWidth || part.bakedCanvas.height !== RefHeight) {
+                part.bakedCanvas.width = RefWidth;
+                part.bakedCanvas.height = RefHeight;
+            }
+            const c = part.bakedCanvas;
+            const g = c.getContext('2d');
+            g.clearRect(0, 0, RefWidth, RefHeight);
+
+            const cx = part.mesh.bounds && part.mesh.bounds.bw ? (part.mesh.bounds.minX + part.mesh.bounds.bw * 0.5) : RefWidth * 0.5;
+            const cy = part.mesh.bounds && part.mesh.bounds.bh ? (part.mesh.bounds.minY + part.mesh.bounds.bh * 0.5) : RefHeight * 0.5;
+
+            g.save();
+            g.translate(cx + part.x, cy + part.y);
+            g.rotate((part.rot * Math.PI) / 180);
+            g.scale(part.scaleX, part.scaleY);
+            g.translate(-cx, -cy);
+            g.drawImage(part.rawSourceCanvas, 0, 0, RefWidth, RefHeight);
+            g.restore();
+        }
+
+        // ============================================================================
+        // CONSTRUCCION DE MALLA DE ALTA RESOLUCION SIN RECORTAR EXTREMIDADES
+        // ============================================================================
+        function pointToSegmentDist(px, py, x1, y1, x2, y2) {
+            const dx = x2 - x1, dy = y2 - y1;
+            const len2 = dx * dx + dy * dy;
+            if (len2 < 0.0001) return Math.hypot(px - x1, py - y1);
+            const t = Math.max(0, Math.min(1, ((px - x1) * dx + (py - y1) * dy) / len2));
+            return Math.hypot(px - (x1 + t * dx), py - (y1 + t * dy));
+        }
+
+        function buildSinglePartMesh(part, computeWeights = true) {
+            updatePartBakedCanvas(part);
+            const src = part.bakedCanvas;
+            const w = src.width, h = src.height;
+            const imgData = src.getContext('2d').getImageData(0, 0, w, h).data;
+
+            const baseCols = parseInt(document.getElementById('sl_meshDensity').value, 10) || 22;
+            const padPct = parseInt(document.getElementById('sl_meshPadding').value, 10) || 8;
+            const useFullRect = document.getElementById('chkFullRectMesh').checked;
+
+            const padPx = Math.round(Math.max(w, h) * (padPct / 100));
+
+            let minX = w, minY = h, maxX = 0, maxY = 0, found = false;
+            if (!useFullRect) {
+                const stepScan = Math.max(1, Math.floor(Math.min(w, h) / 350));
+                for (let y = 0; y < h; y += stepScan) {
+                    for (let x = 0; x < w; x += stepScan) {
+                        if (imgData[(y * w + x) * 4 + 3] > 2) {
+                            if (x < minX) minX = x;
+                            if (x > maxX) maxX = x;
+                            if (y < minY) minY = y;
+                            if (y > maxY) maxY = y;
+                            found = true;
+                        }
+                    }
+                }
+            }
+
+            if (useFullRect || !found) {
+                minX = 0; minY = 0; maxX = w; maxY = h;
+            } else {
+                minX = Math.max(0, minX - padPx);
+                minY = Math.max(0, minY - padPx);
+                maxX = Math.min(w, maxX + padPx);
+                maxY = Math.min(h, maxY + padPx);
+            }
+
+            const bw = Math.max(32, maxX - minX);
+            const bh = Math.max(32, maxY - minY);
+
+            const cols = Math.max(10, Math.min(baseCols, Math.round(baseCols * (bw / RefWidth) + 8)));
+            const rows = Math.max(10, Math.min(Math.round(baseCols * 1.45), Math.round(baseCols * 1.45 * (bh / RefHeight) + 8)));
+
+            const vertices = [];
+            for (let r = 0; r <= rows; r++) {
+                const ny = r / rows;
+                const uy = minY + ny * bh;
+                for (let c = 0; c <= cols; c++) {
+                    const nx = c / cols;
+                    const ux = minX + nx * bw;
+                    vertices.push({
+                        u: ux,
+                        v: uy,
+                        nx,
+                        ny,
+                        ox: 0,
+                        oy: 0,
+                        dx: ux,
+                        dy: uy,
+                        weights: {}
+                    });
+                }
+            }
+
+            const hasSilhouetteNearby = (cx, cy, radius) => {
+                if (useFullRect || !found) return true;
+                const x0 = Math.max(0, Math.floor(cx - radius));
+                const x1 = Math.min(w - 1, Math.ceil(cx + radius));
+                const y0 = Math.max(0, Math.floor(cy - radius));
+                const y1 = Math.min(h - 1, Math.ceil(cy + radius));
+                const step = Math.max(1, Math.floor(radius / 3));
+                for (let py = y0; py <= y1; py += step) {
+                    for (let px = x0; px <= x1; px += step) {
+                        if (imgData[(py * w + px) * 4 + 3] > 2) return true;
+                    }
+                }
+                return false;
+            };
+
+            const triangles = [];
+            const edgeCount = new Map();
+            const neighbors = Array.from({ length: vertices.length }, () => new Set());
+
+            const registerEdge = (a, b) => {
+                const key = a < b ? `${a}_${b}` : `${b}_${a}`;
+                edgeCount.set(key, (edgeCount.get(key) || 0) + 1);
+                neighbors[a].add(b);
+                neighbors[b].add(a);
+            };
+
+            const cellRadius = Math.max(bw / cols, bh / rows) * 1.25 + padPx * 0.35;
+
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    const i0 = r * (cols + 1) + c;
+                    const i1 = i0 + 1;
+                    const i2 = i0 + (cols + 1);
+                    const i3 = i2 + 1;
+
+                    const cx1 = (vertices[i0].u + vertices[i1].u + vertices[i2].u) / 3;
+                    const cy1 = (vertices[i0].v + vertices[i1].v + vertices[i2].v) / 3;
+                    if (hasSilhouetteNearby(cx1, cy1, cellRadius)) {
+                        triangles.push([i0, i1, i2]);
+                        registerEdge(i0, i1);
+                        registerEdge(i1, i2);
+                        registerEdge(i2, i0);
+                    }
+
+                    const cx2 = (vertices[i1].u + vertices[i3].u + vertices[i2].u) / 3;
+                    const cy2 = (vertices[i1].v + vertices[i3].v + vertices[i2].v) / 3;
+                    if (hasSilhouetteNearby(cx2, cy2, cellRadius)) {
+                        triangles.push([i1, i3, i2]);
+                        registerEdge(i1, i3);
+                        registerEdge(i3, i2);
+                        registerEdge(i2, i1);
+                    }
+                }
+            }
+
+            const hullEdges = [];
+            edgeCount.forEach((cnt, key) => {
+                if (cnt === 1) hullEdges.push(key.split('_').map(Number));
+            });
+
+            part.mesh = {
+                cols,
+                rows,
+                bounds: { minX, minY, maxX, maxY, bw, bh },
+                vertices,
+                triangles,
+                hullEdges,
+                neighbors: neighbors.map(s => Array.from(s))
+            };
+
+            if (computeWeights) {
+                computePartSmoothWeights(part);
+            }
+        }
+
+        function rebuildAllPartMeshes() {
+            const cols = parseInt(document.getElementById('sl_meshDensity').value, 10) || 22;
+            const padPct = parseInt(document.getElementById('sl_meshPadding').value, 10) || 8;
+            studio.meshConfig.cols = cols;
+            studio.meshConfig.paddingPct = padPct;
+            studio.meshConfig.fullRect = document.getElementById('chkFullRectMesh').checked;
+
+            document.getElementById('val_meshDensity').textContent = cols;
+            document.getElementById('val_meshPadding').textContent = padPct + '%';
+
+            let totalTris = 0;
+            studio.parts.forEach(p => {
+                buildSinglePartMesh(p, true);
+                totalTris += p.mesh.triangles.length;
+            });
+            document.getElementById('meshStatsBadge').textContent = `${totalTris} tris totales`;
+        }
+
+        function computePartSmoothWeights(part) {
+            const baseSigma = Math.max(RefWidth, RefHeight) * 0.085;
+            const activeBones = studio.bones.filter(b =>
+                !part.allowedBones || part.allowedBones.length === 0 || part.allowedBones.includes(b.id)
+            );
+            const fallbackBones = activeBones.length > 0 ? activeBones : studio.bones;
+
+            const bonePixels = fallbackBones.map(b => ({
+                id: b.id,
+                x1: b.nx1 * RefWidth,
+                y1: b.ny1 * RefHeight,
+                x2: b.nx2 * RefWidth,
+                y2: b.ny2 * RefHeight,
+                sigma: baseSigma * (b.envelope || 1.0)
+            }));
+
+            const anchor = part.anchor || { parentBone: 'none', nx: 0.5, ny: 0.3, radiusPct: 12, strength: 0 };
+            const hasAnchorParent = anchor.parentBone && anchor.parentBone !== 'none' && anchor.strength > 0 && studio.bones.some(b => b.id === anchor.parentBone);
+            const anchorPxX = anchor.nx * RefWidth;
+            const anchorPxY = anchor.ny * RefHeight;
+            const anchorRadiusPx = ((anchor.radiusPct || 12) / 100) * RefWidth;
+
+            part.mesh.vertices.forEach(vt => {
+                const wMap = {};
+                let total = 0;
+
+                bonePixels.forEach(bp => {
+                    const d = pointToSegmentDist(vt.u, vt.v, bp.x1, bp.y1, bp.x2, bp.y2);
+                    const w = Math.exp(-(d * d) / (2 * bp.sigma * bp.sigma)) + 1e-6;
+                    wMap[bp.id] = w;
+                    total += w;
+                });
+
+                if (total > 0) {
+                    Object.keys(wMap).forEach(k => { wMap[k] /= total; });
+                } else if (bonePixels[0]) {
+                    wMap[bonePixels[0].id] = 1.0;
+                }
+
+                if (hasAnchorParent) {
+                    const distToAnchor = Math.hypot(vt.u - anchorPxX, vt.v - anchorPxY);
+                    if (distToAnchor < anchorRadiusPx) {
+                        const weldT = Math.pow(1.0 - (distToAnchor / anchorRadiusPx), 1.45) * anchor.strength;
+                        const remain = 1.0 - weldT;
+                        Object.keys(wMap).forEach(k => { wMap[k] *= remain; });
+                        wMap[anchor.parentBone] = (wMap[anchor.parentBone] || 0) + weldT;
+                    }
+                }
+
+                vt.weights = wMap;
+            });
+
+            relaxSinglePartWeights(part, 2);
+        }
+
+        function recomputeAllPartsWeights(recordUndo = false) {
+            if (recordUndo) pushUndoState();
+            studio.parts.forEach(p => computePartSmoothWeights(p));
+        }
+
+        function relaxSinglePartWeights(part, iterations = 2) {
+            const verts = part.mesh.vertices;
+            const nbrs = part.mesh.neighbors;
+            const boneIds = studio.bones.map(b => b.id);
+
+            for (let it = 0; it < iterations; it++) {
+                const nextW = verts.map(v => ({ ...v.weights }));
+                for (let i = 0; i < verts.length; i++) {
+                    const nList = nbrs[i];
+                    if (!nList || nList.length === 0) continue;
+                    const blended = {};
+                    let sum = 0;
+                    boneIds.forEach(bId => {
+                        let acc = (verts[i].weights[bId] || 0) * 0.58;
+                        const share = 0.42 / nList.length;
+                        for (let j = 0; j < nList.length; j++) {
+                            acc += (verts[nList[j]].weights[bId] || 0) * share;
+                        }
+                        if (acc > 0.002) {
+                            blended[bId] = acc;
+                            sum += acc;
+                        }
+                    });
+                    if (sum > 0) {
+                        Object.keys(blended).forEach(k => { blended[k] /= sum; });
+                        nextW[i] = blended;
+                    }
+                }
+                for (let i = 0; i < verts.length; i++) {
+                    verts[i].weights = nextW[i];
+                }
+            }
+        }
+
+        function relaxAllPartWeights(iterations = 2) {
+            studio.parts.forEach(p => relaxSinglePartWeights(p, iterations));
+        }
+
+        // ============================================================================
+        // PLANTILLAS DE POSE, AUTO-DETECCION Y GESTION DE HUESOS
+        // ============================================================================
+        function applyPoseTemplate(presetKey, rebuild = true) {
+            if (rebuild) pushUndoState();
+            const tpl = POSE_TEMPLATES[presetKey];
+            if (!tpl) return;
+            studio.activePosePreset = presetKey;
+
+            studio.bones = Object.entries(tpl).map(([id, b]) => ({
+                id,
+                label: b.label,
+                color: b.color,
+                role: b.role,
+                nx1: b.x1,
+                ny1: b.y1,
+                nx2: b.x2,
+                ny2: b.y2,
+                envelope: 1.0
+            }));
+
+            ['dynamic', 'casual', 'apose', 'compact'].forEach(k => {
+                const el = document.getElementById('poseBtn_' + k);
+                if (el) {
+                    el.className = (k === presetKey)
+                        ? 'px-2 py-1 rounded bg-[#101420] border border-sky-500/70 text-left text-[10px] font-medium text-white'
+                        : 'px-2 py-1 rounded bg-[#101420] border border-[#252d44] text-left text-[10px] font-medium text-slate-300';
+                }
+            });
+
+            if (rebuild) {
+                syncAnchorsWithSkeleton();
+                recomputeAllPartsWeights(false);
+                renderBoneTreeUI();
+                syncBoneInspectorUI();
+                renderPartBoneMaskUI();
+            }
+        }
+
+        function syncAnchorsWithSkeleton() {
+            const findB = (id) => studio.bones.find(b => b.id === id);
+            const neck = findB('neck');
+            const uR = findB('upperArmR');
+            const uL = findB('upperArmL');
+            const torso = findB('torso');
+
+            studio.parts.forEach(p => {
+                if (!p.anchor) return;
+                if (p.id === 'Cabeza' || p.id === 'CabezaBase') {
+                    if (neck) { p.anchor.nx = neck.nx1; p.anchor.ny = neck.ny1; }
+                } else if (p.id === 'Brazo1' || p.id === 'Brazo1Hombro') {
+                    if (uR) { p.anchor.nx = uR.nx1; p.anchor.ny = uR.ny1; }
+                } else if (p.id === 'Brazo2' || p.id === 'Brazo2Hombro') {
+                    if (uL) { p.anchor.nx = uL.nx1; p.anchor.ny = uL.ny1; }
+                } else if (p.id === 'Falda' || p.id === 'Piernas') {
+                    if (torso) { p.anchor.nx = torso.nx1; p.anchor.ny = torso.ny1; }
+                }
+            });
+        }
+
+        function addNewBoneImmediate() {
+            pushUndoState();
+            const parentBone = studio.bones.find(b => b.id === studio.selectedBoneId) || studio.bones[0];
+            const idx = studio.bones.length + 1;
+            const newId = 'boneExtra_' + Date.now().toString().slice(-4);
+
+            const startNX = parentBone ? parentBone.nx2 : 0.50;
+            const startNY = parentBone ? parentBone.ny2 : 0.35;
+            const endNX = Math.max(0.05, Math.min(0.95, startNX + 0.08));
+            const endNY = Math.max(0.05, Math.min(0.95, startNY + 0.08));
+
+            const newBone = {
+                id: newId,
+                label: 'Hueso Extra ' + idx,
+                color: '#f43f5e',
+                role: 'pendulum',
+                nx1: startNX,
+                ny1: startNY,
+                nx2: endNX,
+                ny2: endNY,
+                envelope: 1.0
+            };
+
+            studio.bones.push(newBone);
+            const selPart = studio.parts.find(p => p.id === studio.selectedPartId);
+            if (selPart && selPart.allowedBones) {
+                selPart.allowedBones.push(newId);
+            }
+
+            studio.selectedBoneId = newId;
+            recomputeAllPartsWeights(false);
+            renderBoneTreeUI();
+            syncBoneInspectorUI();
+            renderPartBoneMaskUI();
+        }
+
+        function deleteBoneById(boneId) {
+            if (studio.bones.length <= 1) return;
+            pushUndoState();
+            studio.bones = studio.bones.filter(b => b.id !== boneId);
+            studio.parts.forEach(p => {
+                if (p.allowedBones) {
+                    p.allowedBones = p.allowedBones.filter(id => id !== boneId);
+                }
+            });
+            if (studio.selectedBoneId === boneId) {
+                studio.selectedBoneId = studio.bones[0].id;
+            }
+            recomputeAllPartsWeights(false);
+            renderBoneTreeUI();
+            syncBoneInspectorUI();
+            renderPartBoneMaskUI();
+        }
+
+        function autoDetectPoseFromAllParts() {
+            pushUndoState();
+            const comp = document.createElement('canvas');
+            comp.width = RefWidth;
+            comp.height = RefHeight;
+            const g = comp.getContext('2d');
+            for (let i = studio.parts.length - 1; i >= 0; i--) {
+                if (studio.parts[i].visible) {
+                    g.drawImage(studio.parts[i].bakedCanvas, 0, 0);
+                }
+            }
+            const data = g.getImageData(0, 0, RefWidth, RefHeight).data;
+
+            const scanBand = (ny0, ny1) => {
+                const y0 = Math.max(0, Math.floor(ny0 * RefHeight));
+                const y1 = Math.min(RefHeight - 1, Math.ceil(ny1 * RefHeight));
+                let l = RefWidth, r = 0, sumX = 0, cnt = 0;
+                const step = Math.max(2, Math.floor(RefWidth / 300));
+                for (let y = y0; y <= y1; y += step) {
+                    for (let x = 0; x < RefWidth; x += step) {
+                        if (data[(y * RefWidth + x) * 4 + 3] > 15) {
+                            if (x < l) l = x;
+                            if (x > r) r = x;
+                            sumX += x;
+                            cnt++;
+                        }
+                    }
+                }
+                if (cnt === 0) return { l: 0.3, r: 0.7, m: 0.5 };
+                return { l: l / RefWidth, r: r / RefWidth, m: (sumX / cnt) / RefWidth };
+            };
+
+            const headB = scanBand(0.06, 0.20);
+            const chestB = scanBand(0.24, 0.35);
+            const armB = scanBand(0.28, 0.45);
+            const hipB = scanBand(0.45, 0.55);
+
+            const findB = (id) => studio.bones.find(b => b.id === id);
+            const torso = findB('torso'), neck = findB('neck'), head = findB('head');
+            if (torso && neck && head) {
+                torso.nx1 = hipB.m; torso.ny1 = 0.48;
+                torso.nx2 = chestB.m; torso.ny2 = 0.29;
+                neck.nx1 = chestB.m; neck.ny1 = 0.29;
+                neck.nx2 = (chestB.m + headB.m) * 0.5; neck.ny2 = 0.22;
+                head.nx1 = neck.nx2; head.ny1 = 0.22;
+                head.nx2 = headB.m; head.ny2 = 0.11;
+            }
+
+            const uR = findB('upperArmR'), fR = findB('forearmR');
+            const uL = findB('upperArmL'), fL = findB('forearmL');
+            if (uR && fR && uL && fL) {
+                uR.nx1 = Math.max(0.25, chestB.m - 0.08); uR.ny1 = 0.28;
+                uR.nx2 = (uR.nx1 + armB.l) * 0.52; uR.ny2 = 0.36;
+                fR.nx1 = uR.nx2; fR.ny1 = 0.36;
+                fR.nx2 = Math.max(0.05, armB.l + 0.02); fR.ny2 = 0.45;
+
+                uL.nx1 = Math.min(0.75, chestB.m + 0.08); uL.ny1 = 0.28;
+                uL.nx2 = (uL.nx1 + armB.r) * 0.52; uL.ny2 = 0.35;
+                fL.nx1 = uL.nx2; fL.ny1 = 0.35;
+                fL.nx2 = Math.min(0.95, armB.r - 0.02); fL.ny2 = 0.28;
+            }
+
+            syncAnchorsWithSkeleton();
+            recomputeAllPartsWeights(false);
+            renderBoneTreeUI();
+            syncBoneInspectorUI();
+        }
+
+        // ============================================================================
+        // GESTION DE PARTES Y ORDEN DE CAPAS (Z-ORDER)
+        // ============================================================================
+        function movePartZOrder(index, direction) {
+            const targetIndex = index + direction;
+            if (targetIndex < 0 || targetIndex >= studio.parts.length) return;
+            pushUndoState();
+            const temp = studio.parts[index];
+            studio.parts[index] = studio.parts[targetIndex];
+            studio.parts[targetIndex] = temp;
+            renderPartTreeUI();
+        }
+
+        function createNewEmptyPart(customName, customCanvas) {
+            pushUndoState();
+            const idx = studio.parts.length + 1;
+            const id = 'Parte_' + Date.now().toString().slice(-4) + '_' + idx;
+            const name = customName || ('NuevaParte_' + idx);
+
+            let rawCanvas = customCanvas;
+            if (!rawCanvas) {
+                rawCanvas = document.createElement('canvas');
+                rawCanvas.width = RefWidth;
+                rawCanvas.height = RefHeight;
+                const g = rawCanvas.getContext('2d');
+                g.fillStyle = 'rgba(56, 189, 248, 0.35)';
+                g.strokeStyle = '#38bdf8';
+                g.lineWidth = 4;
+                g.beginPath();
+                g.roundRect(RefWidth * 0.5 - 100, RefHeight * 0.5 - 100, 200, 200, 24);
+                g.fill();
+                g.stroke();
+            }
+
+            const newPart = {
+                id,
+                name,
+                color: '#38bdf8',
+                visible: true,
+                x: 0,
+                y: 0,
+                scaleX: 1.0,
+                scaleY: 1.0,
+                rot: 0,
+                allowedBones: studio.bones.map(b => b.id),
+                anchor: { parentBone: 'torso', nx: 0.49, ny: 0.35, radiusPct: 12, strength: 0.80 },
+                rawSourceCanvas: rawCanvas,
+                bakedCanvas: cloneCanvas(rawCanvas),
+                mesh: { bounds: {}, vertices: [], triangles: [], hullEdges: [], neighbors: [] }
+            };
+
+            studio.parts.unshift(newPart);
+            buildSinglePartMesh(newPart);
+            selectPartById(id);
+        }
+
+        function deletePartById(partId) {
+            if (studio.parts.length <= 1) return;
+            pushUndoState();
+            studio.parts = studio.parts.filter(p => p.id !== partId);
+            if (studio.selectedPartId === partId) {
+                studio.selectedPartId = studio.parts[0].id;
+            }
+            renderPartTreeUI();
+            syncPartInspectorUI();
+        }
+
+        function assignBonesAndAnchorByPartNameHeuristic(partName) {
+            const n = partName.toLowerCase();
+            if (n.includes('cabeza') || n.includes('head') || n.includes('pelo') || n.includes('hair')) {
+                return {
+                    allowedBones: ['head', 'neck'],
+                    anchor: { parentBone: 'torso', nx: 0.48, ny: 0.28, radiusPct: 12, strength: 0.85 }
+                };
+            }
+            if (n.includes('brazo2') || n.includes('brazo 2') || n.includes('arm2') || n.includes('der')) {
+                return {
+                    allowedBones: ['upperArmL', 'forearmL'],
+                    anchor: { parentBone: 'torso', nx: 0.57, ny: 0.28, radiusPct: 14, strength: 0.90 }
+                };
+            }
+            if (n.includes('brazo') || n.includes('arm') || n.includes('izq')) {
+                return {
+                    allowedBones: ['upperArmR', 'forearmR'],
+                    anchor: { parentBone: 'torso', nx: 0.41, ny: 0.28, radiusPct: 14, strength: 0.90 }
+                };
+            }
+            if (n.includes('torso') || n.includes('pecho') || n.includes('sudadera')) {
+                return {
+                    allowedBones: ['torso', 'neck'],
+                    anchor: { parentBone: 'none', nx: 0.49, ny: 0.48, radiusPct: 10, strength: 0.0 }
+                };
+            }
+            if (n.includes('falda') || n.includes('skirt')) {
+                return {
+                    allowedBones: ['torso', 'strap'],
+                    anchor: { parentBone: 'torso', nx: 0.49, ny: 0.48, radiusPct: 13, strength: 0.85 }
+                };
+            }
+            if (n.includes('pierna') || n.includes('leg') || n.includes('pantalon') || n.includes('calceta') || n.includes('tenis')) {
+                return {
+                    allowedBones: ['torso', 'upperLegR', 'lowerLegR', 'upperLegL', 'lowerLegL'],
+                    anchor: { parentBone: 'torso', nx: 0.49, ny: 0.49, radiusPct: 12, strength: 0.85 }
+                };
+            }
+            return {
+                allowedBones: studio.bones.map(b => b.id),
+                anchor: { parentBone: 'torso', nx: 0.49, ny: 0.35, radiusPct: 12, strength: 0.80 }
+            };
+        }
+
+        function importTextureForPartId(partId, file) {
+            if (!file) return;
+            pushUndoState();
+            const removeWhite = document.getElementById('chkAutoRemoveWhite').checked;
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                const img = new Image();
+                img.onload = () => {
+                    const part = studio.parts.find(p => p.id === partId);
+                    if (!part) return;
+                    part.rawSourceCanvas = normalizeImageToRefCanvas(img, removeWhite);
+                    part.x = 0;
+                    part.y = 0;
+                    part.scaleX = 1.0;
+                    part.scaleY = 1.0;
+                    part.rot = 0;
+                    rebuildAllPartMeshes();
+                    selectPartById(partId);
+                    resetCameraView();
+                };
+                img.src = ev.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function importTextureForSelectedPart(e) {
+            const file = e.target.files && e.target.files[0];
+            if (file) importTextureForPartId(studio.selectedPartId, file);
+            e.target.value = '';
+        }
+
+        function importMultiplePartFiles(e) {
+            const files = Array.from(e.target.files || []);
+            if (files.length === 0) return;
+            pushUndoState();
+            const removeWhite = document.getElementById('chkAutoRemoveWhite').checked;
+
+            files.forEach(file => {
+                const cleanName = file.name.replace(/\.[^/.]+$/, '');
+                const existing = studio.parts.find(p => p.name.toLowerCase() === cleanName.toLowerCase() || p.id.toLowerCase() === cleanName.toLowerCase());
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const normCanvas = normalizeImageToRefCanvas(img, removeWhite);
+                        const heur = assignBonesAndAnchorByPartNameHeuristic(cleanName);
+                        if (existing) {
+                            existing.rawSourceCanvas = normCanvas;
+                            existing.x = 0; existing.y = 0; existing.scaleX = 1; existing.scaleY = 1; existing.rot = 0;
+                            existing.allowedBones = heur.allowedBones;
+                            existing.anchor = heur.anchor;
+                            rebuildAllPartMeshes();
+                            renderPartTreeUI();
+                            syncPartInspectorUI();
+                        } else {
+                            createNewEmptyPart(cleanName, normCanvas);
+                            const created = studio.parts[0];
+                            created.allowedBones = heur.allowedBones;
+                            created.anchor = heur.anchor;
+                            computePartSmoothWeights(created);
+                            renderPartTreeUI();
+                            syncPartInspectorUI();
+                        }
+                        resetCameraView();
+                    };
+                    img.src = ev.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+            e.target.value = '';
+        }
+
+        function importSingleFullAvatar(e) {
+            const file = e.target.files && e.target.files[0];
+            if (!file) return;
+            pushUndoState();
+            const removeWhite = document.getElementById('chkAutoRemoveWhite').checked;
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                const img = new Image();
+                img.onload = () => {
+                    const normCanvas = normalizeImageToRefCanvas(img, removeWhite);
+                    studio.parts = [{
+                        id: 'AvatarCompleto',
+                        name: 'Avatar Completo',
+                        color: '#38bdf8',
+                        visible: true,
+                        x: 0,
+                        y: 0,
+                        scaleX: 1.0,
+                        scaleY: 1.0,
+                        rot: 0,
+                        allowedBones: studio.bones.map(b => b.id),
+                        anchor: { parentBone: 'none', nx: 0.5, ny: 0.5, radiusPct: 10, strength: 0 },
+                        rawSourceCanvas: normCanvas,
+                        bakedCanvas: cloneCanvas(normCanvas),
+                        mesh: { bounds: {}, vertices: [], triangles: [], hullEdges: [], neighbors: [] }
+                    }];
+                    studio.selectedPartId = 'AvatarCompleto';
+                    rebuildAllPartMeshes();
+                    autoDetectPoseFromAllParts();
+                    renderPartTreeUI();
+                    syncPartInspectorUI();
+                    resetCameraView();
+                };
+                img.src = ev.target.result;
+            };
+            reader.readAsDataURL(file);
+            e.target.value = '';
+        }
+
+        // ============================================================================
+        // CINEMATICA JERARQUICA CONECTADA + DEFORMACION PROPORCIONAL A LA RESOLUCION
+        // ============================================================================
+        function rotatePointAround(px, py, ox, oy, rad) {
+            const c = Math.cos(rad), s = Math.sin(rad);
+            const dx = px - ox, dy = py - oy;
+            return {
+                x: ox + dx * c - dy * s,
+                y: oy + dx * s + dy * c
+            };
+        }
+
+        function solveSkeletonAndDeformParts(dt) {
+            if (studio.systemState === 'animate' && studio.anim.playing) {
+                studio.anim.time = (studio.anim.time + dt * (studio.anim.speed * 0.45)) % studio.anim.duration;
+            }
+
+            const f = -115 * studio.anim.gust - 7.5 * studio.anim.gustVel;
+            studio.anim.gustVel += f * dt;
+            studio.anim.gust += studio.anim.gustVel * dt;
+
+            const phase = (studio.anim.time / studio.anim.duration) * Math.PI * 2;
+            const sinP = Math.sin(phase);
+            const cosP = Math.cos(phase);
+            const gust = studio.anim.gust;
+
+            const resScaleX = RefWidth / 520;
+            const resScaleY = RefHeight / 700;
+
+            let clipMulHipX = 1.0, clipMulHipY = 1.0, clipMulArm = 1.0, clipWaveBoost = 0;
+            if (studio.anim.clip === 'walk') {
+                clipMulHipX = 1.65; clipMulHipY = 2.0; clipMulArm = 2.0;
+            } else if (studio.anim.clip === 'jump') {
+                clipMulHipY = 3.2; clipMulArm = 2.4;
+            } else if (studio.anim.clip === 'wave') {
+                clipWaveBoost = Math.sin(phase * 2) * 16;
+            }
+
+            const hipDX = (studio.systemState === 'animate') ? (cosP * studio.anim.hipX * resScaleX * clipMulHipX) : 0;
+            const hipDY = (studio.systemState === 'animate') ? (Math.abs(sinP) * studio.anim.hipY * resScaleY * clipMulHipY) : 0;
+
+            const boneTransforms = {};
+            const posedBones = [];
+
+            const torsoBone = studio.bones.find(b => b.id === 'torso') || studio.bones[0];
+            const tRx1 = torsoBone ? torsoBone.nx1 * RefWidth : RefWidth * 0.5;
+            const tRy1 = torsoBone ? torsoBone.ny1 * RefHeight : RefHeight * 0.48;
+
+            const torsoOverride = studio.anim.poseOverrides['torso'] || { dAngle: 0, dx: 0, dy: 0 };
+            const torsoAngle = (studio.systemState === 'animate')
+                ? (torsoOverride.dAngle + (Math.sin(phase - 0.25) * 1.3 + gust * 0.12) * Math.PI / 180)
+                : 0;
+            const torsoScaleY = (studio.systemState === 'animate')
+                ? (1.0 + sinP * studio.anim.breath)
+                : 1.0;
+            const torsoAx1 = tRx1 + hipDX + torsoOverride.dx;
+            const torsoAy1 = tRy1 + hipDY + torsoOverride.dy;
+
+            const evalTorsoSpace = (px, py) => {
+                if (studio.systemState === 'setup') return { x: px, y: py };
+                const sy = tRy1 + (py - tRy1) * torsoScaleY;
+                const rotP = rotatePointAround(px, sy, tRx1, tRy1, torsoAngle);
+                return {
+                    x: rotP.x + (torsoAx1 - tRx1),
+                    y: rotP.y + (torsoAy1 - tRy1)
+                };
+            };
+
+            const solvedMap = {};
+
+            studio.bones.forEach((b, idx) => {
+                const rx1 = b.nx1 * RefWidth;
+                const ry1 = b.ny1 * RefHeight;
+                const rx2 = b.nx2 * RefWidth;
+                const ry2 = b.ny2 * RefHeight;
+
+                if (studio.systemState === 'setup') {
+                    boneTransforms[b.id] = { rx: rx1, ry: ry1, ax: rx1, ay: ry1, dAngle: 0, scaleY: 1 };
+                    const pObj = { ...b, rx1, ry1, rx2, ry2, ax1: rx1, ay1: ry1, ax2: rx2, ay2: ry2 };
+                    posedBones.push(pObj);
+                    solvedMap[b.id] = pObj;
+                    return;
+                }
+
+                const userOffset = studio.anim.poseOverrides[b.id] || { dAngle: 0, dx: 0, dy: 0 };
+
+                if (b.id === 'torso' || b.role === 'breath') {
+                    const pEnd = evalTorsoSpace(rx2, ry2);
+                    boneTransforms[b.id] = {
+                        rx: rx1, ry: ry1,
+                        ax: torsoAx1, ay: torsoAy1,
+                        dAngle: torsoAngle,
+                        scaleY: torsoScaleY
+                    };
+                    const pObj = { ...b, rx1, ry1, rx2, ry2, ax1: torsoAx1, ay1: torsoAy1, ax2: pEnd.x, ay2: pEnd.y };
+                    posedBones.push(pObj);
+                    solvedMap[b.id] = pObj;
+                    return;
+                }
+
+                let ax1 = rx1 + hipDX;
+                let ay1 = ry1 + hipDY;
+                let localAngle = userOffset.dAngle;
+
+                if (b.id === 'neck') {
+                    const anchorPt = evalTorsoSpace(rx1, ry1);
+                    ax1 = anchorPt.x;
+                    ay1 = anchorPt.y;
+                    localAngle += torsoAngle + (Math.sin(phase - 0.5) * (studio.anim.headTilt * 0.45) + gust * 0.2) * Math.PI / 180;
+                } else if (b.id === 'head' || b.role === 'head') {
+                    const neckSolved = solvedMap['neck'];
+                    if (neckSolved) {
+                        ax1 = neckSolved.ax2;
+                        ay1 = neckSolved.ay2;
+                    } else {
+                        const anchorPt = evalTorsoSpace(rx1, ry1);
+                        ax1 = anchorPt.x;
+                        ay1 = anchorPt.y;
+                    }
+                    localAngle += torsoAngle + (Math.sin(phase - 0.65) * studio.anim.headTilt + gust * 0.3) * Math.PI / 180;
+                } else if (b.role === 'armR') {
+                    const isFore = b.id.toLowerCase().includes('fore');
+                    if (isFore && solvedMap['upperArmR']) {
+                        ax1 = solvedMap['upperArmR'].ax2;
+                        ay1 = solvedMap['upperArmR'].ay2;
+                        const deg = (-Math.sin(phase - 0.95) * studio.anim.forearmSwing * clipMulArm + gust * 0.35);
+                        localAngle += (boneTransforms['upperArmR'] ? boneTransforms['upperArmR'].dAngle : 0) + deg * Math.PI / 180;
+                    } else {
+                        const shoulderAnchor = evalTorsoSpace(rx1, ry1);
+                        ax1 = shoulderAnchor.x;
+                        ay1 = shoulderAnchor.y;
+                        const deg = (-Math.sin(phase - 0.35) * studio.anim.armSwing * clipMulArm + gust * 0.2);
+                        localAngle += torsoAngle * 0.7 + deg * Math.PI / 180;
+                    }
+                } else if (b.role === 'armL') {
+                    const isFore = b.id.toLowerCase().includes('fore');
+                    if (isFore && solvedMap['upperArmL']) {
+                        ax1 = solvedMap['upperArmL'].ax2;
+                        ay1 = solvedMap['upperArmL'].ay2;
+                        const deg = (Math.sin(phase - 0.95) * studio.anim.forearmSwing * clipMulArm + clipWaveBoost + gust * 0.35);
+                        localAngle += (boneTransforms['upperArmL'] ? boneTransforms['upperArmL'].dAngle : 0) + deg * Math.PI / 180;
+                    } else {
+                        const shoulderAnchor = evalTorsoSpace(rx1, ry1);
+                        ax1 = shoulderAnchor.x;
+                        ay1 = shoulderAnchor.y;
+                        const deg = (Math.sin(phase - 0.35) * studio.anim.armSwing * clipMulArm + clipWaveBoost * 0.4 + gust * 0.2);
+                        localAngle += torsoAngle * 0.7 + deg * Math.PI / 180;
+                    }
+                } else if (b.role === 'pendulum') {
+                    const hipAnchor = evalTorsoSpace(rx1, ry1);
+                    ax1 = hipAnchor.x;
+                    ay1 = hipAnchor.y;
+                    const deg = Math.sin(phase - 1.15 - idx * 0.2) * studio.anim.pendulumSwing + gust * 0.95;
+                    localAngle += deg * Math.PI / 180;
+                } else if (b.role === 'legR' || b.role === 'legL') {
+                    const isLower = b.id.toLowerCase().includes('lower');
+                    const parentKey = b.role === 'legR' ? 'upperLegR' : 'upperLegL';
+                    if (studio.flags.footIK && studio.anim.clip !== 'walk') {
+                        if (isLower && solvedMap[parentKey]) {
+                            ax1 = solvedMap[parentKey].ax2;
+                            ay1 = solvedMap[parentKey].ay2;
+                            const targetAnkleX = rx2;
+                            const targetAnkleY = ry2;
+                            const restAng = Math.atan2(ry2 - ry1, rx2 - rx1);
+                            const ikAng = Math.atan2(targetAnkleY - ay1, targetAnkleX - ax1);
+                            localAngle += (ikAng - restAng);
+                        } else {
+                            ax1 = rx1 + hipDX * 0.75;
+                            ay1 = ry1 + hipDY * 0.75;
+                            localAngle += (cosP * 2.0) * Math.PI / 180;
+                        }
+                    } else {
+                        const dir = b.role === 'legR' ? 1 : -1;
+                        if (isLower && solvedMap[parentKey]) {
+                            ax1 = solvedMap[parentKey].ax2;
+                            ay1 = solvedMap[parentKey].ay2;
+                        }
+                        localAngle += (Math.sin(phase) * 12 * dir) * Math.PI / 180;
+                    }
+                }
+
+                const rotEnd = rotatePointAround(ax1 + (rx2 - rx1), ay1 + (ry2 - ry1), ax1, ay1, localAngle);
+
+                boneTransforms[b.id] = {
+                    rx: rx1,
+                    ry: ry1,
+                    ax: ax1,
+                    ay: ay1,
+                    dAngle: localAngle,
+                    scaleY: 1.0
+                };
+
+                const pObj = {
+                    ...b,
+                    rx1, ry1, rx2, ry2,
+                    ax1, ay1,
+                    ax2: rotEnd.x,
+                    ay2: rotEnd.y
+                };
+                posedBones.push(pObj);
+                solvedMap[b.id] = pObj;
+            });
+
+            studio.parts.forEach(part => {
+                if (!part.visible) return;
+                const verts = part.mesh.vertices;
+                for (let i = 0; i < verts.length; i++) {
+                    const vt = verts[i];
+                    const u = vt.u + vt.ox;
+                    const v = vt.v + vt.oy;
+
+                    if (studio.systemState === 'setup') {
+                        vt.dx = u;
+                        vt.dy = v;
+                        continue;
+                    }
+
+                    let finalX = 0, finalY = 0, wSum = 0;
+                    const wMap = vt.weights;
+                    for (const bId in wMap) {
+                        const w = wMap[bId];
+                        if (w <= 0.0001) continue;
+                        const tr = boneTransforms[bId];
+                        if (!tr) continue;
+
+                        const localY = tr.ry + (v - tr.ry) * tr.scaleY;
+                        const p = rotatePointAround(u, localY, tr.rx, tr.ry, tr.dAngle);
+                        const tx = p.x + (tr.ax - tr.rx);
+                        const ty = p.y + (tr.ay - tr.ry);
+
+                        finalX += tx * w;
+                        finalY += ty * w;
+                        wSum += w;
+                    }
+
+                    if (wSum > 0.0001) {
+                        vt.dx = finalX / wSum;
+                        vt.dy = finalY / wSum;
+                    } else {
+                        vt.dx = u;
+                        vt.dy = v;
+                    }
+                }
+            });
+
+            return { posedBones, evalTorsoSpace };
+        }
+
+        // ============================================================================
+        // RENDERIZADO DEL VIEWPORT MULTI-MALLA + PUNTOS DE ANCLAJE
+        // ============================================================================
+        function weightToThermalColor(w, alpha = 0.52) {
+            const clamped = Math.max(0, Math.min(1, w));
+            let r = 0, g = 0, b = 0;
+            if (clamped < 0.25) {
+                const t = clamped / 0.25;
+                r = Math.round(25 * (1 - t));
+                g = Math.round(80 + 130 * t);
+                b = Math.round(215 + 30 * t);
+            } else if (clamped < 0.5) {
+                const t = (clamped - 0.25) / 0.25;
+                r = Math.round(16 * t);
+                g = Math.round(210 - 15 * t);
+                b = Math.round(245 * (1 - t));
+            } else if (clamped < 0.75) {
+                const t = (clamped - 0.5) / 0.25;
+                r = Math.round(16 + 234 * t);
+                g = Math.round(195 + 10 * t);
+                b = 15;
+            } else {
+                const t = (clamped - 0.75) / 0.25;
+                r = 245;
+                g = Math.round(205 * (1 - t));
+                b = Math.round(25 * t);
+            }
+            return `rgba(${r},${g},${b},${alpha})`;
+        }
+
+        function drawTexturedTriangleAffine(c, img, u0, v0, u1, v1, u2, v2, x0, y0, x1, y1, x2, y2) {
+            c.save();
+            c.beginPath();
+            c.moveTo(x0, y0);
+            c.lineTo(x1, y1);
+            c.lineTo(x2, y2);
+            c.closePath();
+            c.clip();
+
+            const denom = (u0 * (v2 - v1) - u1 * v2 + u2 * v1 + (u1 - u2) * v0);
+            if (Math.abs(denom) < 0.0001) {
+                c.restore();
+                return;
+            }
+
+            const m11 = -(v0 * (x2 - x1) - v1 * x2 + v2 * x1 + (v1 - v2) * x0) / denom;
+            const m12 = (v1 * y2 + v0 * (y1 - y2) - v2 * y1 + (v2 - v1) * y0) / denom;
+            const m21 = (u0 * (x2 - x1) - u1 * x2 + u2 * x1 + (u1 - u2) * x0) / denom;
+            const m22 = -(u1 * y2 + u0 * (y1 - y2) - u2 * y1 + (u2 - u1) * y0) / denom;
+            const dx = (u0 * (v2 * x1 - v1 * x2) + v0 * (u1 * x2 - u2 * x1) + (u2 * v1 - u1 * v2) * x0) / denom;
+            const dy = (u0 * (v2 * y1 - v1 * y2) + v0 * (u1 * y2 - u2 * y1) + (u2 * v1 - u1 * v2) * y0) / denom;
+
+            c.transform(m11, m12, m21, m22, dx, dy);
+            c.drawImage(img, 0, 0);
+            c.restore();
+        }
+
+        function renderViewport(frame) {
+            const dpr = window.devicePixelRatio || 1;
+            const cw = viewportCanvas.width / dpr;
+            const ch = viewportCanvas.height / dpr;
+
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            ctx.clearRect(0, 0, cw, ch);
+
+            const z = studio.camera.zoom;
+            const camX = studio.camera.x;
+            const camY = studio.camera.y;
+
+            if (studio.flags.showGrid) {
+                const gridStep = Math.max(24, Math.round(80 * z));
+                ctx.strokeStyle = '#141a29';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                const startX = ((camX % gridStep) + gridStep) % gridStep;
+                const startY = ((camY % gridStep) + gridStep) % gridStep;
+                for (let x = startX; x < cw; x += gridStep) {
+                    ctx.moveTo(x, 0);
+                    ctx.lineTo(x, ch);
+                }
+                for (let y = startY; y < ch; y += gridStep) {
+                    ctx.moveTo(0, y);
+                    ctx.lineTo(cw, y);
+                }
+                ctx.stroke();
+            }
+
+            ctx.save();
+            ctx.translate(camX, camY);
+            ctx.scale(z, z);
+
+            ctx.strokeStyle = 'rgba(56, 189, 248, 0.25)';
+            ctx.lineWidth = 1.2 / z;
+            ctx.strokeRect(0, 0, RefWidth, RefHeight);
+
+            for (let pIdx = studio.parts.length - 1; pIdx >= 0; pIdx--) {
+                const part = studio.parts[pIdx];
+                if (!part.visible) continue;
+
+                const md = part.mesh;
+                const tex = part.bakedCanvas;
+                const isSelectedPart = (part.id === studio.selectedPartId);
+
+                for (let i = 0; i < md.triangles.length; i++) {
+                    const [i0, i1, i2] = md.triangles[i];
+                    const v0 = md.vertices[i0], v1 = md.vertices[i1], v2 = md.vertices[i2];
+                    drawTexturedTriangleAffine(
+                        ctx, tex,
+                        v0.u, v0.v, v1.u, v1.v, v2.u, v2.v,
+                        v0.dx, v0.dy, v1.dx, v1.dy, v2.dx, v2.dy
+                    );
+                }
+
+                if ((studio.flags.showWeights || studio.activeTool === 'weights') && (isSelectedPart || document.getElementById('chkPaintAllParts').checked)) {
+                    const targetB = studio.selectedBoneId;
+                    for (let i = 0; i < md.triangles.length; i++) {
+                        const [i0, i1, i2] = md.triangles[i];
+                        const v0 = md.vertices[i0], v1 = md.vertices[i1], v2 = md.vertices[i2
