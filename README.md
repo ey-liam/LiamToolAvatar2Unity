@@ -4,6 +4,8 @@ Herramienta web (single-file HTML) para crear **avatares animados estilo Just Da
 
 > Estado actual: **funcional**, pero la **exportación de archivos para Unity está pendiente de corregir** y aún no se integra la **creación de atlas**.
 
+https://sites.google.com/view/liamtoolavatar2unity/full-page-embed
+
 ## Características
 
 - Editor visual en el navegador (sin instalación, abre `index.html`).
