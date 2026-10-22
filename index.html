@@ -2181,19 +2181,10 @@
         }
 
         function computePartSmoothWeights(part) {
-            const diag = Math.hypot(RefWidth, RefHeight);
-            let activeBones = studio.bones.filter(b =>
+            const baseSigma = Math.max(RefWidth, RefHeight) * 0.085;
+            const activeBones = studio.bones.filter(b =>
                 !part.allowedBones || part.allowedBones.length === 0 || part.allowedBones.includes(b.id)
             );
-            const hasLimbSubBones = activeBones.some(b =>
-                b.id.includes('upperArm') || b.id.includes('forearm') || b.id.includes('upperLeg') || b.id.includes('lowerLeg')
-            );
-            const partLower = ((part.name || '') + ' ' + (part.id || '')).toLowerCase();
-            const isFullBody = partLower.includes('completo') || partLower.includes('full') || activeBones.length >= 8;
-            if (hasLimbSubBones && !isFullBody && activeBones.length > 1) {
-                const withoutTorso = activeBones.filter(b => b.id !== 'torso');
-                if (withoutTorso.length > 0) activeBones = withoutTorso;
-            }
             const fallbackBones = activeBones.length > 0 ? activeBones : studio.bones;
 
             const bonePixels = fallbackBones.map(b => ({
@@ -2202,7 +2193,7 @@
                 y1: b.ny1 * RefHeight,
                 x2: b.nx2 * RefWidth,
                 y2: b.ny2 * RefHeight,
-                env: Math.max(0.25, b.envelope || 1.0)
+                sigma: baseSigma * Math.max(0.25, b.envelope || 1.0)
             }));
 
             const anchor = part.anchor || { parentBone: 'none', nx: 0.5, ny: 0.3, radiusPct: 12, strength: 0 };
@@ -2212,21 +2203,14 @@
             const anchorRadiusPx = ((anchor.radiusPct || 12) / 100) * RefWidth;
 
             part.mesh.vertices.forEach(vt => {
-                const candidates = bonePixels.map(bp => {
-                    const d = pointToSegmentDist(vt.u, vt.v, bp.x1, bp.y1, bp.x2, bp.y2);
-                    const normD = d / (diag * bp.env);
-                    const w = 1.0 / Math.pow(normD + 0.006, 3.2);
-                    return { id: bp.id, normD, w };
-                });
-
-                candidates.sort((a, b) => a.normD - b.normD);
-                const topK = candidates.slice(0, Math.min(2, candidates.length));
-
                 const wMap = {};
                 let total = 0;
-                topK.forEach(c => {
-                    wMap[c.id] = c.w;
-                    total += c.w;
+
+                bonePixels.forEach(bp => {
+                    const d = pointToSegmentDist(vt.u, vt.v, bp.x1, bp.y1, bp.x2, bp.y2);
+                    const w = Math.exp(-(d * d) / (2 * bp.sigma * bp.sigma)) + 1e-6;
+                    wMap[bp.id] = w;
+                    total += w;
                 });
 
                 if (total > 0) {
@@ -4373,18 +4357,18 @@ public class ${className} : MonoBehaviour
 
     [Header("4. Parametros de Malla y Animacion")]
     public AnimationClipMode activeClip = AnimationClipMode.Idle;
-    [Range(0.2f, 4.0f)] public float motionIntensity = 1.65f;
+    [Range(0.1f, 3.0f)] public float motionIntensity = 1.0f;
     public int gridColumns = ${cols};
     public int gridRows = ${rows};
     public float worldScale = 5.0f;
-    public float cycleSpeed = ${Math.max(1.5, studio.anim.speed).toFixed(2)}f;
-    public float breathAmount = ${Math.max(0.02, studio.anim.breath).toFixed(3)}f;
-    public float hipSwayX = ${Math.max(3.5, studio.anim.hipX).toFixed(2)}f;
-    public float hipBounceY = ${Math.max(4.0, studio.anim.hipY).toFixed(2)}f;
-    public float armSwingDeg = ${Math.max(5.5, studio.anim.armSwing).toFixed(2)}f;
-    public float forearmSwingDeg = ${Math.max(7.5, studio.anim.forearmSwing).toFixed(2)}f;
-    public float pendulumSwingDeg = ${Math.max(6.5, studio.anim.pendulumSwing).toFixed(2)}f;
-    public float headTiltDeg = ${Math.max(3.5, studio.anim.headTilt).toFixed(2)}f;
+    public float cycleSpeed = ${studio.anim.speed.toFixed(2)}f;
+    public float breathAmount = ${studio.anim.breath.toFixed(3)}f;
+    public float hipSwayX = ${studio.anim.hipX.toFixed(2)}f;
+    public float hipBounceY = ${studio.anim.hipY.toFixed(2)}f;
+    public float armSwingDeg = ${studio.anim.armSwing.toFixed(2)}f;
+    public float forearmSwingDeg = ${studio.anim.forearmSwing.toFixed(2)}f;
+    public float pendulumSwingDeg = ${studio.anim.pendulumSwing.toFixed(2)}f;
+    public float headTiltDeg = ${studio.anim.headTilt.toFixed(2)}f;
     public bool lockFeetIK = ${studio.flags.footIK ? 'true' : 'false'};
     public bool previewInEditMode = true;
 
@@ -4401,6 +4385,11 @@ public class ${className} : MonoBehaviour
         EditorApplication.update -= OnEditorUpdate;
         EditorApplication.update += OnEditorUpdate;
 #endif
+        if (Mathf.Abs(motionIntensity - 1.65f) < 0.05f || armSwingDeg > 5.0f)
+        {
+            motionIntensity = 1.0f;
+            if (jsonFile != null) ParseJsonData(jsonFile.text, true);
+        }
         if (avatarParts == null || avatarParts.Count == 0 || avatarParts[0].runtimeMesh == null || avatarParts[0].skinWeights == null)
         {
             RebuildAvatarMeshes();
@@ -4420,14 +4409,11 @@ public class ${className} : MonoBehaviour
         if (this == null || !isActiveAndEnabled) return;
         if (Application.isPlaying || !previewInEditMode) return;
         double now = EditorApplication.timeSinceStartup;
+        if (now - lastEditorTime < 0.033) return;
         float dt = Mathf.Clamp((float)(now - lastEditorTime), 0f, 0.05f);
         lastEditorTime = now;
-        if (dt > 0.0001f)
-        {
-            StepAnimation(dt);
-            SceneView.RepaintAll();
-            EditorApplication.QueuePlayerLoopUpdate();
-        }
+        StepAnimation(dt);
+        SceneView.RepaintAll();
     }
 #endif
 
@@ -4758,30 +4744,14 @@ ${defaultLayersCode}
         layer.skinWeights = new BoneWeightPair[vCount];
         if (bones == null || bones.Count == 0) return;
 
-        float diag = Mathf.Sqrt(canvasWidth * canvasWidth + canvasHeight * canvasHeight);
+        float baseSigma = Mathf.Max(canvasWidth, canvasHeight) * 0.085f;
 
         List<int> activeBoneIndices = new List<int>();
-        string partLower = (layer.partName ?? "").ToLower();
-        bool isFullBodyPart = partLower.Contains("completo") || partLower.Contains("full") || (layer.allowedBones != null && layer.allowedBones.Count >= 8);
-        bool hasLimbSubBone = false;
-        if (layer.allowedBones != null)
-        {
-            foreach (string ab in layer.allowedBones)
-            {
-                if (ab.Contains("upperArm") || ab.Contains("forearm") || ab.Contains("upperLeg") || ab.Contains("lowerLeg"))
-                {
-                    hasLimbSubBone = true;
-                    break;
-                }
-            }
-        }
-
         for (int bIdx = 0; bIdx < bones.Count; bIdx++)
         {
             string bId = bones[bIdx].id;
             if (layer.allowedBones == null || layer.allowedBones.Count == 0 || layer.allowedBones.Contains(bId))
             {
-                if (hasLimbSubBone && !isFullBodyPart && bId == "torso") continue;
                 activeBoneIndices.Add(bIdx);
             }
         }
@@ -4807,43 +4777,18 @@ ${defaultLayersCode}
             rawW[i] = new float[bTotal];
             Vector2 uv = layer.canvasUVs[i];
             Vector2 ptPx = new Vector2(uv.x * canvasWidth, uv.y * canvasHeight);
-
-            int best0 = activeBoneIndices[0];
-            int best1 = activeBoneIndices.Count > 1 ? activeBoneIndices[1] : best0;
-            float minD0 = float.MaxValue;
-            float minD1 = float.MaxValue;
+            float total = 0f;
 
             foreach (int bIdx in activeBoneIndices)
             {
                 BoneDefinition b = bones[bIdx];
                 Vector2 sPx = new Vector2(b.restStart.x * canvasWidth, b.restStart.y * canvasHeight);
                 Vector2 ePx = new Vector2(b.restEnd.x * canvasWidth, b.restEnd.y * canvasHeight);
-                float d = PointToSegmentDist(ptPx, sPx, ePx) / Mathf.Max(0.25f, b.envelope);
-                if (d < minD0)
-                {
-                    minD1 = minD0;
-                    best1 = best0;
-                    minD0 = d;
-                    best0 = bIdx;
-                }
-                else if (d < minD1 && bIdx != best0)
-                {
-                    minD1 = d;
-                    best1 = bIdx;
-                }
-            }
-
-            float normD0 = minD0 / diag;
-            float w0 = 1.0f / Mathf.Pow(normD0 + 0.006f, 3.2f);
-            rawW[i][best0] = w0;
-            float total = w0;
-
-            if (best1 != best0 && minD1 < float.MaxValue)
-            {
-                float normD1 = minD1 / diag;
-                float w1 = 1.0f / Mathf.Pow(normD1 + 0.006f, 3.2f);
-                rawW[i][best1] = w1;
-                total += w1;
+                float d = PointToSegmentDist(ptPx, sPx, ePx);
+                float sigma = baseSigma * Mathf.Max(0.25f, b.envelope);
+                float w = Mathf.Exp(-(d * d) / (2f * sigma * sigma)) + 1e-6f;
+                rawW[i][bIdx] = w;
+                total += w;
             }
 
             if (total > 0f)
@@ -5024,8 +4969,10 @@ ${defaultLayersCode}
 
         float aspect = canvasWidth / Mathf.Max(1f, canvasHeight);
 
-        float normHipX = (hipSwayX > 0.2f) ? (hipSwayX / 520f) : hipSwayX;
-        float normHipY = (hipBounceY > 0.2f) ? (hipBounceY / 700f) : hipBounceY;
+        float hipPxX = (hipSwayX < 0.25f) ? (hipSwayX * 250f) : hipSwayX;
+        float hipPxY = (hipBounceY < 0.25f) ? (hipBounceY * 250f) : hipBounceY;
+        float normHipX = hipPxX / 520f;
+        float normHipY = hipPxY / 700f;
 
         float hipDX = cosP * normHipX * aspect * clipMulHipX * motionIntensity;
         float hipDY = -Mathf.Abs(sinP) * normHipY * clipMulHipY * motionIntensity;
@@ -5133,8 +5080,8 @@ ${defaultLayersCode}
                     }
                     else
                     {
-                        a1 = new Vector2(r1.x + hipDX * 0.85f, r1.y + hipDY * 0.85f);
-                        localAngle = -(cosP * 2.5f * motionIntensity) * Mathf.Deg2Rad;
+                        a1 = new Vector2(r1.x + hipDX * 0.75f, r1.y + hipDY * 0.75f);
+                        localAngle = -(cosP * 2.0f * motionIntensity) * Mathf.Deg2Rad;
                     }
                 }
                 else
@@ -5208,16 +5155,16 @@ ${defaultLayersCode}
 
         if (overwriteSliders)
         {
-            cycleSpeed = Mathf.Max(1.5f, ParseFloatKey(jsonText, "cycleSpeed", cycleSpeed));
-            breathAmount = Mathf.Max(0.020f, ParseFloatKey(jsonText, "breathAmount", breathAmount));
+            cycleSpeed = ParseFloatKey(jsonText, "cycleSpeed", cycleSpeed);
+            breathAmount = ParseFloatKey(jsonText, "breathAmount", breathAmount);
             float rawHipX = ParseFloatKey(jsonText, "hipSwayX", hipSwayX);
             float rawHipY = ParseFloatKey(jsonText, "hipBounceY", hipBounceY);
-            hipSwayX = Mathf.Max(3.5f, (rawHipX < 0.2f) ? (rawHipX * 250f) : rawHipX);
-            hipBounceY = Mathf.Max(4.5f, (rawHipY < 0.2f) ? (rawHipY * 250f) : rawHipY);
-            armSwingDeg = Mathf.Max(5.5f, ParseFloatKey(jsonText, "armSwingDeg", armSwingDeg));
-            forearmSwingDeg = Mathf.Max(7.5f, ParseFloatKey(jsonText, "forearmSwingDeg", forearmSwingDeg));
-            pendulumSwingDeg = Mathf.Max(6.5f, ParseFloatKey(jsonText, "pendulumSwingDeg", pendulumSwingDeg));
-            headTiltDeg = Mathf.Max(3.5f, ParseFloatKey(jsonText, "headTiltDeg", headTiltDeg));
+            hipSwayX = (rawHipX < 0.25f) ? (rawHipX * 250f) : rawHipX;
+            hipBounceY = (rawHipY < 0.25f) ? (rawHipY * 250f) : rawHipY;
+            armSwingDeg = ParseFloatKey(jsonText, "armSwingDeg", armSwingDeg);
+            forearmSwingDeg = ParseFloatKey(jsonText, "forearmSwingDeg", forearmSwingDeg);
+            pendulumSwingDeg = ParseFloatKey(jsonText, "pendulumSwingDeg", pendulumSwingDeg);
+            headTiltDeg = ParseFloatKey(jsonText, "headTiltDeg", headTiltDeg);
         }
 
         int bonesStart = jsonText.IndexOf("\\"bones\\"");
