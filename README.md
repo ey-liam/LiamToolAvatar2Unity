@@ -2,7 +2,8 @@
 
 Herramienta web (single-file HTML) y servidor **MCP (Model Context Protocol)** para crear, riggear y animar **avatares 2D en alta resolución (1536x2752)** estilo Just Dance y exportarlos listos para Unity con empaquetador de **Atlas de Texturas Inteligente**.
 
-https://sites.google.com/view/liamtoolavatar2unity/full-page-embed
+- **Google Sites**: https://sites.google.com/view/liamtoolavatar2unity/full-page-embed
+- **GitHub Pages (Auto-actualizable)**: https://ey-liam.github.io/LiamToolAvatar2Unity/
 
 ## Características Principales
 
