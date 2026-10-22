@@ -1,6 +1,6 @@
 # LiamToolAvatar2Unity
 
-Herramienta web (single-file HTML) y servidor **MCP (Model Context Protocol)** para crear, riggear y animar **avatares 2D en alta resolución (1536x2752)** estilo Just Dance y exportarlos listos para Unity con empaquetador de **Atlas de Texturas Inteligente**.
+Herramienta web (single-file HTML) para crear, riggear y animar **avatares 2D en alta resolución (1536x2752)** estilo Just Dance y exportarlos listos para Unity con empaquetador de **Atlas de Texturas Inteligente**.
 
 - **Google Sites**: https://sites.google.com/view/liamtoolavatar2unity/full-page-embed
 - **GitHub Pages (Auto-actualizable)**: https://ey-liam.github.io/LiamToolAvatar2Unity/
@@ -14,21 +14,13 @@ Herramienta web (single-file HTML) y servidor **MCP (Model Context Protocol)** p
 - **Formato de Proyecto `.L2U`**: Guardado y carga de proyectos editables completos con retrocompatibilidad automática.
 - **Servidor MCP Integrado (`mcp-server.js`)**: Permite que agentes de IA tomen capturas en tiempo real del viewport o del Atlas, inspeccionen el estado del rig, ajusten huesos/anclajes/pesos de forma inteligente y exporten los paquetes de Unity automáticamente.
 
-## Herramientas MCP Disponibles para IA
-
-- `avatar_capture_screenshot`: Toma una captura PNG en vivo del viewport (`setup` o `animate`) o del Atlas empaquetado.
-- `avatar_get_state`: Lee el estado completo de capas, orden Z, huesos, anclajes y animación.
-- `avatar_update_bones`: Ajusta coordenadas (`nx1, ny1, nx2, ny2`), roles y envolturas de huesos y recalcula pesos.
-- `avatar_update_part`: Ajusta posición, escala, rotación, orden Z y anclaje anti-dislocación de cualquier parte.
-- `avatar_smart_auto_adjust`: Ejecuta auto-detección de pose por silueta, soldadura de anclajes y suavizado de fronteras.
-- `avatar_configure_mesh_and_anim`: Configura densidad/margen de malla y parámetros procedurales de animación.
-- `avatar_load_l2u_project`: Carga un archivo `.l2u` desde disco.
-- `avatar_export_unity_bundle`: Exporta `LiamAvatar_Atlas.png`, `LiamAvatar.json`, `LiamAvatar2UnityRuntime.cs` y `Proyecto_LiamAvatar2Unity.l2u`.
+## Licencia y Creditos
+- Si usas la Tool dame los créditos necesarios en tu proyecto
+- No robes/copies/clones nada del codigo fuente
 
 ## Estructura del Repositorio
 
 - `index.html` — Aplicación completa auto-contenida (lista para abrir en navegador o incrustar en Google Sites).
-- `mcp-server.js` — Servidor Model Context Protocol (Stdio + puente HTTP en `127.0.0.1:17420`).
 - `LiamAvatar2UnityRuntime.cs` — Script Runtime de Unity para renderizar y animar el Atlas y el JSON.
 - `mcp_config.json` — Configuración de conexión MCP.
 
