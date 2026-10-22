@@ -138,6 +138,13 @@
 
             <div class="h-5 w-px bg-[#22293c]"></div>
 
+            <div class="flex items-center gap-1.5 bg-[#141926] px-2 py-0.5 rounded border border-[#242c42]" title="Nombre del Avatar para exportar .cs, .json y atlas">
+                <span class="text-[10px] text-slate-400 font-semibold">Avatar:</span>
+                <input type="text" id="inpHeaderAvatarName" value="LiamAvatar" oninput="onAvatarNameChanged(this.value)" class="w-28 bg-[#0b0e16] border border-[#26304a] rounded px-1.5 py-0.5 text-[10px] mono text-emerald-300 font-bold focus:outline-none focus:border-emerald-500" placeholder="Nombre Avatar">
+            </div>
+
+            <div class="h-5 w-px bg-[#22293c]"></div>
+
             <div class="flex items-center gap-1">
                 <button id="btnUndo" onclick="performUndo()" disabled class="px-2 py-1 rounded bg-[#151a28] hover:bg-[#1e263a] disabled:opacity-35 border border-[#26304a] text-slate-200 text-[11px] font-medium flex items-center gap-1 transition" title="Ctrl+Z">
                     <svg class="w-3.5 h-3.5 text-sky-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -854,17 +861,21 @@
                     <button id="expTab_atlas" onclick="switchExportTab('atlas')" class="px-3 py-1.5 rounded text-xs font-semibold mode-animate-active">Vista Previa del Atlas Unico</button>
                     <button id="expTab_json" onclick="switchExportTab('json')" class="px-3 py-1.5 rounded text-xs font-semibold bg-[#181f30] text-slate-300 hover:text-white">Archivo LiamAvatar.json</button>
                     <button id="expTab_cs" onclick="switchExportTab('cs')" class="px-3 py-1.5 rounded text-xs font-semibold bg-[#181f30] text-slate-300 hover:text-white">Script C# Unity</button>
+                    <div class="flex items-center gap-1.5 bg-[#141a29] border border-[#28334e] rounded px-2 py-1">
+                        <span class="text-[10px] text-emerald-400 font-bold uppercase">Avatar:</span>
+                        <input id="inpExportAvatarName" type="text" value="LiamAvatar" oninput="onAvatarNameChanged(this.value)" class="bg-[#090d14] border border-[#26314d] rounded px-1.5 py-0.5 text-[11px] text-emerald-300 mono w-32 focus:outline-none focus:border-emerald-500 font-bold" placeholder="Nombre Avatar">
+                    </div>
                     <div class="flex items-center gap-1 bg-[#141a29] border border-[#28334e] rounded px-2 py-1">
                         <span class="text-[10px] text-slate-400 font-semibold">Clase C#:</span>
-                        <input id="inpExportCsName" type="text" value="LiamAvatar2UnityRuntime" oninput="onCsClassNameChanged()" class="bg-[#090d14] border border-[#26314d] rounded px-1.5 py-0.5 text-[11px] text-sky-300 mono w-44 focus:outline-none focus:border-sky-500">
+                        <input id="inpExportCsName" type="text" value="LiamAvatar2UnityRuntime" oninput="onCsClassNameChanged()" class="bg-[#090d14] border border-[#26314d] rounded px-1.5 py-0.5 text-[11px] text-sky-300 mono w-44 focus:outline-none focus:border-sky-500 font-bold">
                         <button onclick="cycleExportCsClassName()" class="px-1.5 py-0.5 rounded bg-[#1e273d] hover:bg-[#2a3654] text-[10px] text-slate-200 font-semibold">Cambiar</button>
                     </div>
                 </div>
                 <div class="flex gap-1.5 pb-2 flex-wrap">
-                    <button onclick="downloadAtlasPng()" class="px-3 py-1.5 rounded bg-teal-600 hover:bg-teal-500 text-white text-xs font-semibold shadow">
+                    <button id="btnDownloadAtlasPng" onclick="downloadAtlasPng()" class="px-3 py-1.5 rounded bg-teal-600 hover:bg-teal-500 text-white text-xs font-semibold shadow">
                         1. Descargar LiamAvatar_Atlas.png
                     </button>
-                    <button onclick="downloadExportJson()" class="px-3 py-1.5 rounded bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold shadow">
+                    <button id="btnDownloadExportJson" onclick="downloadExportJson()" class="px-3 py-1.5 rounded bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold shadow">
                         2. Descargar LiamAvatar.json
                     </button>
                     <button id="btnDownloadCsFile" onclick="downloadExportCs()" class="px-3 py-1.5 rounded bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow">
@@ -893,6 +904,7 @@
         let RefHeight = 2752;
 
         const studio = {
+            avatarName: 'LiamAvatar',
             systemState: 'setup',
             activeTool: 'bone',
             activePosePreset: 'dynamic',
@@ -1141,6 +1153,7 @@
 
         function serializeStudioSnapshot(includeImages = false) {
             return {
+                avatarName: studio.avatarName || 'LiamAvatar',
                 refWidth: RefWidth,
                 refHeight: RefHeight,
                 activePosePreset: studio.activePosePreset,
@@ -1176,6 +1189,14 @@
 
         function restoreStudioSnapshot(snap) {
             if (!snap) return;
+            if (snap.avatarName) {
+                studio.avatarName = snap.avatarName;
+                const inpH = document.getElementById('inpHeaderAvatarName');
+                const inpM = document.getElementById('inpExportAvatarName');
+                if (inpH) inpH.value = snap.avatarName;
+                if (inpM) inpM.value = snap.avatarName;
+                onAvatarNameChanged(snap.avatarName);
+            }
             const isLegacy520 = !snap.refWidth || !snap.refHeight;
             if (snap.refWidth && snap.refHeight) {
                 RefWidth = snap.refWidth;
@@ -4119,6 +4140,7 @@
         }
 
         function buildSpineUnityJSON() {
+            const avatarName = getSanitizedAvatarName();
             const meta = buildSmartTextureAtlas();
             const w = RefWidth;
             const h = RefHeight;
@@ -4168,6 +4190,7 @@
             });
 
             const exportData = {
+                avatarName: avatarName,
                 exporter: 'LiamToolAvatar2Unity V2',
                 preset: studio.activeLayerPreset,
                 skeleton: {
@@ -4203,36 +4226,86 @@
             return JSON.stringify(exportData, null, 2);
         }
 
-        function getSanitizedCsClassName(overrideName) {
-            const inp = typeof document !== 'undefined' ? document.getElementById('inpExportCsName') : null;
-            const raw = (overrideName || (inp && inp.value) || 'LiamAvatar2UnityRuntime').trim();
-            let clean = raw.replace(/\.cs$/i, '').replace(/[^a-zA-Z0-9_]/g, '');
-            if (!clean || /^[0-9]/.test(clean)) clean = 'LiamAvatar2UnityRuntime';
+        function getSanitizedAvatarName(overrideName) {
+            const inpModal = typeof document !== 'undefined' ? document.getElementById('inpExportAvatarName') : null;
+            const inpHeader = typeof document !== 'undefined' ? document.getElementById('inpHeaderAvatarName') : null;
+            const raw = (overrideName || (inpModal && inpModal.value) || (inpHeader && inpHeader.value) || (studio && studio.avatarName) || 'LiamAvatar').trim();
+            let clean = raw.replace(/\.[a-zA-Z0-9]+$/i, '').replace(/[^a-zA-Z0-9_]/g, '');
+            if (!clean || /^[0-9]/.test(clean)) clean = 'LiamAvatar';
             return clean;
         }
 
-        function onCsClassNameChanged() {
-            const clean = getSanitizedCsClassName();
-            const btn = document.getElementById('btnDownloadCsFile');
-            if (btn) btn.textContent = `3. Descargar ${clean}.cs`;
-            if (studio.exportTab === 'cs') {
-                const out = document.getElementById('exportCodeOutput');
-                if (out) out.value = buildUnityCSharpScript(clean);
+        function getSanitizedCsClassName(overrideName) {
+            const inp = typeof document !== 'undefined' ? document.getElementById('inpExportCsName') : null;
+            const fallback = (getSanitizedAvatarName()) + '2UnityRuntime';
+            const raw = (overrideName || (inp && inp.value) || fallback).trim();
+            let clean = raw.replace(/\.cs$/i, '').replace(/[^a-zA-Z0-9_]/g, '');
+            if (!clean || /^[0-9]/.test(clean)) clean = fallback;
+            return clean;
+        }
+
+        function onAvatarNameChanged(val) {
+            const clean = getSanitizedAvatarName(val);
+            if (studio) studio.avatarName = clean;
+            const inpModal = document.getElementById('inpExportAvatarName');
+            const inpHeader = document.getElementById('inpHeaderAvatarName');
+            if (inpModal && inpModal.value !== clean) inpModal.value = clean;
+            if (inpHeader && inpHeader.value !== clean) inpHeader.value = clean;
+
+            const inpCs = document.getElementById('inpExportCsName');
+            if (inpCs && (!inpCs.dataset || !inpCs.dataset.userEdited || inpCs.dataset.userEdited === 'false')) {
+                inpCs.value = clean + '2UnityRuntime';
             }
+            updateExportModalLabels();
+        }
+
+        function onCsClassNameChanged() {
+            const inpCs = document.getElementById('inpExportCsName');
+            if (inpCs) {
+                if (!inpCs.dataset) inpCs.dataset = {};
+                inpCs.dataset.userEdited = 'true';
+            }
+            updateExportModalLabels();
         }
 
         function cycleExportCsClassName() {
-            const presets = ['LiamAvatar2UnityRuntime', 'LiamAvatarAtlasRuntime', 'LiamAvatarV3Runtime'];
+            const avatarName = getSanitizedAvatarName();
+            const presets = [`${avatarName}2UnityRuntime`, `${avatarName}Runtime`, `${avatarName}AtlasRuntime`];
             const inp = document.getElementById('inpExportCsName');
             if (!inp) return;
             const cur = getSanitizedCsClassName();
             const idx = presets.indexOf(cur);
             inp.value = presets[(idx + 1) % presets.length];
-            onCsClassNameChanged();
+            if (!inp.dataset) inp.dataset = {};
+            inp.dataset.userEdited = 'true';
+            updateExportModalLabels();
         }
 
-        function buildUnityCSharpScript(customClassName) {
+        function updateExportModalLabels() {
+            const avatarName = getSanitizedAvatarName();
+            const className = getSanitizedCsClassName();
+
+            const tabJson = document.getElementById('expTab_json');
+            if (tabJson) tabJson.textContent = `Archivo ${avatarName}.json`;
+
+            const btnAtlas = document.getElementById('btnDownloadAtlasPng');
+            if (btnAtlas) btnAtlas.textContent = `1. Descargar ${avatarName}_Atlas.png`;
+
+            const btnJson = document.getElementById('btnDownloadExportJson');
+            if (btnJson) btnJson.textContent = `2. Descargar ${avatarName}.json`;
+
+            const btnCs = document.getElementById('btnDownloadCsFile');
+            if (btnCs) btnCs.textContent = `3. Descargar ${className}.cs`;
+
+            const out = document.getElementById('exportCodeOutput');
+            if (out && !out.classList.contains('hidden')) {
+                out.value = (studio.exportTab === 'json') ? buildSpineUnityJSON() : buildUnityCSharpScript(className, avatarName);
+            }
+        }
+
+        function buildUnityCSharpScript(customClassName, customAvatarName) {
             const className = getSanitizedCsClassName(customClassName);
+            const avatarName = getSanitizedAvatarName(customAvatarName);
             const meta = buildSmartTextureAtlas();
             const w = RefWidth;
             const h = RefHeight;
@@ -4441,7 +4514,8 @@ public class ${className} : MonoBehaviour
 #if UNITY_EDITOR
         if (sharedAtlasTexture == null)
         {
-            string[] guids = AssetDatabase.FindAssets("LiamAvatar_Atlas t:Texture2D");
+            string[] guids = AssetDatabase.FindAssets("${avatarName}_Atlas t:Texture2D");
+            if (guids == null || guids.Length == 0) guids = AssetDatabase.FindAssets("LiamAvatar_Atlas t:Texture2D");
             if (guids != null && guids.Length > 0)
             {
                 string path = AssetDatabase.GUIDToAssetPath(guids[0]);
@@ -4459,7 +4533,8 @@ public class ${className} : MonoBehaviour
         }
         if (jsonFile == null)
         {
-            string[] jGuids = AssetDatabase.FindAssets("LiamAvatar t:TextAsset");
+            string[] jGuids = AssetDatabase.FindAssets("${avatarName} t:TextAsset");
+            if (jGuids == null || jGuids.Length == 0) jGuids = AssetDatabase.FindAssets("LiamAvatar t:TextAsset");
             if (jGuids != null && jGuids.Length > 0)
             {
                 string jPath = AssetDatabase.GUIDToAssetPath(jGuids[0]);
@@ -5356,7 +5431,7 @@ ${defaultLayersCode}
             const modal = document.getElementById('exportModal');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
-            onCsClassNameChanged();
+            updateExportModalLabels();
             switchExportTab(studio.exportTab || 'atlas');
         }
 
@@ -5384,32 +5459,37 @@ ${defaultLayersCode}
             } else {
                 prevBox.classList.add('hidden');
                 out.classList.remove('hidden');
-                out.value = tab === 'json' ? buildSpineUnityJSON() : buildUnityCSharpScript();
+                const avatarName = getSanitizedAvatarName();
+                const className = getSanitizedCsClassName();
+                out.value = (tab === 'json') ? buildSpineUnityJSON() : buildUnityCSharpScript(className, avatarName);
             }
         }
 
         function downloadAtlasPng() {
+            const avatarName = getSanitizedAvatarName();
             buildSmartTextureAtlas();
             const a = document.createElement('a');
-            a.download = 'LiamAvatar_Atlas.png';
+            a.download = `${avatarName}_Atlas.png`;
             a.href = studio.packedAtlasCanvas.toDataURL('image/png');
             a.click();
         }
 
         function downloadExportJson() {
+            const avatarName = getSanitizedAvatarName();
             const content = buildSpineUnityJSON();
             const blob = new Blob([content], { type: 'application/json;charset=utf-8' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'LiamAvatar.json';
+            a.download = `${avatarName}.json`;
             a.click();
             URL.revokeObjectURL(url);
         }
 
         function downloadExportCs() {
             const className = getSanitizedCsClassName();
-            const content = buildUnityCSharpScript(className);
+            const avatarName = getSanitizedAvatarName();
+            const content = buildUnityCSharpScript(className, avatarName);
             const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -5422,7 +5502,9 @@ ${defaultLayersCode}
         function copyExportBuffer() {
             const out = document.getElementById('exportCodeOutput');
             if (out.classList.contains('hidden')) {
-                out.value = buildUnityCSharpScript();
+                const className = getSanitizedCsClassName();
+                const avatarName = getSanitizedAvatarName();
+                out.value = (studio.exportTab === 'json') ? buildSpineUnityJSON() : buildUnityCSharpScript(className, avatarName);
             }
             if (navigator.clipboard && navigator.clipboard.writeText) {
                 navigator.clipboard.writeText(out.value).catch(() => {});
