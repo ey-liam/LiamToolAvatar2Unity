@@ -4344,10 +4344,11 @@ public class ${className} : MonoBehaviour
             {
                 string path = AssetDatabase.GUIDToAssetPath(guids[0]);
                 TextureImporter ti = AssetImporter.GetAtPath(path) as TextureImporter;
-                if (ti != null && (ti.maxTextureSize < 4096 || !ti.alphaIsTransparency))
+                if (ti != null && (ti.maxTextureSize < 4096 || !ti.alphaIsTransparency || ti.npotScale != TextureImporterNPOTScale.None))
                 {
                     ti.maxTextureSize = 4096;
                     ti.alphaIsTransparency = true;
+                    ti.npotScale = TextureImporterNPOTScale.None;
                     ti.textureCompression = TextureImporterCompression.Uncompressed;
                     ti.SaveAndReimport();
                 }
@@ -4361,6 +4362,17 @@ public class ${className} : MonoBehaviour
             {
                 string jPath = AssetDatabase.GUIDToAssetPath(jGuids[0]);
                 jsonFile = AssetDatabase.LoadAssetAtPath<TextAsset>(jPath);
+            }
+        }
+        if (avatarParts != null)
+        {
+            foreach (AvatarPartLayer layer in avatarParts)
+            {
+                if (layer.partTexture != null && (layer.partTexture == sharedAtlasTexture || layer.partTexture.name.ToLower().Contains("atlas")))
+                {
+                    if (sharedAtlasTexture == null) sharedAtlasTexture = layer.partTexture;
+                    layer.partTexture = null;
+                }
             }
         }
 #endif
@@ -4387,8 +4399,25 @@ ${defaultLayersCode}
         };
     }
 
+    [ContextMenu("Reconstruir Avatar Ahora")]
+    public void RebuildAvatar()
+    {
+        Start();
+    }
+
     void Start()
     {
+        for (int i = transform.childCount - 1; i >= 0; i--)
+        {
+            Transform ch = transform.GetChild(i);
+            if (ch != null && ch.name.StartsWith("Part_"))
+            {
+                ch.SetParent(null);
+                if (Application.isPlaying) Destroy(ch.gameObject);
+                else DestroyImmediate(ch.gameObject);
+            }
+        }
+
         AutoBindEditorAssets();
         if (jsonFile != null)
         {
@@ -4431,14 +4460,22 @@ ${defaultLayersCode}
             mr.material = new Material(spriteShader);
             mr.sortingOrder = (avatarParts.Count - pIdx) * 10;
 
-            bool useAtlas = (layer.partTexture == null && sharedAtlasTexture != null);
-            if (layer.partTexture != null)
+            bool isPartTexAtlas = (layer.partTexture == null) || (layer.partTexture == sharedAtlasTexture) || layer.partTexture.name.ToLower().Contains("atlas");
+            bool hasSubAtlasRect = (layer.atlasRect.z > layer.atlasRect.x && layer.atlasRect.w > layer.atlasRect.y) &&
+                                   (layer.atlasRect.x > 0.0001f || layer.atlasRect.y > 0.0001f || layer.atlasRect.z < 0.9999f || layer.atlasRect.w < 0.9999f);
+            bool useAtlas = (isPartTexAtlas && (sharedAtlasTexture != null || layer.partTexture != null)) || (hasSubAtlasRect && (layer.customUVs == null || layer.customUVs.Length == 0));
+
+            if (layer.partTexture != null && !isPartTexAtlas)
             {
                 mr.material.mainTexture = layer.partTexture;
             }
             else if (sharedAtlasTexture != null)
             {
                 mr.material.mainTexture = sharedAtlasTexture;
+            }
+            else if (layer.partTexture != null)
+            {
+                mr.material.mainTexture = layer.partTexture;
             }
 
             layer.runtimeMesh = new Mesh { name = "Mesh_" + layer.partName };
@@ -4610,7 +4647,10 @@ ${defaultLayersCode}
             {
                 if (!string.IsNullOrEmpty(existing.partName) && existing.partTexture != null)
                 {
-                    savedTextures[existing.partName] = existing.partTexture;
+                    if (existing.partTexture != sharedAtlasTexture && !existing.partTexture.name.ToLower().Contains("atlas"))
+                    {
+                        savedTextures[existing.partName] = existing.partTexture;
+                    }
                 }
             }
         }
