@@ -1270,11 +1270,9 @@
                         for (let vIdx = 0; vIdx < pObj.mesh.vertices.length; vIdx++) {
                             pObj.mesh.vertices[vIdx].ox = sp.vertexOffsetsAndWeights[vIdx].ox || 0;
                             pObj.mesh.vertices[vIdx].oy = sp.vertexOffsetsAndWeights[vIdx].oy || 0;
-                            pObj.mesh.vertices[vIdx].weights = { ...sp.vertexOffsetsAndWeights[vIdx].weights };
                         }
-                    } else {
-                        computePartSmoothWeights(pObj);
                     }
+                    computePartSmoothWeights(pObj);
                     newParts.push(pObj);
                 }
                 studio.parts = newParts;
@@ -2183,10 +2181,19 @@
         }
 
         function computePartSmoothWeights(part) {
-            const baseSigma = Math.max(RefWidth, RefHeight) * 0.085;
-            const activeBones = studio.bones.filter(b =>
+            const diag = Math.hypot(RefWidth, RefHeight);
+            let activeBones = studio.bones.filter(b =>
                 !part.allowedBones || part.allowedBones.length === 0 || part.allowedBones.includes(b.id)
             );
+            const hasLimbSubBones = activeBones.some(b =>
+                b.id.includes('upperArm') || b.id.includes('forearm') || b.id.includes('upperLeg') || b.id.includes('lowerLeg')
+            );
+            const partLower = ((part.name || '') + ' ' + (part.id || '')).toLowerCase();
+            const isFullBody = partLower.includes('completo') || partLower.includes('full') || activeBones.length >= 8;
+            if (hasLimbSubBones && !isFullBody && activeBones.length > 1) {
+                const withoutTorso = activeBones.filter(b => b.id !== 'torso');
+                if (withoutTorso.length > 0) activeBones = withoutTorso;
+            }
             const fallbackBones = activeBones.length > 0 ? activeBones : studio.bones;
 
             const bonePixels = fallbackBones.map(b => ({
@@ -2195,7 +2202,7 @@
                 y1: b.ny1 * RefHeight,
                 x2: b.nx2 * RefWidth,
                 y2: b.ny2 * RefHeight,
-                sigma: baseSigma * (b.envelope || 1.0)
+                env: Math.max(0.25, b.envelope || 1.0)
             }));
 
             const anchor = part.anchor || { parentBone: 'none', nx: 0.5, ny: 0.3, radiusPct: 12, strength: 0 };
@@ -2205,14 +2212,21 @@
             const anchorRadiusPx = ((anchor.radiusPct || 12) / 100) * RefWidth;
 
             part.mesh.vertices.forEach(vt => {
+                const candidates = bonePixels.map(bp => {
+                    const d = pointToSegmentDist(vt.u, vt.v, bp.x1, bp.y1, bp.x2, bp.y2);
+                    const normD = d / (diag * bp.env);
+                    const w = 1.0 / Math.pow(normD + 0.006, 3.2);
+                    return { id: bp.id, normD, w };
+                });
+
+                candidates.sort((a, b) => a.normD - b.normD);
+                const topK = candidates.slice(0, Math.min(2, candidates.length));
+
                 const wMap = {};
                 let total = 0;
-
-                bonePixels.forEach(bp => {
-                    const d = pointToSegmentDist(vt.u, vt.v, bp.x1, bp.y1, bp.x2, bp.y2);
-                    const w = Math.exp(-(d * d) / (2 * bp.sigma * bp.sigma)) + 1e-6;
-                    wMap[bp.id] = w;
-                    total += w;
+                topK.forEach(c => {
+                    wMap[c.id] = c.w;
+                    total += c.w;
                 });
 
                 if (total > 0) {
@@ -4241,13 +4255,25 @@
             const cols = studio.meshConfig.cols || 22;
             const rows = Math.round(cols * 1.35);
 
+            const defaultBonesCode = studio.bones.map(b => {
+                const sx = b.nx1.toFixed(4);
+                const sy = (1.0 - b.ny1).toFixed(4);
+                const ex = b.nx2.toFixed(4);
+                const ey = (1.0 - b.ny2).toFixed(4);
+                const env = (b.envelope || 1.0).toFixed(2);
+                return `            new BoneDefinition { id = "${b.id}", role = "${b.role}", restStart = new Vector2(${sx}f, ${sy}f), restEnd = new Vector2(${ex}f, ${ey}f), envelope = ${env}f }`;
+            }).join(',\n');
+
             const defaultLayersCode = meta.items.map(it => {
                 const p = it.part;
                 const anc = p.anchor || { parentBone: 'torso', nx: 0.49, ny: 0.30, radiusPct: 12, strength: 0.85 };
                 const safeName = (p.name || p.id).replace(/"/g, '');
+                const pBone = (anc.parentBone || 'torso').replace(/"/g, '');
                 const ax = (anc.nx !== undefined ? anc.nx : 0.49).toFixed(4);
                 const ay = (1.0 - (anc.ny !== undefined ? anc.ny : 0.30)).toFixed(4);
+                const rad = (anc.radiusPct !== undefined ? anc.radiusPct : 12);
                 const str = (anc.strength !== undefined ? anc.strength : 0.85).toFixed(3);
+                const allowedList = (p.allowedBones && p.allowedBones.length > 0 ? p.allowedBones : studio.bones.map(b => b.id)).map(bId => `"${bId}"`).join(', ');
 
                 const u0 = (it.atlasX / meta.atlasW).toFixed(5);
                 const u1 = ((it.atlasX + it.cropW) / meta.atlasW).toFixed(5);
@@ -4259,7 +4285,7 @@
                 const cy0 = (1.0 - (it.cropY + it.cropH) / h).toFixed(5);
                 const cy1 = (1.0 - it.cropY / h).toFixed(5);
 
-                return `            new AvatarPartLayer { partName = "${safeName}", visible = ${p.visible ? 'true' : 'false'}, anchorUV = new Vector2(${ax}f, ${ay}f), seamWeldStrength = ${str}f, canvasRect = new Vector4(${cx0}f, ${cy0}f, ${cx1}f, ${cy1}f), atlasRect = new Vector4(${u0}f, ${v0}f, ${u1}f, ${v1}f) }`;
+                return `            new AvatarPartLayer { partName = "${safeName}", visible = ${p.visible ? 'true' : 'false'}, parentBone = "${pBone}", anchorUV = new Vector2(${ax}f, ${ay}f), anchorRadiusPct = ${rad}f, seamWeldStrength = ${str}f, allowedBones = new List<string> { ${allowedList} }, canvasRect = new Vector4(${cx0}f, ${cy0}f, ${cx1}f, ${cy1}f), atlasRect = new Vector4(${u0}f, ${v0}f, ${u1}f, ${v1}f) }`;
             }).join(',\n');
 
             const cleanPartNames = studio.parts.map(p => (p.name || p.id).replace(/"/g, "'")).join(', ');
@@ -4272,16 +4298,53 @@ using System.Text.RegularExpressions;
 using UnityEditor;
 #endif
 
+[ExecuteAlways]
 public class ${className} : MonoBehaviour
 {
+    public enum AnimationClipMode
+    {
+        Idle,
+        Walk,
+        Jump,
+        Wave
+    }
+
+    [System.Serializable]
+    public class BoneDefinition
+    {
+        public string id;
+        public string role;
+        public Vector2 restStart;
+        public Vector2 restEnd;
+        public float envelope = 1.0f;
+
+        [HideInInspector] public Vector2 posedStart;
+        [HideInInspector] public Vector2 posedEnd;
+        [HideInInspector] public float dAngle;
+        [HideInInspector] public float scaleY = 1.0f;
+    }
+
+    public struct BoneWeightPair
+    {
+        public int boneIndex0;
+        public float weight0;
+        public int boneIndex1;
+        public float weight1;
+        public int boneIndex2;
+        public float weight2;
+    }
+
     [System.Serializable]
     public class AvatarPartLayer
     {
         public string partName;
         public bool visible = true;
         public Texture2D partTexture;
+        public string parentBone = "torso";
         public Vector2 anchorUV = new Vector2(0.49f, 0.72f);
+        public float anchorRadiusPct = 12f;
         [Range(0f, 1f)] public float seamWeldStrength = 0.85f;
+        public List<string> allowedBones = new List<string>();
         public Vector4 canvasRect = new Vector4(0f, 0f, 1f, 1f);
         public Vector4 atlasRect = new Vector4(0f, 0f, 1f, 1f);
 
@@ -4292,6 +4355,7 @@ public class ${className} : MonoBehaviour
         [HideInInspector] public Vector3[] deformedVerts;
         [HideInInspector] public Vector2[] canvasUVs;
         [HideInInspector] public Vector2[] meshUVs;
+        [HideInInspector] public BoneWeightPair[] skinWeights;
     }
 
     [Header("1. Atlas Unico y Archivo JSON (Alta Resolucion ${w}x${h})")]
@@ -4304,22 +4368,73 @@ public class ${className} : MonoBehaviour
     [Header("2. Capas en Orden Z (${cleanPartNames})")]
     public List<AvatarPartLayer> avatarParts = new List<AvatarPartLayer>();
 
-    [Header("3. Parametros de Malla y Animacion")]
+    [Header("3. Esqueleto (12 Huesos Jerarquicos)")]
+    public List<BoneDefinition> bones = new List<BoneDefinition>();
+
+    [Header("4. Parametros de Malla y Animacion")]
+    public AnimationClipMode activeClip = AnimationClipMode.Idle;
+    [Range(0.2f, 4.0f)] public float motionIntensity = 1.65f;
     public int gridColumns = ${cols};
     public int gridRows = ${rows};
     public float worldScale = 5.0f;
-    public float cycleSpeed = ${studio.anim.speed.toFixed(2)}f;
-    public float breathAmount = ${studio.anim.breath.toFixed(3)}f;
-    public float hipSwayX = ${(studio.anim.hipX * 0.004).toFixed(4)}f;
-    public float hipBounceY = ${(studio.anim.hipY * 0.004).toFixed(4)}f;
-    public float armSwingDeg = ${studio.anim.armSwing.toFixed(2)}f;
-    public float headTiltDeg = ${studio.anim.headTilt.toFixed(2)}f;
-    public float legSwingAmount = 0.015f;
+    public float cycleSpeed = ${Math.max(1.5, studio.anim.speed).toFixed(2)}f;
+    public float breathAmount = ${Math.max(0.02, studio.anim.breath).toFixed(3)}f;
+    public float hipSwayX = ${Math.max(3.5, studio.anim.hipX).toFixed(2)}f;
+    public float hipBounceY = ${Math.max(4.0, studio.anim.hipY).toFixed(2)}f;
+    public float armSwingDeg = ${Math.max(5.5, studio.anim.armSwing).toFixed(2)}f;
+    public float forearmSwingDeg = ${Math.max(7.5, studio.anim.forearmSwing).toFixed(2)}f;
+    public float pendulumSwingDeg = ${Math.max(6.5, studio.anim.pendulumSwing).toFixed(2)}f;
+    public float headTiltDeg = ${Math.max(3.5, studio.anim.headTilt).toFixed(2)}f;
     public bool lockFeetIK = ${studio.flags.footIK ? 'true' : 'false'};
+    public bool previewInEditMode = true;
+
+    private float animTime = 0f;
+    private const float animDuration = 2.0f;
+#if UNITY_EDITOR
+    private double lastEditorTime = 0.0;
+#endif
+
+    void OnEnable()
+    {
+#if UNITY_EDITOR
+        lastEditorTime = EditorApplication.timeSinceStartup;
+        EditorApplication.update -= OnEditorUpdate;
+        EditorApplication.update += OnEditorUpdate;
+#endif
+        if (avatarParts == null || avatarParts.Count == 0 || avatarParts[0].runtimeMesh == null || avatarParts[0].skinWeights == null)
+        {
+            RebuildAvatarMeshes();
+        }
+    }
+
+    void OnDisable()
+    {
+#if UNITY_EDITOR
+        EditorApplication.update -= OnEditorUpdate;
+#endif
+    }
+
+#if UNITY_EDITOR
+    private void OnEditorUpdate()
+    {
+        if (this == null || !isActiveAndEnabled) return;
+        if (Application.isPlaying || !previewInEditMode) return;
+        double now = EditorApplication.timeSinceStartup;
+        float dt = Mathf.Clamp((float)(now - lastEditorTime), 0f, 0.05f);
+        lastEditorTime = now;
+        if (dt > 0.0001f)
+        {
+            StepAnimation(dt);
+            SceneView.RepaintAll();
+            EditorApplication.QueuePlayerLoopUpdate();
+        }
+    }
+#endif
 
     void Reset()
     {
         AutoBindEditorAssets();
+        EnsureDefaultBones();
         if (jsonFile != null) ParseJsonData(jsonFile.text);
         else EnsureDefaultLayers();
     }
@@ -4327,6 +4442,7 @@ public class ${className} : MonoBehaviour
     void OnValidate()
     {
         AutoBindEditorAssets();
+        if (bones == null || bones.Count == 0) EnsureDefaultBones();
         if (avatarParts == null || avatarParts.Count == 0)
         {
             if (jsonFile != null) ParseJsonData(jsonFile.text);
@@ -4382,12 +4498,28 @@ public class ${className} : MonoBehaviour
     public void LoadFromJsonInEditor()
     {
         AutoBindEditorAssets();
+        EnsureDefaultBones();
         if (jsonFile == null)
         {
             EnsureDefaultLayers();
             return;
         }
         ParseJsonData(jsonFile.text);
+    }
+
+    [ContextMenu("Reconstruir Avatar Ahora")]
+    public void RebuildAvatar()
+    {
+        RebuildAvatarMeshes();
+    }
+
+    private void EnsureDefaultBones()
+    {
+        if (bones != null && bones.Count > 0) return;
+        bones = new List<BoneDefinition>
+        {
+${defaultBonesCode}
+        };
     }
 
     private void EnsureDefaultLayers()
@@ -4399,13 +4531,13 @@ ${defaultLayersCode}
         };
     }
 
-    [ContextMenu("Reconstruir Avatar Ahora")]
-    public void RebuildAvatar()
+    void Start()
     {
-        Start();
+        RebuildAvatarMeshes();
     }
 
-    void Start()
+    [ContextMenu("Rebuild Avatar Meshes")]
+    public void RebuildAvatarMeshes()
     {
         for (int i = transform.childCount - 1; i >= 0; i--)
         {
@@ -4419,13 +4551,15 @@ ${defaultLayersCode}
         }
 
         AutoBindEditorAssets();
-        if (jsonFile != null)
+        EnsureDefaultBones();
+        if (avatarParts == null || avatarParts.Count == 0)
         {
-            ParseJsonData(jsonFile.text);
+            if (jsonFile != null) ParseJsonData(jsonFile.text);
+            else EnsureDefaultLayers();
         }
-        else
+        else if (jsonFile != null && (avatarParts[0].customUVs == null || avatarParts[0].customUVs.Length == 0))
         {
-            EnsureDefaultLayers();
+            ParseJsonData(jsonFile.text, false);
         }
 
         if (autoDetectResolutionFromTexture && sharedAtlasTexture == null)
@@ -4442,10 +4576,17 @@ ${defaultLayersCode}
         }
 
         float aspect = canvasWidth / Mathf.Max(1f, canvasHeight);
+        int cols = Mathf.Max(8, gridColumns);
+        int rows = Mathf.Max(8, gridRows);
 
         for (int pIdx = 0; pIdx < avatarParts.Count; pIdx++)
         {
             AvatarPartLayer layer = avatarParts[pIdx];
+            if (layer.allowedBones == null || layer.allowedBones.Count == 0)
+            {
+                AssignHeuristicBones(layer);
+            }
+
             GameObject child = new GameObject("Part_" + layer.partName);
             child.transform.SetParent(transform, false);
             child.transform.localPosition = new Vector3(0f, 0f, pIdx * 0.005f);
@@ -4481,8 +4622,10 @@ ${defaultLayersCode}
             layer.runtimeMesh = new Mesh { name = "Mesh_" + layer.partName };
             mf.mesh = layer.runtimeMesh;
 
+            bool isGrid = true;
             if (!useAtlas && layer.customUVs != null && layer.customUVs.Length > 0 && layer.customTriangles != null && layer.customTriangles.Length > 0)
             {
+                isGrid = false;
                 int vCount = layer.customUVs.Length;
                 layer.canvasUVs = new Vector2[vCount];
                 layer.meshUVs = new Vector2[vCount];
@@ -4503,7 +4646,7 @@ ${defaultLayersCode}
             }
             else
             {
-                int vCount = (gridColumns + 1) * (gridRows + 1);
+                int vCount = (cols + 1) * (rows + 1);
                 layer.restVerts = new Vector3[vCount];
                 layer.deformedVerts = new Vector3[vCount];
                 layer.canvasUVs = new Vector2[vCount];
@@ -4514,15 +4657,15 @@ ${defaultLayersCode}
                 Vector4 aRect = (useAtlas && hasValidRect) ? layer.atlasRect : new Vector4(0f, 0f, 1f, 1f);
 
                 int idx = 0;
-                for (int r = 0; r <= gridRows; r++)
+                for (int r = 0; r <= rows; r++)
                 {
-                    float ty = (float)r / gridRows;
+                    float ty = (float)r / rows;
                     float cy = Mathf.Lerp(cRect.y, cRect.w, ty);
                     float vy = Mathf.Lerp(aRect.y, aRect.w, ty);
 
-                    for (int c = 0; c <= gridColumns; c++)
+                    for (int c = 0; c <= cols; c++)
                     {
-                        float tx = (float)c / gridColumns;
+                        float tx = (float)c / cols;
                         float cx = Mathf.Lerp(cRect.x, cRect.z, tx);
                         float ux = Mathf.Lerp(aRect.x, aRect.z, tx);
 
@@ -4533,15 +4676,15 @@ ${defaultLayersCode}
                     }
                 }
 
-                int[] tris = new int[gridColumns * gridRows * 6];
+                int[] tris = new int[cols * rows * 6];
                 int t = 0;
-                for (int r = 0; r < gridRows; r++)
+                for (int r = 0; r < rows; r++)
                 {
-                    for (int c = 0; c < gridColumns; c++)
+                    for (int c = 0; c < cols; c++)
                     {
-                        int i0 = r * (gridColumns + 1) + c;
+                        int i0 = r * (cols + 1) + c;
                         int i1 = i0 + 1;
-                        int i2 = i0 + (gridColumns + 1);
+                        int i2 = i0 + (cols + 1);
                         int i3 = i2 + 1;
                         tris[t++] = i0; tris[t++] = i2; tris[t++] = i1;
                         tris[t++] = i1; tris[t++] = i2; tris[t++] = i3;
@@ -4554,77 +4697,507 @@ ${defaultLayersCode}
             }
 
             layer.runtimeMesh.RecalculateBounds();
+            ComputeLayerSkinWeights(layer, isGrid, cols, rows);
         }
+    }
+
+    private void AssignHeuristicBones(AvatarPartLayer layer)
+    {
+        string n = (layer.partName ?? "").ToLower();
+        if (n.Contains("cabeza") || n.Contains("head") || n.Contains("cabello") || n.Contains("lentes") || n.Contains("ojos"))
+        {
+            layer.allowedBones = new List<string> { "head", "neck" };
+            layer.parentBone = "torso";
+        }
+        else if (n.Contains("brazo 2") || n.Contains("brazo2") || n.Contains("der"))
+        {
+            layer.allowedBones = new List<string> { "upperArmL", "forearmL" };
+            layer.parentBone = "torso";
+        }
+        else if (n.Contains("brazo") || n.Contains("arm") || n.Contains("izq"))
+        {
+            layer.allowedBones = new List<string> { "upperArmR", "forearmR" };
+            layer.parentBone = "torso";
+        }
+        else if (n.Contains("torso") || n.Contains("pecho") || n.Contains("sudadera") || n.Contains("cordones"))
+        {
+            layer.allowedBones = new List<string> { "torso", "neck" };
+            layer.parentBone = "none";
+        }
+        else if (n.Contains("falda") || n.Contains("skirt") || n.Contains("correa"))
+        {
+            layer.allowedBones = new List<string> { "torso", "strap" };
+            layer.parentBone = "torso";
+        }
+        else if (n.Contains("pierna 1") || n.Contains("pierna1"))
+        {
+            layer.allowedBones = new List<string> { "upperLegR", "lowerLegR" };
+            layer.parentBone = "torso";
+        }
+        else if (n.Contains("pierna 2") || n.Contains("pierna2"))
+        {
+            layer.allowedBones = new List<string> { "upperLegL", "lowerLegL" };
+            layer.parentBone = "torso";
+        }
+        else if (n.Contains("pierna") || n.Contains("leg") || n.Contains("calceta") || n.Contains("tenis"))
+        {
+            layer.allowedBones = new List<string> { "upperLegR", "lowerLegR", "upperLegL", "lowerLegL" };
+            layer.parentBone = "torso";
+        }
+        else
+        {
+            layer.allowedBones = new List<string>();
+            foreach (BoneDefinition b in bones) layer.allowedBones.Add(b.id);
+            layer.parentBone = "torso";
+        }
+    }
+
+    private void ComputeLayerSkinWeights(AvatarPartLayer layer, bool isGrid, int cols, int rows)
+    {
+        int vCount = layer.canvasUVs.Length;
+        layer.skinWeights = new BoneWeightPair[vCount];
+        if (bones == null || bones.Count == 0) return;
+
+        float diag = Mathf.Sqrt(canvasWidth * canvasWidth + canvasHeight * canvasHeight);
+
+        List<int> activeBoneIndices = new List<int>();
+        string partLower = (layer.partName ?? "").ToLower();
+        bool isFullBodyPart = partLower.Contains("completo") || partLower.Contains("full") || (layer.allowedBones != null && layer.allowedBones.Count >= 8);
+        bool hasLimbSubBone = false;
+        if (layer.allowedBones != null)
+        {
+            foreach (string ab in layer.allowedBones)
+            {
+                if (ab.Contains("upperArm") || ab.Contains("forearm") || ab.Contains("upperLeg") || ab.Contains("lowerLeg"))
+                {
+                    hasLimbSubBone = true;
+                    break;
+                }
+            }
+        }
+
+        for (int bIdx = 0; bIdx < bones.Count; bIdx++)
+        {
+            string bId = bones[bIdx].id;
+            if (layer.allowedBones == null || layer.allowedBones.Count == 0 || layer.allowedBones.Contains(bId))
+            {
+                if (hasLimbSubBone && !isFullBodyPart && bId == "torso") continue;
+                activeBoneIndices.Add(bIdx);
+            }
+        }
+        if (activeBoneIndices.Count == 0)
+        {
+            for (int bIdx = 0; bIdx < bones.Count; bIdx++) activeBoneIndices.Add(bIdx);
+        }
+
+        int parentBoneIdx = -1;
+        if (!string.IsNullOrEmpty(layer.parentBone) && layer.parentBone != "none" && layer.seamWeldStrength > 0.001f)
+        {
+            parentBoneIdx = FindBoneIndex(layer.parentBone);
+        }
+
+        Vector2 anchorPx = new Vector2(layer.anchorUV.x * canvasWidth, layer.anchorUV.y * canvasHeight);
+        float anchorRadiusPx = (Mathf.Max(3f, layer.anchorRadiusPct) / 100f) * canvasWidth;
+
+        int bTotal = bones.Count;
+        float[][] rawW = new float[vCount][];
+
+        for (int i = 0; i < vCount; i++)
+        {
+            rawW[i] = new float[bTotal];
+            Vector2 uv = layer.canvasUVs[i];
+            Vector2 ptPx = new Vector2(uv.x * canvasWidth, uv.y * canvasHeight);
+
+            int best0 = activeBoneIndices[0];
+            int best1 = activeBoneIndices.Count > 1 ? activeBoneIndices[1] : best0;
+            float minD0 = float.MaxValue;
+            float minD1 = float.MaxValue;
+
+            foreach (int bIdx in activeBoneIndices)
+            {
+                BoneDefinition b = bones[bIdx];
+                Vector2 sPx = new Vector2(b.restStart.x * canvasWidth, b.restStart.y * canvasHeight);
+                Vector2 ePx = new Vector2(b.restEnd.x * canvasWidth, b.restEnd.y * canvasHeight);
+                float d = PointToSegmentDist(ptPx, sPx, ePx) / Mathf.Max(0.25f, b.envelope);
+                if (d < minD0)
+                {
+                    minD1 = minD0;
+                    best1 = best0;
+                    minD0 = d;
+                    best0 = bIdx;
+                }
+                else if (d < minD1 && bIdx != best0)
+                {
+                    minD1 = d;
+                    best1 = bIdx;
+                }
+            }
+
+            float normD0 = minD0 / diag;
+            float w0 = 1.0f / Mathf.Pow(normD0 + 0.006f, 3.2f);
+            rawW[i][best0] = w0;
+            float total = w0;
+
+            if (best1 != best0 && minD1 < float.MaxValue)
+            {
+                float normD1 = minD1 / diag;
+                float w1 = 1.0f / Mathf.Pow(normD1 + 0.006f, 3.2f);
+                rawW[i][best1] = w1;
+                total += w1;
+            }
+
+            if (total > 0f)
+            {
+                for (int bIdx = 0; bIdx < bTotal; bIdx++) rawW[i][bIdx] /= total;
+            }
+            else
+            {
+                rawW[i][activeBoneIndices[0]] = 1f;
+            }
+
+            if (parentBoneIdx >= 0)
+            {
+                float distToAnchor = Vector2.Distance(ptPx, anchorPx);
+                if (distToAnchor < anchorRadiusPx)
+                {
+                    float weldT = Mathf.Pow(1f - (distToAnchor / anchorRadiusPx), 1.45f) * layer.seamWeldStrength;
+                    float remain = 1f - weldT;
+                    for (int bIdx = 0; bIdx < bTotal; bIdx++) rawW[i][bIdx] *= remain;
+                    rawW[i][parentBoneIdx] += weldT;
+                }
+            }
+        }
+
+        if (isGrid)
+        {
+            for (int iter = 0; iter < 2; iter++)
+            {
+                float[][] nextW = new float[vCount][];
+                for (int r = 0; r <= rows; r++)
+                {
+                    for (int c = 0; c <= cols; c++)
+                    {
+                        int idx = r * (cols + 1) + c;
+                        nextW[idx] = new float[bTotal];
+                        int nCount = 0;
+                        int n0 = (r > 0) ? (r - 1) * (cols + 1) + c : -1;
+                        int n1 = (r < rows) ? (r + 1) * (cols + 1) + c : -1;
+                        int n2 = (c > 0) ? r * (cols + 1) + (c - 1) : -1;
+                        int n3 = (c < cols) ? r * (cols + 1) + (c + 1) : -1;
+                        if (n0 >= 0) nCount++;
+                        if (n1 >= 0) nCount++;
+                        if (n2 >= 0) nCount++;
+                        if (n3 >= 0) nCount++;
+
+                        if (nCount == 0)
+                        {
+                            System.Array.Copy(rawW[idx], nextW[idx], bTotal);
+                            continue;
+                        }
+
+                        float share = 0.42f / nCount;
+                        float sum = 0f;
+                        for (int bIdx = 0; bIdx < bTotal; bIdx++)
+                        {
+                            float acc = rawW[idx][bIdx] * 0.58f;
+                            if (n0 >= 0) acc += rawW[n0][bIdx] * share;
+                            if (n1 >= 0) acc += rawW[n1][bIdx] * share;
+                            if (n2 >= 0) acc += rawW[n2][bIdx] * share;
+                            if (n3 >= 0) acc += rawW[n3][bIdx] * share;
+                            nextW[idx][bIdx] = acc;
+                            sum += acc;
+                        }
+                        if (sum > 0.0001f)
+                        {
+                            for (int bIdx = 0; bIdx < bTotal; bIdx++) nextW[idx][bIdx] /= sum;
+                        }
+                    }
+                }
+                rawW = nextW;
+            }
+        }
+
+        for (int i = 0; i < vCount; i++)
+        {
+            int idx0 = 0, idx1 = 0, idx2 = 0;
+            float w0 = -1f, w1 = -1f, w2 = -1f;
+            for (int bIdx = 0; bIdx < bTotal; bIdx++)
+            {
+                float w = rawW[i][bIdx];
+                if (w > w0)
+                {
+                    w2 = w1; idx2 = idx1;
+                    w1 = w0; idx1 = idx0;
+                    w0 = w;  idx0 = bIdx;
+                }
+                else if (w > w1)
+                {
+                    w2 = w1; idx2 = idx1;
+                    w1 = w;  idx1 = bIdx;
+                }
+                else if (w > w2)
+                {
+                    w2 = w;  idx2 = bIdx;
+                }
+            }
+            w0 = Mathf.Max(0f, w0);
+            w1 = Mathf.Max(0f, w1);
+            w2 = Mathf.Max(0f, w2);
+            float wSum = w0 + w1 + w2;
+            if (wSum > 0.0001f)
+            {
+                w0 /= wSum;
+                w1 /= wSum;
+                w2 /= wSum;
+            }
+            else
+            {
+                w0 = 1f; w1 = 0f; w2 = 0f;
+            }
+            layer.skinWeights[i] = new BoneWeightPair
+            {
+                boneIndex0 = idx0, weight0 = w0,
+                boneIndex1 = idx1, weight1 = w1,
+                boneIndex2 = idx2, weight2 = w2
+            };
+        }
+    }
+
+    private float PointToSegmentDist(Vector2 p, Vector2 a, Vector2 b)
+    {
+        Vector2 ab = b - a;
+        float lenSq = ab.sqrMagnitude;
+        if (lenSq < 0.00001f) return Vector2.Distance(p, a);
+        float t = Mathf.Clamp01(Vector2.Dot(p - a, ab) / lenSq);
+        Vector2 proj = a + ab * t;
+        return Vector2.Distance(p, proj);
+    }
+
+    private Vector2 RotatePoint2D(Vector2 pt, Vector2 pivot, float rad)
+    {
+        float c = Mathf.Cos(rad);
+        float s = Mathf.Sin(rad);
+        float dx = pt.x - pivot.x;
+        float dy = pt.y - pivot.y;
+        return new Vector2(pivot.x + dx * c - dy * s, pivot.y + dx * s + dy * c);
+    }
+
+    private int FindBoneIndex(string id)
+    {
+        for (int i = 0; i < bones.Count; i++)
+        {
+            if (bones[i].id == id) return i;
+        }
+        return -1;
     }
 
     void Update()
     {
-        float phase = Time.time * cycleSpeed;
+        if (Application.isPlaying)
+        {
+            StepAnimation(Time.deltaTime);
+        }
+    }
+
+    public void StepAnimation(float dt)
+    {
+        if (bones == null || bones.Count == 0) return;
+
+        animTime = (animTime + dt * (cycleSpeed * 0.45f)) % animDuration;
+        float phase = (animTime / animDuration) * Mathf.PI * 2f;
         float sinP = Mathf.Sin(phase);
         float cosP = Mathf.Cos(phase);
+
+        float clipMulHipX = 1.0f, clipMulHipY = 1.0f, clipMulArm = 1.0f, clipWaveBoost = 0f;
+        if (activeClip == AnimationClipMode.Walk)
+        {
+            clipMulHipX = 1.65f; clipMulHipY = 2.0f; clipMulArm = 2.0f;
+        }
+        else if (activeClip == AnimationClipMode.Jump)
+        {
+            clipMulHipY = 3.2f; clipMulArm = 2.4f;
+        }
+        else if (activeClip == AnimationClipMode.Wave)
+        {
+            clipWaveBoost = Mathf.Sin(phase * 2f) * 16f;
+        }
+
         float aspect = canvasWidth / Mathf.Max(1f, canvasHeight);
+
+        float normHipX = (hipSwayX > 0.2f) ? (hipSwayX / 520f) : hipSwayX;
+        float normHipY = (hipBounceY > 0.2f) ? (hipBounceY / 700f) : hipBounceY;
+
+        float hipDX = cosP * normHipX * aspect * clipMulHipX * motionIntensity;
+        float hipDY = -Mathf.Abs(sinP) * normHipY * clipMulHipY * motionIntensity;
+
+        int torsoIdx = FindBoneIndex("torso");
+        BoneDefinition torsoBone = (torsoIdx >= 0) ? bones[torsoIdx] : bones[0];
+        Vector2 tRestStart = new Vector2(torsoBone.restStart.x * aspect, torsoBone.restStart.y);
+
+        float torsoAngle = -Mathf.Sin(phase - 0.25f) * 1.3f * motionIntensity * Mathf.Deg2Rad;
+        float torsoScaleY = 1.0f + sinP * breathAmount * motionIntensity;
+        Vector2 torsoPosedStart = new Vector2(tRestStart.x + hipDX, tRestStart.y + hipDY);
+
+        System.Func<Vector2, Vector2> evalTorsoSpace = (Vector2 ptIso) =>
+        {
+            float sy = tRestStart.y + (ptIso.y - tRestStart.y) * torsoScaleY;
+            Vector2 rotP = RotatePoint2D(new Vector2(ptIso.x, sy), tRestStart, torsoAngle);
+            return new Vector2(rotP.x + (torsoPosedStart.x - tRestStart.x), rotP.y + (torsoPosedStart.y - tRestStart.y));
+        };
+
+        for (int idx = 0; idx < bones.Count; idx++)
+        {
+            BoneDefinition b = bones[idx];
+            Vector2 r1 = new Vector2(b.restStart.x * aspect, b.restStart.y);
+            Vector2 r2 = new Vector2(b.restEnd.x * aspect, b.restEnd.y);
+
+            if (b.id == "torso" || b.role == "breath")
+            {
+                b.posedStart = torsoPosedStart;
+                b.posedEnd = evalTorsoSpace(r2);
+                b.dAngle = torsoAngle;
+                b.scaleY = torsoScaleY;
+                continue;
+            }
+
+            Vector2 a1 = new Vector2(r1.x + hipDX, r1.y + hipDY);
+            float localAngle = 0f;
+
+            if (b.id == "neck")
+            {
+                a1 = evalTorsoSpace(r1);
+                localAngle = torsoAngle - (Mathf.Sin(phase - 0.5f) * (headTiltDeg * 0.45f) * motionIntensity) * Mathf.Deg2Rad;
+            }
+            else if (b.id == "head" || b.role == "head")
+            {
+                int neckIdx = FindBoneIndex("neck");
+                if (neckIdx >= 0) a1 = bones[neckIdx].posedEnd;
+                else a1 = evalTorsoSpace(r1);
+                localAngle = torsoAngle - (Mathf.Sin(phase - 0.65f) * headTiltDeg * motionIntensity) * Mathf.Deg2Rad;
+            }
+            else if (b.role == "armR")
+            {
+                bool isFore = b.id.ToLower().Contains("fore");
+                int uIdx = FindBoneIndex("upperArmR");
+                if (isFore && uIdx >= 0)
+                {
+                    a1 = bones[uIdx].posedEnd;
+                    float deg = Mathf.Sin(phase - 0.95f) * forearmSwingDeg * clipMulArm * motionIntensity;
+                    localAngle = bones[uIdx].dAngle + deg * Mathf.Deg2Rad;
+                }
+                else
+                {
+                    a1 = evalTorsoSpace(r1);
+                    float deg = Mathf.Sin(phase - 0.35f) * armSwingDeg * clipMulArm * motionIntensity;
+                    localAngle = torsoAngle * 0.7f + deg * Mathf.Deg2Rad;
+                }
+            }
+            else if (b.role == "armL")
+            {
+                bool isFore = b.id.ToLower().Contains("fore");
+                int uIdx = FindBoneIndex("upperArmL");
+                if (isFore && uIdx >= 0)
+                {
+                    a1 = bones[uIdx].posedEnd;
+                    float deg = -Mathf.Sin(phase - 0.95f) * forearmSwingDeg * clipMulArm * motionIntensity - clipWaveBoost;
+                    localAngle = bones[uIdx].dAngle + deg * Mathf.Deg2Rad;
+                }
+                else
+                {
+                    a1 = evalTorsoSpace(r1);
+                    float deg = -Mathf.Sin(phase - 0.35f) * armSwingDeg * clipMulArm * motionIntensity - clipWaveBoost * 0.4f;
+                    localAngle = torsoAngle * 0.7f + deg * Mathf.Deg2Rad;
+                }
+            }
+            else if (b.role == "pendulum")
+            {
+                a1 = evalTorsoSpace(r1);
+                float deg = -Mathf.Sin(phase - 1.15f - idx * 0.2f) * pendulumSwingDeg * motionIntensity;
+                localAngle = deg * Mathf.Deg2Rad;
+            }
+            else if (b.role == "legR" || b.role == "legL")
+            {
+                bool isLower = b.id.ToLower().Contains("lower");
+                string parentKey = (b.role == "legR") ? "upperLegR" : "upperLegL";
+                int uLegIdx = FindBoneIndex(parentKey);
+
+                if (lockFeetIK && activeClip != AnimationClipMode.Walk)
+                {
+                    if (isLower && uLegIdx >= 0)
+                    {
+                        a1 = bones[uLegIdx].posedEnd;
+                        Vector2 targetAnkle = r2;
+                        float restAng = Mathf.Atan2(r2.y - r1.y, r2.x - r1.x);
+                        float ikAng = Mathf.Atan2(targetAnkle.y - a1.y, targetAnkle.x - a1.x);
+                        localAngle = ikAng - restAng;
+                    }
+                    else
+                    {
+                        a1 = new Vector2(r1.x + hipDX * 0.85f, r1.y + hipDY * 0.85f);
+                        localAngle = -(cosP * 2.5f * motionIntensity) * Mathf.Deg2Rad;
+                    }
+                }
+                else
+                {
+                    float dir = (b.role == "legR") ? -1f : 1f;
+                    if (isLower && uLegIdx >= 0) a1 = bones[uLegIdx].posedEnd;
+                    localAngle = (Mathf.Sin(phase) * 12f * dir * motionIntensity) * Mathf.Deg2Rad;
+                }
+            }
+
+            Vector2 rotEnd = RotatePoint2D(a1 + (r2 - r1), a1, localAngle);
+            b.posedStart = a1;
+            b.posedEnd = rotEnd;
+            b.dAngle = localAngle;
+            b.scaleY = 1.0f;
+        }
 
         foreach (AvatarPartLayer layer in avatarParts)
         {
-            if (layer.runtimeMesh == null || !layer.visible) continue;
-            string n = (layer.partName ?? "").ToLower();
+            if (layer.runtimeMesh == null || !layer.visible || layer.skinWeights == null) continue;
+            int vCount = layer.restVerts.Length;
 
-            Vector3 anchorWorld = new Vector3(
-                (layer.anchorUV.x - 0.5f) * worldScale * aspect,
-                (layer.anchorUV.y - 0.5f) * worldScale,
-                0f
-            );
-
-            for (int i = 0; i < layer.restVerts.Length; i++)
+            for (int i = 0; i < vCount; i++)
             {
-                Vector3 p = layer.restVerts[i];
-                Vector2 cuv = layer.canvasUVs[i];
+                Vector2 uv = layer.canvasUVs[i];
+                Vector2 uvIso = new Vector2(uv.x * aspect, uv.y);
+                BoneWeightPair sw = layer.skinWeights[i];
 
-                float groundLock = lockFeetIK ? Mathf.Clamp01((cuv.y - 0.05f) * 2.2f) : 1.0f;
-                float distToAnchor = Vector2.Distance(cuv, layer.anchorUV);
-                float mobileFactor = Mathf.Clamp01(distToAnchor / 0.12f) * (1f - layer.seamWeldStrength * Mathf.Exp(-distToAnchor * 15f));
+                Vector2 finalIso = Vector2.zero;
 
-                if (n.Contains("cabeza") || n.Contains("head") || n.Contains("cabello") || n.Contains("lentes") || n.Contains("ojos"))
+                if (sw.weight0 > 0.0001f)
                 {
-                    float rad = Mathf.Sin(phase - 0.5f) * headTiltDeg * Mathf.Deg2Rad * mobileFactor;
-                    p = RotateAround2D(p, anchorWorld, rad);
+                    BoneDefinition b0 = bones[sw.boneIndex0];
+                    Vector2 r0 = new Vector2(b0.restStart.x * aspect, b0.restStart.y);
+                    float ly0 = r0.y + (uvIso.y - r0.y) * b0.scaleY;
+                    Vector2 p0 = RotatePoint2D(new Vector2(uvIso.x, ly0), r0, b0.dAngle) + (b0.posedStart - r0);
+                    finalIso += p0 * sw.weight0;
                 }
-                else if (n.Contains("brazo") || n.Contains("arm"))
+                if (sw.weight1 > 0.0001f)
                 {
-                    float dir = (n.Contains("2") || n.Contains("der")) ? -1f : 1f;
-                    float rad = -Mathf.Sin(phase - 0.35f) * dir * armSwingDeg * Mathf.Deg2Rad * mobileFactor;
-                    p = RotateAround2D(p, anchorWorld, rad);
+                    BoneDefinition b1 = bones[sw.boneIndex1];
+                    Vector2 r1 = new Vector2(b1.restStart.x * aspect, b1.restStart.y);
+                    float ly1 = r1.y + (uvIso.y - r1.y) * b1.scaleY;
+                    Vector2 p1 = RotatePoint2D(new Vector2(uvIso.x, ly1), r1, b1.dAngle) + (b1.posedStart - r1);
+                    finalIso += p1 * sw.weight1;
                 }
-                else if (n.Contains("falda") || n.Contains("skirt") || n.Contains("correa"))
+                if (sw.weight2 > 0.0001f)
                 {
-                    p.x += Mathf.Sin(phase - 0.4f) * (hipSwayX * 1.1f) * mobileFactor;
-                }
-                else if (n.Contains("pierna") || n.Contains("leg") || n.Contains("muslo") || n.Contains("calceta") || n.Contains("pantalon"))
-                {
-                    p.x += cosP * legSwingAmount * mobileFactor * groundLock;
+                    BoneDefinition b2 = bones[sw.boneIndex2];
+                    Vector2 r2 = new Vector2(b2.restStart.x * aspect, b2.restStart.y);
+                    float ly2 = r2.y + (uvIso.y - r2.y) * b2.scaleY;
+                    Vector2 p2 = RotatePoint2D(new Vector2(uvIso.x, ly2), r2, b2.dAngle) + (b2.posedStart - r2);
+                    finalIso += p2 * sw.weight2;
                 }
 
-                p.x += cosP * hipSwayX * groundLock;
-                p.y -= Mathf.Abs(sinP) * hipBounceY * groundLock;
-                p.y += sinP * breathAmount * Mathf.Clamp01(cuv.y - 0.48f);
-
-                layer.deformedVerts[i] = p;
+                layer.deformedVerts[i] = new Vector3((finalIso.x - 0.5f * aspect) * worldScale, (finalIso.y - 0.5f) * worldScale, 0f);
             }
 
             layer.runtimeMesh.vertices = layer.deformedVerts;
         }
     }
 
-    private Vector3 RotateAround2D(Vector3 pt, Vector3 pivot, float rad)
-    {
-        float c = Mathf.Cos(rad);
-        float s = Mathf.Sin(rad);
-        float dx = pt.x - pivot.x;
-        float dy = pt.y - pivot.y;
-        return new Vector3(pivot.x + dx * c - dy * s, pivot.y + dx * s + dy * c, pt.z);
-    }
-
-    public void ParseJsonData(string jsonText)
+    public void ParseJsonData(string jsonText, bool overwriteSliders = true)
     {
         if (string.IsNullOrEmpty(jsonText)) return;
 
@@ -4633,12 +5206,54 @@ ${defaultLayersCode}
         if (wMatch.Success) canvasWidth = float.Parse(wMatch.Groups[1].Value, CultureInfo.InvariantCulture);
         if (hMatch.Success) canvasHeight = float.Parse(hMatch.Groups[1].Value, CultureInfo.InvariantCulture);
 
-        cycleSpeed = ParseFloatKey(jsonText, "cycleSpeed", cycleSpeed);
-        breathAmount = ParseFloatKey(jsonText, "breathAmount", breathAmount);
-        hipSwayX = ParseFloatKey(jsonText, "hipSwayX", hipSwayX);
-        hipBounceY = ParseFloatKey(jsonText, "hipBounceY", hipBounceY);
-        armSwingDeg = ParseFloatKey(jsonText, "armSwingDeg", armSwingDeg);
-        headTiltDeg = ParseFloatKey(jsonText, "headTiltDeg", headTiltDeg);
+        if (overwriteSliders)
+        {
+            cycleSpeed = Mathf.Max(1.5f, ParseFloatKey(jsonText, "cycleSpeed", cycleSpeed));
+            breathAmount = Mathf.Max(0.020f, ParseFloatKey(jsonText, "breathAmount", breathAmount));
+            float rawHipX = ParseFloatKey(jsonText, "hipSwayX", hipSwayX);
+            float rawHipY = ParseFloatKey(jsonText, "hipBounceY", hipBounceY);
+            hipSwayX = Mathf.Max(3.5f, (rawHipX < 0.2f) ? (rawHipX * 250f) : rawHipX);
+            hipBounceY = Mathf.Max(4.5f, (rawHipY < 0.2f) ? (rawHipY * 250f) : rawHipY);
+            armSwingDeg = Mathf.Max(5.5f, ParseFloatKey(jsonText, "armSwingDeg", armSwingDeg));
+            forearmSwingDeg = Mathf.Max(7.5f, ParseFloatKey(jsonText, "forearmSwingDeg", forearmSwingDeg));
+            pendulumSwingDeg = Mathf.Max(6.5f, ParseFloatKey(jsonText, "pendulumSwingDeg", pendulumSwingDeg));
+            headTiltDeg = Mathf.Max(3.5f, ParseFloatKey(jsonText, "headTiltDeg", headTiltDeg));
+        }
+
+        int bonesStart = jsonText.IndexOf("\\"bones\\"");
+        int layersStart = jsonText.IndexOf("\\"layers\\"");
+        if (bonesStart != -1 && layersStart != -1 && layersStart > bonesStart)
+        {
+            string bonesSection = jsonText.Substring(bonesStart, layersStart - bonesStart);
+            string[] boneBlocks = bonesSection.Split(new string[] { "\\"name\\"" }, System.StringSplitOptions.RemoveEmptyEntries);
+            List<BoneDefinition> parsedBones = new List<BoneDefinition>();
+            for (int i = 1; i < boneBlocks.Length; i++)
+            {
+                string bb = boneBlocks[i];
+                Match mId = Regex.Match(bb, @"^\\s*:\\s*""([^""]+)""");
+                if (!mId.Success) continue;
+                BoneDefinition bd = new BoneDefinition();
+                bd.id = mId.Groups[1].Value;
+                Match mRole = Regex.Match(bb, @"""role""\\s*:\\s*""([^""]+)""");
+                bd.role = mRole.Success ? mRole.Groups[1].Value : "breath";
+                bd.envelope = ParseFloatKey(bb, "envelope", 1.0f);
+
+                MatchCollection xyMatches = Regex.Matches(bb, @"""x""\\s*:\\s*([-+]?[0-9]*\\.?[0-9]+)\\s*,\\s*""y""\\s*:\\s*([-+]?[0-9]*\\.?[0-9]+)");
+                if (xyMatches.Count >= 2)
+                {
+                    bd.restStart = new Vector2(
+                        float.Parse(xyMatches[0].Groups[1].Value, CultureInfo.InvariantCulture),
+                        float.Parse(xyMatches[0].Groups[2].Value, CultureInfo.InvariantCulture)
+                    );
+                    bd.restEnd = new Vector2(
+                        float.Parse(xyMatches[1].Groups[1].Value, CultureInfo.InvariantCulture),
+                        float.Parse(xyMatches[1].Groups[2].Value, CultureInfo.InvariantCulture)
+                    );
+                }
+                parsedBones.Add(bd);
+            }
+            if (parsedBones.Count > 0) bones = parsedBones;
+        }
 
         Dictionary<string, Texture2D> savedTextures = new Dictionary<string, Texture2D>();
         if (avatarParts != null)
@@ -4656,7 +5271,8 @@ ${defaultLayersCode}
         }
 
         List<AvatarPartLayer> parsed = new List<AvatarPartLayer>();
-        string[] blocks = jsonText.Split(new string[] { "\\"slotName\\"" }, System.StringSplitOptions.RemoveEmptyEntries);
+        string layersText = (layersStart != -1) ? jsonText.Substring(layersStart) : jsonText;
+        string[] blocks = layersText.Split(new string[] { "\\"slotName\\"" }, System.StringSplitOptions.RemoveEmptyEntries);
 
         for (int s = 1; s < blocks.Length; s++)
         {
@@ -4669,6 +5285,9 @@ ${defaultLayersCode}
             Match mVis = Regex.Match(b, @"""visible""\\s*:\\s*(true|false)");
             if (mVis.Success) layer.visible = (mVis.Groups[1].Value == "true");
 
+            Match mPBone = Regex.Match(b, @"""parentBone""\\s*:\\s*""([^""]+)""");
+            if (mPBone.Success) layer.parentBone = mPBone.Groups[1].Value;
+
             Match mNx = Regex.Match(b, @"""nx""\\s*:\\s*([-+]?[0-9]*\\.?[0-9]+)");
             Match mNy = Regex.Match(b, @"""ny""\\s*:\\s*([-+]?[0-9]*\\.?[0-9]+)");
             if (mNx.Success && mNy.Success)
@@ -4678,8 +5297,22 @@ ${defaultLayersCode}
                 layer.anchorUV = new Vector2(nx, 1f - ny);
             }
 
+            layer.anchorRadiusPct = ParseFloatKey(b, "radiusPct", 12f);
+
             Match mStr = Regex.Match(b, @"""strength""\\s*:\\s*([-+]?[0-9]*\\.?[0-9]+)");
             if (mStr.Success) layer.seamWeldStrength = float.Parse(mStr.Groups[1].Value, CultureInfo.InvariantCulture);
+
+            Match mAllowed = Regex.Match(b, @"""allowedBones""\\s*:\\s*\\[([^\\]]*)\\]");
+            if (mAllowed.Success)
+            {
+                MatchCollection boneStrs = Regex.Matches(mAllowed.Groups[1].Value, @"""([^""]+)""");
+                layer.allowedBones = new List<string>();
+                foreach (Match bm in boneStrs) layer.allowedBones.Add(bm.Groups[1].Value);
+            }
+            if (layer.allowedBones == null || layer.allowedBones.Count == 0)
+            {
+                AssignHeuristicBones(layer);
+            }
 
             layer.canvasRect = new Vector4(
                 ParseFloatKey(b, "xMin", 0f),
@@ -4732,7 +5365,10 @@ ${defaultLayersCode}
             }
             else if (avatarParts != null && s - 1 < avatarParts.Count && avatarParts[s - 1].partTexture != null)
             {
-                layer.partTexture = avatarParts[s - 1].partTexture;
+                if (avatarParts[s - 1].partTexture != sharedAtlasTexture && !avatarParts[s - 1].partTexture.name.ToLower().Contains("atlas"))
+                {
+                    layer.partTexture = avatarParts[s - 1].partTexture;
+                }
             }
 
             parsed.Add(layer);
