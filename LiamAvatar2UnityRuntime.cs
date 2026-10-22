@@ -2,6 +2,9 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text.RegularExpressions;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 public class LiamAvatar2UnityRuntime : MonoBehaviour
 {
@@ -11,11 +14,13 @@ public class LiamAvatar2UnityRuntime : MonoBehaviour
         public string partName;
         public bool visible = true;
         public Texture2D partTexture;
-        public Vector2 anchorUV = new Vector2(0.49f, 0.79f);
+        public Vector2 anchorUV = new Vector2(0.49f, 0.72f);
         [Range(0f, 1f)] public float seamWeldStrength = 0.85f;
         public Vector4 canvasRect = new Vector4(0f, 0f, 1f, 1f);
         public Vector4 atlasRect = new Vector4(0f, 0f, 1f, 1f);
 
+        [HideInInspector] public Vector2[] customUVs;
+        [HideInInspector] public int[] customTriangles;
         [HideInInspector] public Mesh runtimeMesh;
         [HideInInspector] public Vector3[] restVerts;
         [HideInInspector] public Vector3[] deformedVerts;
@@ -28,35 +33,124 @@ public class LiamAvatar2UnityRuntime : MonoBehaviour
     public Texture2D sharedAtlasTexture;
     public float canvasWidth = 1536f;
     public float canvasHeight = 2752f;
+    public bool autoDetectResolutionFromTexture = true;
 
-    [Header("2. Capas del Avatar en Orden Z")]
+    [Header("2. Capas en Orden Z (Cabeza, Brazo 1 (Izq Pantalla), Torso, Brazo 2 (Der Pantalla), PiernasConCalcetasYTenis, Falda, Pierna1, Pierna2)")]
     public List<AvatarPartLayer> avatarParts = new List<AvatarPartLayer>();
 
     [Header("3. Parametros de Malla y Animacion")]
     public int gridColumns = 22;
     public int gridRows = 30;
     public float worldScale = 5.0f;
-    public float cycleSpeed = 2.00f;
+    public float cycleSpeed = 0.80f;
     public float breathAmount = 0.020f;
-    public float hipSwayX = 0.0140f;
-    public float hipBounceY = 0.0080f;
-    public float armSwingDeg = 3.20f;
-    public float headTiltDeg = 2.20f;
+    public float hipSwayX = 0.0100f;
+    public float hipBounceY = 0.0100f;
+    public float armSwingDeg = 2.20f;
+    public float headTiltDeg = 5.00f;
     public float legSwingAmount = 0.015f;
     public bool lockFeetIK = true;
+
+    void Reset()
+    {
+        AutoBindEditorAssets();
+        if (jsonFile != null) ParseJsonData(jsonFile.text);
+        else EnsureDefaultLayers();
+    }
+
+    void OnValidate()
+    {
+        AutoBindEditorAssets();
+        if (avatarParts == null || avatarParts.Count == 0)
+        {
+            if (jsonFile != null) ParseJsonData(jsonFile.text);
+            else EnsureDefaultLayers();
+        }
+    }
+
+    private void AutoBindEditorAssets()
+    {
+#if UNITY_EDITOR
+        if (sharedAtlasTexture == null)
+        {
+            string[] guids = AssetDatabase.FindAssets("LiamAvatar_Atlas t:Texture2D");
+            if (guids != null && guids.Length > 0)
+            {
+                string path = AssetDatabase.GUIDToAssetPath(guids[0]);
+                TextureImporter ti = AssetImporter.GetAtPath(path) as TextureImporter;
+                if (ti != null && (ti.maxTextureSize < 4096 || !ti.alphaIsTransparency))
+                {
+                    ti.maxTextureSize = 4096;
+                    ti.alphaIsTransparency = true;
+                    ti.textureCompression = TextureImporterCompression.Uncompressed;
+                    ti.SaveAndReimport();
+                }
+                sharedAtlasTexture = AssetDatabase.LoadAssetAtPath<Texture2D>(path);
+            }
+        }
+        if (jsonFile == null)
+        {
+            string[] jGuids = AssetDatabase.FindAssets("LiamAvatar t:TextAsset");
+            if (jGuids != null && jGuids.Length > 0)
+            {
+                string jPath = AssetDatabase.GUIDToAssetPath(jGuids[0]);
+                jsonFile = AssetDatabase.LoadAssetAtPath<TextAsset>(jPath);
+            }
+        }
+#endif
+    }
 
     [ContextMenu("Cargar Datos desde JSON")]
     public void LoadFromJsonInEditor()
     {
-        if (jsonFile == null) return;
+        AutoBindEditorAssets();
+        if (jsonFile == null)
+        {
+            EnsureDefaultLayers();
+            return;
+        }
         ParseJsonData(jsonFile.text);
+    }
+
+    private void EnsureDefaultLayers()
+    {
+        if (avatarParts != null && avatarParts.Count > 0) return;
+        avatarParts = new List<AvatarPartLayer>
+        {
+            new AvatarPartLayer { partName = "Cabeza", visible = true, anchorUV = new Vector2(0.5348f, 0.7100f), seamWeldStrength = 0.850f, canvasRect = new Vector4(0.34245f, 0.70567f, 0.62435f, 0.88663f), atlasRect = new Vector4(0.63031f, 0.27342f, 0.87248f, 0.47190f) },
+            new AvatarPartLayer { partName = "Brazo 1 (Izq Pantalla)", visible = true, anchorUV = new Vector2(0.4283f, 0.7200f), seamWeldStrength = 0.900f, canvasRect = new Vector4(0.03841f, 0.47347f, 0.42253f, 0.70930f), atlasRect = new Vector4(0.29698f, 0.21323f, 0.62696f, 0.47190f) },
+            new AvatarPartLayer { partName = "Torso", visible = true, anchorUV = new Vector2(0.4867f, 0.5200f), seamWeldStrength = 0.000f, canvasRect = new Vector4(0.33529f, 0.49746f, 0.67318f, 0.76672f), atlasRect = new Vector4(0.00336f, 0.17656f, 0.29362f, 0.47190f) },
+            new AvatarPartLayer { partName = "Brazo 2 (Der Pantalla)", visible = true, anchorUV = new Vector2(0.6009f, 0.7244f), seamWeldStrength = 0.900f, canvasRect = new Vector4(0.56901f, 0.59375f, 0.94206f, 0.74273f), atlasRect = new Vector4(0.37248f, 0.01076f, 0.69295f, 0.17417f) },
+            new AvatarPartLayer { partName = "PiernasConCalcetasYTenis", visible = false, anchorUV = new Vector2(0.5655f, 0.4990f), seamWeldStrength = 0.850f, canvasRect = new Vector4(0.28841f, 0.05305f, 0.81901f, 0.53016f), atlasRect = new Vector4(0.00336f, 0.47429f, 0.45917f, 0.99761f) },
+            new AvatarPartLayer { partName = "Falda", visible = true, anchorUV = new Vector2(0.5655f, 0.4990f), seamWeldStrength = 0.850f, canvasRect = new Vector4(0.34701f, 0.38263f, 0.77279f, 0.53924f), atlasRect = new Vector4(0.00336f, 0.00239f, 0.36913f, 0.17417f) },
+            new AvatarPartLayer { partName = "Pierna1", visible = true, anchorUV = new Vector2(0.4867f, 0.6500f), seamWeldStrength = 0.800f, canvasRect = new Vector4(0.28776f, 0.05305f, 0.57487f, 0.43060f), atlasRect = new Vector4(0.46253f, 0.58350f, 0.70917f, 0.99761f) },
+            new AvatarPartLayer { partName = "Pierna2", visible = true, anchorUV = new Vector2(0.4867f, 0.6500f), seamWeldStrength = 0.800f, canvasRect = new Vector4(0.48698f, 0.15225f, 0.81380f, 0.46039f), atlasRect = new Vector4(0.71253f, 0.65963f, 0.99329f, 0.99761f) }
+        };
     }
 
     void Start()
     {
+        AutoBindEditorAssets();
         if (jsonFile != null)
         {
             ParseJsonData(jsonFile.text);
+        }
+        else
+        {
+            EnsureDefaultLayers();
+        }
+
+        if (autoDetectResolutionFromTexture && sharedAtlasTexture == null)
+        {
+            foreach (AvatarPartLayer layer in avatarParts)
+            {
+                if (layer.partTexture != null)
+                {
+                    canvasWidth = layer.partTexture.width;
+                    canvasHeight = layer.partTexture.height;
+                    break;
+                }
+            }
         }
 
         float aspect = canvasWidth / Mathf.Max(1f, canvasHeight);
@@ -66,12 +160,14 @@ public class LiamAvatar2UnityRuntime : MonoBehaviour
             AvatarPartLayer layer = avatarParts[pIdx];
             GameObject child = new GameObject("Part_" + layer.partName);
             child.transform.SetParent(transform, false);
+            child.transform.localPosition = new Vector3(0f, 0f, pIdx * 0.005f);
             child.SetActive(layer.visible);
 
             MeshFilter mf = child.AddComponent<MeshFilter>();
             MeshRenderer mr = child.AddComponent<MeshRenderer>();
 
             Shader spriteShader = Shader.Find("Sprites/Default");
+            if (spriteShader == null) spriteShader = Shader.Find("Universal Render Pipeline/2D/Sprite-Unlit-Default");
             if (spriteShader == null) spriteShader = Shader.Find("Unlit/Transparent");
             mr.material = new Material(spriteShader);
             mr.sortingOrder = (avatarParts.Count - pIdx) * 10;
@@ -89,53 +185,78 @@ public class LiamAvatar2UnityRuntime : MonoBehaviour
             layer.runtimeMesh = new Mesh { name = "Mesh_" + layer.partName };
             mf.mesh = layer.runtimeMesh;
 
-            int vCount = (gridColumns + 1) * (gridRows + 1);
-            layer.restVerts = new Vector3[vCount];
-            layer.deformedVerts = new Vector3[vCount];
-            layer.canvasUVs = new Vector2[vCount];
-            layer.meshUVs = new Vector2[vCount];
-
-            Vector4 cRect = useAtlas ? layer.canvasRect : new Vector4(0f, 0f, 1f, 1f);
-            Vector4 aRect = useAtlas ? layer.atlasRect : new Vector4(0f, 0f, 1f, 1f);
-
-            int idx = 0;
-            for (int r = 0; r <= gridRows; r++)
+            if (!useAtlas && layer.customUVs != null && layer.customUVs.Length > 0 && layer.customTriangles != null && layer.customTriangles.Length > 0)
             {
-                float ty = (float)r / gridRows;
-                float cy = Mathf.Lerp(cRect.y, cRect.w, ty);
-                float vy = Mathf.Lerp(aRect.y, aRect.w, ty);
+                int vCount = layer.customUVs.Length;
+                layer.canvasUVs = new Vector2[vCount];
+                layer.meshUVs = new Vector2[vCount];
+                layer.restVerts = new Vector3[vCount];
+                layer.deformedVerts = new Vector3[vCount];
 
-                for (int c = 0; c <= gridColumns; c++)
+                for (int i = 0; i < vCount; i++)
                 {
-                    float tx = (float)c / gridColumns;
-                    float cx = Mathf.Lerp(cRect.x, cRect.z, tx);
-                    float ux = Mathf.Lerp(aRect.x, aRect.z, tx);
-
-                    layer.canvasUVs[idx] = new Vector2(cx, cy);
-                    layer.meshUVs[idx] = new Vector2(ux, vy);
-                    layer.restVerts[idx] = new Vector3((cx - 0.5f) * worldScale * aspect, (cy - 0.5f) * worldScale, 0f);
-                    idx++;
+                    Vector2 uv = layer.customUVs[i];
+                    layer.canvasUVs[i] = uv;
+                    layer.meshUVs[i] = uv;
+                    layer.restVerts[i] = new Vector3((uv.x - 0.5f) * worldScale * aspect, (uv.y - 0.5f) * worldScale, 0f);
                 }
+
+                layer.runtimeMesh.vertices = layer.restVerts;
+                layer.runtimeMesh.uv = layer.meshUVs;
+                layer.runtimeMesh.triangles = layer.customTriangles;
+            }
+            else
+            {
+                int vCount = (gridColumns + 1) * (gridRows + 1);
+                layer.restVerts = new Vector3[vCount];
+                layer.deformedVerts = new Vector3[vCount];
+                layer.canvasUVs = new Vector2[vCount];
+                layer.meshUVs = new Vector2[vCount];
+
+                bool hasValidRect = (layer.canvasRect.z > layer.canvasRect.x && layer.canvasRect.w > layer.canvasRect.y);
+                Vector4 cRect = (useAtlas && hasValidRect) ? layer.canvasRect : new Vector4(0f, 0f, 1f, 1f);
+                Vector4 aRect = (useAtlas && hasValidRect) ? layer.atlasRect : new Vector4(0f, 0f, 1f, 1f);
+
+                int idx = 0;
+                for (int r = 0; r <= gridRows; r++)
+                {
+                    float ty = (float)r / gridRows;
+                    float cy = Mathf.Lerp(cRect.y, cRect.w, ty);
+                    float vy = Mathf.Lerp(aRect.y, aRect.w, ty);
+
+                    for (int c = 0; c <= gridColumns; c++)
+                    {
+                        float tx = (float)c / gridColumns;
+                        float cx = Mathf.Lerp(cRect.x, cRect.z, tx);
+                        float ux = Mathf.Lerp(aRect.x, aRect.z, tx);
+
+                        layer.canvasUVs[idx] = new Vector2(cx, cy);
+                        layer.meshUVs[idx] = new Vector2(ux, vy);
+                        layer.restVerts[idx] = new Vector3((cx - 0.5f) * worldScale * aspect, (cy - 0.5f) * worldScale, 0f);
+                        idx++;
+                    }
+                }
+
+                int[] tris = new int[gridColumns * gridRows * 6];
+                int t = 0;
+                for (int r = 0; r < gridRows; r++)
+                {
+                    for (int c = 0; c < gridColumns; c++)
+                    {
+                        int i0 = r * (gridColumns + 1) + c;
+                        int i1 = i0 + 1;
+                        int i2 = i0 + (gridColumns + 1);
+                        int i3 = i2 + 1;
+                        tris[t++] = i0; tris[t++] = i2; tris[t++] = i1;
+                        tris[t++] = i1; tris[t++] = i2; tris[t++] = i3;
+                    }
+                }
+
+                layer.runtimeMesh.vertices = layer.restVerts;
+                layer.runtimeMesh.uv = layer.meshUVs;
+                layer.runtimeMesh.triangles = tris;
             }
 
-            int[] tris = new int[gridColumns * gridRows * 6];
-            int t = 0;
-            for (int r = 0; r < gridRows; r++)
-            {
-                for (int c = 0; c < gridColumns; c++)
-                {
-                    int i0 = r * (gridColumns + 1) + c;
-                    int i1 = i0 + 1;
-                    int i2 = i0 + (gridColumns + 1);
-                    int i3 = i2 + 1;
-                    tris[t++] = i0; tris[t++] = i2; tris[t++] = i1;
-                    tris[t++] = i1; tris[t++] = i2; tris[t++] = i3;
-                }
-            }
-
-            layer.runtimeMesh.vertices = layer.restVerts;
-            layer.runtimeMesh.uv = layer.meshUVs;
-            layer.runtimeMesh.triangles = tris;
             layer.runtimeMesh.RecalculateBounds();
         }
     }
@@ -224,11 +345,14 @@ public class LiamAvatar2UnityRuntime : MonoBehaviour
         headTiltDeg = ParseFloatKey(jsonText, "headTiltDeg", headTiltDeg);
 
         Dictionary<string, Texture2D> savedTextures = new Dictionary<string, Texture2D>();
-        foreach (AvatarPartLayer existing in avatarParts)
+        if (avatarParts != null)
         {
-            if (!string.IsNullOrEmpty(existing.partName) && existing.partTexture != null)
+            foreach (AvatarPartLayer existing in avatarParts)
             {
-                savedTextures[existing.partName] = existing.partTexture;
+                if (!string.IsNullOrEmpty(existing.partName) && existing.partTexture != null)
+                {
+                    savedTextures[existing.partName] = existing.partTexture;
+                }
             }
         }
 
@@ -272,9 +396,44 @@ public class LiamAvatar2UnityRuntime : MonoBehaviour
                 ParseFloatKey(b, "vMax", 1f)
             );
 
+            int uvsStart = b.IndexOf("\"uvs\"");
+            int trisStart = b.IndexOf("\"triangles\"");
+            if (uvsStart != -1 && trisStart != -1)
+            {
+                string uvsSection = b.Substring(uvsStart, trisStart - uvsStart);
+                MatchCollection uvMatches = Regex.Matches(uvsSection, @"\[\s*([-+]?[0-9]*\.?[0-9]+)\s*,\s*([-+]?[0-9]*\.?[0-9]+)\s*\]");
+                layer.customUVs = new Vector2[uvMatches.Count];
+                for (int i = 0; i < uvMatches.Count; i++)
+                {
+                    float u = float.Parse(uvMatches[i].Groups[1].Value, CultureInfo.InvariantCulture);
+                    float v = float.Parse(uvMatches[i].Groups[2].Value, CultureInfo.InvariantCulture);
+                    layer.customUVs[i] = new Vector2(u, v);
+                }
+
+                string trisSection = b.Substring(trisStart);
+                int endMesh = trisSection.IndexOf("}");
+                if (endMesh != -1) trisSection = trisSection.Substring(0, endMesh);
+
+                MatchCollection triMatches = Regex.Matches(trisSection, @"\[\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\]");
+                layer.customTriangles = new int[triMatches.Count * 3];
+                for (int i = 0; i < triMatches.Count; i++)
+                {
+                    int i0 = int.Parse(triMatches[i].Groups[1].Value, CultureInfo.InvariantCulture);
+                    int i1 = int.Parse(triMatches[i].Groups[2].Value, CultureInfo.InvariantCulture);
+                    int i2 = int.Parse(triMatches[i].Groups[3].Value, CultureInfo.InvariantCulture);
+                    layer.customTriangles[i * 3] = i0;
+                    layer.customTriangles[i * 3 + 1] = i2;
+                    layer.customTriangles[i * 3 + 2] = i1;
+                }
+            }
+
             if (!string.IsNullOrEmpty(layer.partName) && savedTextures.TryGetValue(layer.partName, out Texture2D tex))
             {
                 layer.partTexture = tex;
+            }
+            else if (avatarParts != null && s - 1 < avatarParts.Count && avatarParts[s - 1].partTexture != null)
+            {
+                layer.partTexture = avatarParts[s - 1].partTexture;
             }
 
             parsed.Add(layer);
