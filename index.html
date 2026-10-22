@@ -2520,7 +2520,7 @@
                 scaleY: 1.0,
                 rot: 0,
                 allowedBones: studio.bones.map(b => b.id),
-                anchor: { parentBone: 'torso', nx: 0.49, ny: 0.35, radiusPct: 12, strength: 0.80 },
+                anchor: { parentBone: 'torso', nx: 0.49, ny: 0.49, radiusPct: 14, strength: 0.85 },
                 rawSourceCanvas: rawCanvas,
                 bakedCanvas: cloneCanvas(rawCanvas),
                 mesh: { bounds: {}, vertices: [], triangles: [], hullEdges: [], neighbors: [] }
@@ -2574,6 +2574,18 @@
                     anchor: { parentBone: 'torso', nx: 0.49, ny: 0.48, radiusPct: 13, strength: 0.85 }
                 };
             }
+            if (n.includes('pierna 1') || n.includes('pierna1')) {
+                return {
+                    allowedBones: ['upperLegR', 'lowerLegR', 'torso'],
+                    anchor: { parentBone: 'torso', nx: 0.46, ny: 0.49, radiusPct: 15, strength: 0.85 }
+                };
+            }
+            if (n.includes('pierna 2') || n.includes('pierna2')) {
+                return {
+                    allowedBones: ['torso', 'upperLegL', 'lowerLegL'],
+                    anchor: { parentBone: 'torso', nx: 0.54, ny: 0.49, radiusPct: 15, strength: 0.85 }
+                };
+            }
             if (n.includes('pierna') || n.includes('leg') || n.includes('pantalon') || n.includes('calceta') || n.includes('tenis')) {
                 return {
                     allowedBones: ['torso', 'upperLegR', 'lowerLegR', 'upperLegL', 'lowerLegL'],
@@ -2582,7 +2594,7 @@
             }
             return {
                 allowedBones: studio.bones.map(b => b.id),
-                anchor: { parentBone: 'torso', nx: 0.49, ny: 0.35, radiusPct: 12, strength: 0.80 }
+                anchor: { parentBone: 'torso', nx: 0.49, ny: 0.49, radiusPct: 12, strength: 0.85 }
             };
         }
 
@@ -2846,7 +2858,8 @@
                     const hipAnchor = evalTorsoSpace(rx1, ry1);
                     ax1 = hipAnchor.x;
                     ay1 = hipAnchor.y;
-                    const deg = Math.sin(phase - 1.15 - idx * 0.2) * studio.anim.pendulumSwing + gust * 0.95;
+                    const swingMultiplier = (b.id === 'strap' || (b.label && b.label.toLowerCase().includes('falda'))) ? 0.55 : 1.0;
+                    const deg = Math.sin(phase - 1.15 - idx * 0.2) * (studio.anim.pendulumSwing * swingMultiplier) + gust * 0.95;
                     localAngle += deg * Math.PI / 180;
                 } else if (b.role === 'legR' || b.role === 'legL') {
                     const isLower = b.id.toLowerCase().includes('lower');
@@ -2861,8 +2874,9 @@
                             const ikAng = Math.atan2(targetAnkleY - ay1, targetAnkleX - ax1);
                             localAngle += (ikAng - restAng);
                         } else {
-                            ax1 = rx1 + hipDX * 0.75;
-                            ay1 = ry1 + hipDY * 0.75;
+                            const hipJ = evalTorsoSpace(rx1, ry1);
+                            ax1 = hipJ.x;
+                            ay1 = hipJ.y;
                             localAngle += (cosP * 2.0) * Math.PI / 180;
                         }
                     } else {
@@ -2870,6 +2884,10 @@
                         if (isLower && solvedMap[parentKey]) {
                             ax1 = solvedMap[parentKey].ax2;
                             ay1 = solvedMap[parentKey].ay2;
+                        } else {
+                            const hipJ = evalTorsoSpace(rx1, ry1);
+                            ax1 = hipJ.x;
+                            ay1 = hipJ.y;
                         }
                         localAngle += (Math.sin(phase) * 12 * dir) * Math.PI / 180;
                     }
@@ -4792,13 +4810,19 @@ ${defaultLayersCode}
         }
         else if (n.Contains("pierna 1") || n.Contains("pierna1"))
         {
-            layer.allowedBones = new List<string> { "upperLegR", "lowerLegR" };
+            layer.allowedBones = new List<string> { "upperLegR", "lowerLegR", "torso" };
             layer.parentBone = "torso";
+            layer.anchorUV = new Vector2(0.46f, 0.51f);
+            layer.anchorRadiusPct = 15f;
+            layer.seamWeldStrength = 0.85f;
         }
         else if (n.Contains("pierna 2") || n.Contains("pierna2"))
         {
-            layer.allowedBones = new List<string> { "upperLegL", "lowerLegL" };
+            layer.allowedBones = new List<string> { "torso", "upperLegL", "lowerLegL" };
             layer.parentBone = "torso";
+            layer.anchorUV = new Vector2(0.54f, 0.51f);
+            layer.anchorRadiusPct = 15f;
+            layer.seamWeldStrength = 0.85f;
         }
         else if (n.Contains("pierna") || n.Contains("leg") || n.Contains("calceta") || n.Contains("tenis"))
         {
@@ -5134,7 +5158,8 @@ ${defaultLayersCode}
             else if (b.role == "pendulum")
             {
                 a1 = evalTorsoSpace(r1);
-                float deg = -Mathf.Sin(phase - 1.15f - idx * 0.2f) * pendulumSwingDeg * motionIntensity;
+                float swingMultiplier = (b.id != null && (b.id == "strap" || b.id.ToLower().Contains("falda") || b.id.ToLower().Contains("skirt"))) ? 0.55f : 1.0f;
+                float deg = -Mathf.Sin(phase - 1.15f - idx * 0.2f) * pendulumSwingDeg * swingMultiplier * motionIntensity;
                 localAngle = deg * Mathf.Deg2Rad;
             }
             else if (b.role == "legR" || b.role == "legL")
@@ -5155,7 +5180,7 @@ ${defaultLayersCode}
                     }
                     else
                     {
-                        a1 = new Vector2(r1.x + hipDX * 0.75f, r1.y + hipDY * 0.75f);
+                        a1 = evalTorsoSpace(r1);
                         localAngle = -(cosP * 2.0f * motionIntensity) * Mathf.Deg2Rad;
                     }
                 }
@@ -5163,6 +5188,7 @@ ${defaultLayersCode}
                 {
                     float dir = (b.role == "legR") ? -1f : 1f;
                     if (isLower && uLegIdx >= 0) a1 = bones[uLegIdx].posedEnd;
+                    else a1 = evalTorsoSpace(r1);
                     localAngle = (Mathf.Sin(phase) * 12f * dir * motionIntensity) * Mathf.Deg2Rad;
                 }
             }
