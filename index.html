@@ -3205,9 +3205,29 @@
         function drawTexturedTriangleAffine(c, img, u0, v0, u1, v1, u2, v2, x0, y0, x1, y1, x2, y2) {
             c.save();
             c.beginPath();
-            c.moveTo(x0, y0);
-            c.lineTo(x1, y1);
-            c.lineTo(x2, y2);
+
+            // Centroid dilation / vertex inflation:
+            // Expands the clip path by ~0.65 screen pixels outward from the centroid.
+            // This eliminates sub-pixel anti-aliasing gaps and alpha leakage at shared triangle edges,
+            // preventing underlying layers (or background) from bleeding through and eliminating visible mesh wireframes.
+            let currentScale = 1;
+            if (c.getTransform) {
+                const m = c.getTransform();
+                const sx = Math.hypot(m.a, m.b);
+                const sy = Math.hypot(m.c, m.d);
+                currentScale = (sx + sy) * 0.5 || 1;
+            }
+            const pad = 0.65 / currentScale;
+
+            const cx = (x0 + x1 + x2) / 3;
+            const cy = (y0 + y1 + y2) / 3;
+            const d0 = Math.hypot(x0 - cx, y0 - cy) || 1;
+            const d1 = Math.hypot(x1 - cx, y1 - cy) || 1;
+            const d2 = Math.hypot(x2 - cx, y2 - cy) || 1;
+
+            c.moveTo(x0 + ((x0 - cx) / d0) * pad, y0 + ((y0 - cy) / d0) * pad);
+            c.lineTo(x1 + ((x1 - cx) / d1) * pad, y1 + ((y1 - cy) / d1) * pad);
+            c.lineTo(x2 + ((x2 - cx) / d2) * pad, y2 + ((y2 - cy) / d2) * pad);
             c.closePath();
             c.clip();
 
@@ -6206,7 +6226,7 @@ ${defaultLayersCode}
                     return (((512 + rmean) * r * r) >> 8) + 4 * g * g + (((767 - rmean) * b * b) >> 8);
                 }
 
-                function prunePalettePerceptual(pal, threshold = 28) {
+                function prunePalettePerceptual(pal, threshold = 8) {
                     const threshSq = threshold * threshold;
                     const result = [];
                     for (let i = 0; i < pal.length; i++) {
@@ -6231,7 +6251,7 @@ ${defaultLayersCode}
                     const maxColors = isTransparent ? 255 : 256;
                     const rawPalette = window.gifenc.quantize(sampleBuffer, maxColors, { format: 'rgb565' });
                     if (shouldStabilize) {
-                        opaquePalette = prunePalettePerceptual(rawPalette, 28);
+                        opaquePalette = prunePalettePerceptual(rawPalette, 8);
                     } else {
                         opaquePalette = rawPalette;
                     }
