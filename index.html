@@ -301,7 +301,7 @@
                 </svg>
             </button>
 
-            <button onclick="recomputeAllPartsWeights(true)" title="Recalcular Pesos y Soldar Anclajes" class="w-8 h-8 rounded border border-[#28324e] bg-[#141926] flex items-center justify-center text-amber-400 hover:bg-amber-500/20 transition">
+            <button onclick="recomputeAllPartsWeights(true, true)" title="Recalcular Pesos y Soldar Anclajes" class="w-8 h-8 rounded border border-[#28324e] bg-[#141926] flex items-center justify-center text-amber-400 hover:bg-amber-500/20 transition">
                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
                 </svg>
@@ -720,12 +720,29 @@
                             </div>
                             <input type="range" id="sl_boneEnvelope" min="0.3" max="2.5" step="0.05" value="1.0" onchange="pushUndoState()" oninput="updateSelectedBoneEnvelope(this.value)">
                         </div>
+
+                        <div>
+                            <div class="flex justify-between text-[10px] mb-1">
+                                <span class="text-slate-400">Rigidez del Hueso (0 elastico / 1 rigido)</span>
+                                <span id="val_boneRigidity" class="mono text-sky-300">0.50 (neutro)</span>
+                            </div>
+                            <input type="range" id="sl_boneRigidity" min="0" max="1" step="0.05" value="0.5" onchange="pushUndoState()" oninput="updateSelectedBoneRigidity(this.value)">
+                        </div>
                     </div>
 
                     <div class="bg-[#161b29] border border-[#252d44] rounded p-2.5 space-y-2.5">
                         <div class="flex items-center justify-between border-b border-[#22293c] pb-1.5">
                             <span class="text-[10px] font-bold uppercase tracking-wider text-amber-400">Pincel de Pesos (Skinning)</span>
                             <span id="lblWeightBoneTarget" class="mono text-[10px] text-amber-300">torso</span>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between text-[10px] mb-1">
+                                <span class="text-slate-400">Rigidez Global de Pesos (transicion entre huesos)</span>
+                                <span id="val_weightRigidity" class="mono text-amber-300">0.50</span>
+                            </div>
+                            <input type="range" id="sl_weightRigidity" min="0" max="1" step="0.05" value="0.5" onchange="pushUndoState()" oninput="updateGlobalWeightRigidity(this.value)">
+                            <div class="text-[9px] text-slate-500 mt-1 leading-tight">Bajo: la malla se estira de forma suave entre huesos. Alto: cada zona sigue a un solo hueso y solo se dobla en la articulacion. Mover estos controles regenera los pesos automaticos y descarta lo pintado.</div>
                         </div>
 
                         <div class="grid grid-cols-3 gap-1">
@@ -762,11 +779,14 @@
                         </label>
 
                         <div class="grid grid-cols-2 gap-1.5 pt-1">
-                            <button onclick="recomputeAllPartsWeights(true)" class="py-1.5 px-2 rounded bg-sky-500/20 hover:bg-sky-500/30 border border-sky-500/40 text-sky-300 text-[10px] font-semibold">
+                            <button onclick="recomputeAllPartsWeights(true, true)" class="py-1.5 px-2 rounded bg-sky-500/20 hover:bg-sky-500/30 border border-sky-500/40 text-sky-300 text-[10px] font-semibold">
                                 Auto-Pesos + Anclaje
                             </button>
                             <button onclick="pushUndoState(); relaxAllPartWeights(3)" class="py-1.5 px-2 rounded bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 text-[10px] font-semibold">
                                 Suavizar Fronteras
+                            </button>
+                            <button onclick="clearPaintedWeightsAll()" class="col-span-2 py-1.5 px-2 rounded bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/40 text-rose-300 text-[10px] font-semibold">
+                                Borrar Pesos Pintados
                             </button>
                         </div>
                     </div>
@@ -931,6 +951,8 @@
                 showWeights: false,
                 footIK: true
             },
+
+            weightRigidity: 0.5,
 
             weightBrush: {
                 mode: 'add',
@@ -1161,6 +1183,7 @@
                 legVariantStyle: studio.legVariantStyle,
                 selectedBoneId: studio.selectedBoneId,
                 selectedPartId: studio.selectedPartId,
+                weightRigidity: studio.weightRigidity,
                 bones: JSON.parse(JSON.stringify(studio.bones)),
                 anim: JSON.parse(JSON.stringify(studio.anim)),
                 meshConfig: JSON.parse(JSON.stringify(studio.meshConfig)),
@@ -1181,7 +1204,8 @@
                     vertexOffsetsAndWeights: p.mesh.vertices.map(v => ({
                         ox: v.ox,
                         oy: v.oy,
-                        weights: { ...v.weights }
+                        weights: { ...v.weights },
+                        paintW: v.paintW ? { ...v.paintW } : null
                     }))
                 }))
             };
@@ -1223,6 +1247,13 @@
                 nx1: remapLegacyNX(b.nx1),
                 nx2: remapLegacyNX(b.nx2)
             }));
+
+            studio.weightRigidity = (typeof snap.weightRigidity === 'number') ? snap.weightRigidity : 0.5;
+            const slGlobalRigid = document.getElementById('sl_weightRigidity');
+            if (slGlobalRigid) {
+                slGlobalRigid.value = studio.weightRigidity;
+                document.getElementById('val_weightRigidity').textContent = studio.weightRigidity.toFixed(2);
+            }
 
             if (snap.anim) {
                 studio.anim = {
@@ -1291,6 +1322,10 @@
                         for (let vIdx = 0; vIdx < pObj.mesh.vertices.length; vIdx++) {
                             pObj.mesh.vertices[vIdx].ox = sp.vertexOffsetsAndWeights[vIdx].ox || 0;
                             pObj.mesh.vertices[vIdx].oy = sp.vertexOffsetsAndWeights[vIdx].oy || 0;
+                            const savedPaint = sp.vertexOffsetsAndWeights[vIdx].paintW;
+                            if (savedPaint && typeof savedPaint === 'object') {
+                                pObj.mesh.vertices[vIdx].paintW = { ...savedPaint };
+                            }
                         }
                     }
                     computePartSmoothWeights(pObj);
@@ -2201,12 +2236,19 @@
             document.getElementById('meshStatsBadge').textContent = `${totalTris} tris totales`;
         }
 
-        function computePartSmoothWeights(part) {
+        function getBoneRigidity(b) {
+            return (b && typeof b.rigidity === 'number') ? Math.max(0, Math.min(1, b.rigidity)) : 0.5;
+        }
+
+        function computePartSmoothWeights(part, resetPainted = false) {
             const baseSigma = Math.max(RefWidth, RefHeight) * 0.085;
             const activeBones = studio.bones.filter(b =>
                 !part.allowedBones || part.allowedBones.length === 0 || part.allowedBones.includes(b.id)
             );
             const fallbackBones = activeBones.length > 0 ? activeBones : studio.bones;
+
+            const globalRigid = Math.max(0, Math.min(1, studio.weightRigidity));
+            const sharpness = 1 + 8 * globalRigid;
 
             const bonePixels = fallbackBones.map(b => ({
                 id: b.id,
@@ -2214,7 +2256,8 @@
                 y1: b.ny1 * RefHeight,
                 x2: b.nx2 * RefWidth,
                 y2: b.ny2 * RefHeight,
-                sigma: baseSigma * Math.max(0.25, b.envelope || 1.0)
+                sigma: baseSigma * Math.max(0.25, b.envelope || 1.0),
+                bias: Math.pow(4, (getBoneRigidity(b) - 0.5) * 2)
             }));
 
             const anchor = part.anchor || { parentBone: 'none', nx: 0.5, ny: 0.3, radiusPct: 12, strength: 0 };
@@ -2229,7 +2272,8 @@
 
                 bonePixels.forEach(bp => {
                     const d = pointToSegmentDist(vt.u, vt.v, bp.x1, bp.y1, bp.x2, bp.y2);
-                    const w = Math.exp(-(d * d) / (2 * bp.sigma * bp.sigma)) + 1e-6;
+                    const g = (Math.exp(-(d * d) / (2 * bp.sigma * bp.sigma)) + 1e-6) * bp.bias;
+                    const w = Math.pow(g, sharpness) + 1e-30;
                     wMap[bp.id] = w;
                     total += w;
                 });
@@ -2253,12 +2297,20 @@
                 vt.weights = wMap;
             });
 
-            relaxSinglePartWeights(part, 2);
+            relaxSinglePartWeights(part, Math.max(0, Math.round(2 - 2 * globalRigid)));
+
+            part.mesh.vertices.forEach(vt => {
+                if (resetPainted) {
+                    delete vt.paintW;
+                } else if (vt.paintW) {
+                    vt.weights = { ...vt.paintW };
+                }
+            });
         }
 
-        function recomputeAllPartsWeights(recordUndo = false) {
+        function recomputeAllPartsWeights(recordUndo = false, resetPainted = false) {
             if (recordUndo) pushUndoState();
-            studio.parts.forEach(p => computePartSmoothWeights(p));
+            studio.parts.forEach(p => computePartSmoothWeights(p, resetPainted));
         }
 
         function relaxSinglePartWeights(part, iterations = 2) {
@@ -2296,7 +2348,10 @@
         }
 
         function relaxAllPartWeights(iterations = 2) {
-            studio.parts.forEach(p => relaxSinglePartWeights(p, iterations));
+            studio.parts.forEach(p => {
+                relaxSinglePartWeights(p, iterations);
+                p.mesh.vertices.forEach(vt => { if (vt.paintW) vt.paintW = { ...vt.weights }; });
+            });
         }
 
         function applyPoseTemplate(presetKey, rebuild = true) {
@@ -3344,6 +3399,8 @@
                         const fb = studio.bones.find(b => b.id !== targetBoneId) || studio.bones[0];
                         vt.weights[fb.id] = remainder;
                     }
+
+                    vt.paintW = { ...vt.weights };
                 }
             });
         }
@@ -3874,6 +3931,11 @@
             document.getElementById('val_boneY2').textContent = Math.round(b.ny2 * 100) + '%';
             document.getElementById('sl_boneEnvelope').value = b.envelope || 1.0;
             document.getElementById('val_boneEnvelope').textContent = (b.envelope || 1.0).toFixed(2);
+            const rigidVal = getBoneRigidity(b);
+            document.getElementById('sl_boneRigidity').value = rigidVal;
+            document.getElementById('val_boneRigidity').textContent = describeRigidity(rigidVal);
+            document.getElementById('sl_weightRigidity').value = studio.weightRigidity;
+            document.getElementById('val_weightRigidity').textContent = studio.weightRigidity.toFixed(2);
         }
 
         function updateSelectedBoneCoordsFromSliders() {
@@ -3900,7 +3962,35 @@
             if (!b) return;
             b.envelope = parseFloat(val);
             document.getElementById('val_boneEnvelope').textContent = b.envelope.toFixed(2);
-            recomputeAllPartsWeights(false);
+            recomputeAllPartsWeights(false, true);
+        }
+
+        function describeRigidity(v) {
+            if (v < 0.2) return v.toFixed(2) + ' (muy elastico)';
+            if (v < 0.45) return v.toFixed(2) + ' (suave)';
+            if (v <= 0.55) return v.toFixed(2) + ' (neutro)';
+            if (v < 0.8) return v.toFixed(2) + ' (firme)';
+            return v.toFixed(2) + ' (muy rigido)';
+        }
+
+        function updateSelectedBoneRigidity(val) {
+            const b = studio.bones.find(x => x.id === studio.selectedBoneId);
+            if (!b) return;
+            b.rigidity = Math.max(0, Math.min(1, parseFloat(val)));
+            document.getElementById('val_boneRigidity').textContent = describeRigidity(b.rigidity);
+            recomputeAllPartsWeights(false, true);
+        }
+
+        function updateGlobalWeightRigidity(val) {
+            studio.weightRigidity = Math.max(0, Math.min(1, parseFloat(val)));
+            document.getElementById('val_weightRigidity').textContent = studio.weightRigidity.toFixed(2);
+            recomputeAllPartsWeights(false, true);
+        }
+
+        function clearPaintedWeightsAll() {
+            pushUndoState();
+            studio.parts.forEach(p => p.mesh.vertices.forEach(vt => { delete vt.paintW; }));
+            recomputeAllPartsWeights(false, true);
         }
 
         function setSystemState(st) {
@@ -4157,6 +4247,36 @@
             return studio.packedAtlasMeta;
         }
 
+        function buildPaintedWeightGridExport(part) {
+            const mesh = part.mesh;
+            if (!mesh || !mesh.vertices || !mesh.cols || !mesh.rows) return undefined;
+            let hasPaint = false;
+            for (let i = 0; i < mesh.vertices.length; i++) {
+                if (mesh.vertices[i].paintW) { hasPaint = true; break; }
+            }
+            if (!hasPaint) return undefined;
+
+            const boneIds = studio.bones.map(b => b.id);
+            const values = [];
+            for (let i = 0; i < mesh.vertices.length; i++) {
+                const wm = mesh.vertices[i].weights || {};
+                for (let k = 0; k < boneIds.length; k++) {
+                    values.push(Number((wm[boneIds[k]] || 0).toFixed(3)));
+                }
+            }
+
+            return {
+                cols: mesh.cols,
+                rows: mesh.rows,
+                minX: Number(mesh.bounds.minX.toFixed(2)),
+                minY: Number(mesh.bounds.minY.toFixed(2)),
+                bw: Number(mesh.bounds.bw.toFixed(2)),
+                bh: Number(mesh.bounds.bh.toFixed(2)),
+                bones: boneIds,
+                values: values
+            };
+        }
+
         function buildSpineUnityJSON() {
             const avatarName = getSanitizedAvatarName();
             const meta = buildSmartTextureAtlas();
@@ -4203,7 +4323,8 @@
                         vMin: Number(v0.toFixed(5)),
                         uMax: Number(u1.toFixed(5)),
                         vMax: Number(v1.toFixed(5))
-                    }
+                    },
+                    weightGrid: buildPaintedWeightGridExport(p)
                 };
             });
 
@@ -4227,6 +4348,7 @@
                     forearmSwingDeg: studio.anim.forearmSwing,
                     pendulumSwingDeg: studio.anim.pendulumSwing,
                     headTiltDeg: studio.anim.headTilt,
+                    weightRigidity: Number(studio.weightRigidity.toFixed(3)),
                     lockFeetIK: studio.flags.footIK
                 },
                 bones: studio.bones.map(b => ({
@@ -4235,7 +4357,8 @@
                     role: b.role,
                     restStart: { x: Number(b.nx1.toFixed(4)), y: Number((1 - b.ny1).toFixed(4)) },
                     restEnd: { x: Number(b.nx2.toFixed(4)), y: Number((1 - b.ny2).toFixed(4)) },
-                    envelope: b.envelope
+                    envelope: b.envelope,
+                    rigidity: getBoneRigidity(b)
                 })),
                 layers: layersData,
                 animations: studio.anim.keyframes
@@ -4336,7 +4459,7 @@
                 const ex = b.nx2.toFixed(4);
                 const ey = (1.0 - b.ny2).toFixed(4);
                 const env = (b.envelope || 1.0).toFixed(2);
-                return `            new BoneDefinition { id = "${b.id}", role = "${b.role}", restStart = new Vector2(${sx}f, ${sy}f), restEnd = new Vector2(${ex}f, ${ey}f), envelope = ${env}f }`;
+                return `            new BoneDefinition { id = "${b.id}", role = "${b.role}", restStart = new Vector2(${sx}f, ${sy}f), restEnd = new Vector2(${ex}f, ${ey}f), envelope = ${env}f, rigidity = ${getBoneRigidity(b).toFixed(2)}f }`;
             }).join(',\n');
 
             const defaultLayersCode = meta.items.map(it => {
@@ -4392,6 +4515,7 @@ public class ${className} : MonoBehaviour
         public Vector2 restStart;
         public Vector2 restEnd;
         public float envelope = 1.0f;
+        [Range(0f, 1f)] public float rigidity = 0.5f;
 
         [HideInInspector] public Vector2 posedStart;
         [HideInInspector] public Vector2 posedEnd;
@@ -4422,6 +4546,12 @@ public class ${className} : MonoBehaviour
         public List<string> allowedBones = new List<string>();
         public Vector4 canvasRect = new Vector4(0f, 0f, 1f, 1f);
         public Vector4 atlasRect = new Vector4(0f, 0f, 1f, 1f);
+
+        [HideInInspector] public int paintCols;
+        [HideInInspector] public int paintRows;
+        [HideInInspector] public Vector4 paintRect;
+        [HideInInspector] public string[] paintBones;
+        [HideInInspector] public float[] paintValues;
 
         [HideInInspector] public Vector2[] customUVs;
         [HideInInspector] public int[] customTriangles;
@@ -4460,6 +4590,7 @@ public class ${className} : MonoBehaviour
     public float forearmSwingDeg = ${studio.anim.forearmSwing.toFixed(2)}f;
     public float pendulumSwingDeg = ${studio.anim.pendulumSwing.toFixed(2)}f;
     public float headTiltDeg = ${studio.anim.headTilt.toFixed(2)}f;
+    [Range(0f, 1f)] public float weightRigidity = ${studio.weightRigidity.toFixed(2)}f;
     public bool lockFeetIK = ${studio.flags.footIK ? 'true' : 'false'};
     public bool previewInEditMode = true;
 
@@ -4871,6 +5002,9 @@ ${defaultLayersCode}
         int bTotal = bones.Count;
         float[][] rawW = new float[vCount][];
 
+        float globalRigid = Mathf.Clamp01(weightRigidity);
+        float sharpness = 1f + 8f * globalRigid;
+
         for (int i = 0; i < vCount; i++)
         {
             rawW[i] = new float[bTotal];
@@ -4885,7 +5019,9 @@ ${defaultLayersCode}
                 Vector2 ePx = new Vector2(b.restEnd.x * canvasWidth, b.restEnd.y * canvasHeight);
                 float d = PointToSegmentDist(ptPx, sPx, ePx);
                 float sigma = baseSigma * Mathf.Max(0.25f, b.envelope);
-                float w = Mathf.Exp(-(d * d) / (2f * sigma * sigma)) + 1e-6f;
+                float bias = Mathf.Pow(4f, (Mathf.Clamp01(b.rigidity) - 0.5f) * 2f);
+                float g = (Mathf.Exp(-(d * d) / (2f * sigma * sigma)) + 1e-6f) * bias;
+                float w = Mathf.Pow(g, sharpness) + 1e-30f;
                 rawW[i][bIdx] = w;
                 total += w;
             }
@@ -4914,7 +5050,8 @@ ${defaultLayersCode}
 
         if (isGrid)
         {
-            for (int iter = 0; iter < 2; iter++)
+            int relaxIters = Mathf.Max(0, Mathf.FloorToInt(2f - 2f * globalRigid + 0.5f));
+            for (int iter = 0; iter < relaxIters; iter++)
             {
                 float[][] nextW = new float[vCount][];
                 for (int r = 0; r <= rows; r++)
@@ -4961,6 +5098,8 @@ ${defaultLayersCode}
             }
         }
 
+        ApplyPaintedWeightGrid(layer, rawW, vCount, bTotal);
+
         for (int i = 0; i < vCount; i++)
         {
             int idx0 = 0, idx1 = 0, idx2 = 0;
@@ -5004,6 +5143,57 @@ ${defaultLayersCode}
                 boneIndex1 = idx1, weight1 = w1,
                 boneIndex2 = idx2, weight2 = w2
             };
+        }
+    }
+
+    private void ApplyPaintedWeightGrid(AvatarPartLayer layer, float[][] rawW, int vCount, int bTotal)
+    {
+        if (layer.paintValues == null || layer.paintBones == null || layer.paintCols <= 0 || layer.paintRows <= 0) return;
+        int pbCount = layer.paintBones.Length;
+        if (pbCount == 0) return;
+        int gridVerts = (layer.paintCols + 1) * (layer.paintRows + 1);
+        if (layer.paintValues.Length < gridVerts * pbCount) return;
+        if (layer.paintRect.z <= 0.0001f || layer.paintRect.w <= 0.0001f) return;
+
+        int[] boneMap = new int[pbCount];
+        for (int k = 0; k < pbCount; k++) boneMap[k] = FindBoneIndex(layer.paintBones[k]);
+
+        int stride = layer.paintCols + 1;
+        for (int i = 0; i < vCount; i++)
+        {
+            Vector2 uv = layer.canvasUVs[i];
+            float px = uv.x * canvasWidth;
+            float py = (1f - uv.y) * canvasHeight;
+            float gx = Mathf.Clamp01((px - layer.paintRect.x) / layer.paintRect.z) * layer.paintCols;
+            float gy = Mathf.Clamp01((py - layer.paintRect.y) / layer.paintRect.w) * layer.paintRows;
+            int x0 = Mathf.Min((int)gx, layer.paintCols - 1);
+            int y0 = Mathf.Min((int)gy, layer.paintRows - 1);
+            float fx = gx - x0;
+            float fy = gy - y0;
+            int i00 = y0 * stride + x0;
+            int i10 = i00 + 1;
+            int i01 = i00 + stride;
+            int i11 = i01 + 1;
+
+            float[] w = new float[bTotal];
+            float sum = 0f;
+            for (int k = 0; k < pbCount; k++)
+            {
+                int bi = boneMap[k];
+                if (bi < 0) continue;
+                float v00 = layer.paintValues[i00 * pbCount + k];
+                float v10 = layer.paintValues[i10 * pbCount + k];
+                float v01 = layer.paintValues[i01 * pbCount + k];
+                float v11 = layer.paintValues[i11 * pbCount + k];
+                float v = Mathf.Lerp(Mathf.Lerp(v00, v10, fx), Mathf.Lerp(v01, v11, fx), fy);
+                w[bi] = v;
+                sum += v;
+            }
+            if (sum > 0.0001f)
+            {
+                for (int bIdx = 0; bIdx < bTotal; bIdx++) w[bIdx] /= sum;
+                rawW[i] = w;
+            }
         }
     }
 
@@ -5266,6 +5456,7 @@ ${defaultLayersCode}
             forearmSwingDeg = ParseFloatKey(jsonText, "forearmSwingDeg", forearmSwingDeg);
             pendulumSwingDeg = ParseFloatKey(jsonText, "pendulumSwingDeg", pendulumSwingDeg);
             headTiltDeg = ParseFloatKey(jsonText, "headTiltDeg", headTiltDeg);
+            weightRigidity = Mathf.Clamp01(ParseFloatKey(jsonText, "weightRigidity", weightRigidity));
         }
 
         int bonesStart = jsonText.IndexOf("\\"bones\\"");
@@ -5285,6 +5476,7 @@ ${defaultLayersCode}
                 Match mRole = Regex.Match(bb, @"""role""\\s*:\\s*""([^""]+)""");
                 bd.role = mRole.Success ? mRole.Groups[1].Value : "breath";
                 bd.envelope = ParseFloatKey(bb, "envelope", 1.0f);
+                bd.rigidity = Mathf.Clamp01(ParseFloatKey(bb, "rigidity", 0.5f));
 
                 MatchCollection xyMatches = Regex.Matches(bb, @"""x""\\s*:\\s*([-+]?[0-9]*\\.?[0-9]+)\\s*,\\s*""y""\\s*:\\s*([-+]?[0-9]*\\.?[0-9]+)");
                 if (xyMatches.Count >= 2)
@@ -5376,6 +5568,43 @@ ${defaultLayersCode}
                 ParseFloatKey(b, "vMax", 1f)
             );
 
+            int weightGridStart = b.IndexOf(((char)34).ToString() + "weightGrid" + ((char)34).ToString());
+            if (weightGridStart != -1)
+            {
+                string wg = b.Substring(weightGridStart);
+                layer.paintCols = Mathf.RoundToInt(ParseFloatKey(wg, "cols", 0f));
+                layer.paintRows = Mathf.RoundToInt(ParseFloatKey(wg, "rows", 0f));
+                layer.paintRect = new Vector4(
+                    ParseFloatKey(wg, "minX", 0f),
+                    ParseFloatKey(wg, "minY", 0f),
+                    ParseFloatKey(wg, "bw", 1f),
+                    ParseFloatKey(wg, "bh", 1f)
+                );
+                string boneList = GetBracketContent(wg, "bones");
+                string valueList = GetBracketContent(wg, "values");
+                if (boneList != null && valueList != null)
+                {
+                    string[] boneParts = boneList.Split(',');
+                    layer.paintBones = new string[boneParts.Length];
+                    for (int bp = 0; bp < boneParts.Length; bp++) layer.paintBones[bp] = boneParts[bp].Trim().Trim((char)34);
+
+                    string[] valueParts = valueList.Split(',');
+                    layer.paintValues = new float[valueParts.Length];
+                    for (int vp = 0; vp < valueParts.Length; vp++)
+                    {
+                        float parsedValue;
+                        if (float.TryParse(valueParts[vp].Trim(), NumberStyles.Float, CultureInfo.InvariantCulture, out parsedValue)) layer.paintValues[vp] = parsedValue;
+                    }
+                }
+            }
+            else
+            {
+                layer.paintCols = 0;
+                layer.paintRows = 0;
+                layer.paintBones = null;
+                layer.paintValues = null;
+            }
+
             int uvsStart = b.IndexOf("\\"uvs\\"");
             int trisStart = b.IndexOf("\\"triangles\\"");
             if (uvsStart != -1 && trisStart != -1)
@@ -5423,6 +5652,17 @@ ${defaultLayersCode}
         }
 
         if (parsed.Count > 0) avatarParts = parsed;
+    }
+
+    private string GetBracketContent(string text, string key)
+    {
+        int keyIndex = text.IndexOf(((char)34).ToString() + key + ((char)34).ToString());
+        if (keyIndex < 0) return null;
+        int open = text.IndexOf('[', keyIndex);
+        if (open < 0) return null;
+        int close = text.IndexOf(']', open);
+        if (close < 0) return null;
+        return text.Substring(open + 1, close - open - 1);
     }
 
     private float ParseFloatKey(string text, string key, float fallback)
@@ -5656,6 +5896,7 @@ ${defaultLayersCode}
                         if (typeof ub.nx2 === 'number') target.nx2 = Math.max(0.01, Math.min(0.99, ub.nx2));
                         if (typeof ub.ny2 === 'number') target.ny2 = Math.max(0.01, Math.min(0.99, ub.ny2));
                         if (typeof ub.envelope === 'number') target.envelope = ub.envelope;
+                if (typeof ub.rigidity === 'number') target.rigidity = Math.max(0, Math.min(1, ub.rigidity));
                         if (typeof ub.role === 'string') target.role = ub.role;
                         if (typeof ub.label === 'string') target.label = ub.label;
                     }
