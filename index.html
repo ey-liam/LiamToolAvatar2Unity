@@ -237,6 +237,15 @@
                 <span>Exportar Unity</span>
             </button>
 
+            <button onclick="openStaticTexturesModal()" class="px-3 py-1.5 rounded bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 hover:from-amber-400 hover:via-orange-400 hover:to-rose-400 text-white text-[11px] font-bold flex items-center gap-1.5 shadow transition" title="Exportar las 7 texturas para Just Dance (Banner, Cursor, DancerCard, Full, Hud, Portrait, Square)">
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                    <circle cx="8.5" cy="8.5" r="1.5"/>
+                    <polyline points="21 15 16 10 5 21"/>
+                </svg>
+                <span>Texturas del Juego (JD)</span>
+            </button>
+
             <button onclick="openGifModal()" class="px-3 py-1.5 rounded bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 hover:from-purple-500 hover:via-pink-500 hover:to-rose-500 text-white text-[11px] font-semibold flex items-center gap-1.5 shadow transition" title="Exportar animación (APNG / GIF)">
                 <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
                     <rect x="2" y="2" width="20" height="20" rx="4"/>
@@ -919,6 +928,9 @@
                     <button id="btnDownloadCsFile" onclick="downloadExportCs()" class="px-3 py-1.5 rounded bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow">
                         3. Descargar LiamAvatar2UnityRuntime.cs
                     </button>
+                    <button onclick="closeExportModal(); openStaticTexturesModal();" class="px-2.5 py-1.5 rounded bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white text-xs font-semibold shadow flex items-center gap-1">
+                        🎮 Texturas JD
+                    </button>
                     <button onclick="downloadSelectedPartPNG()" class="px-2.5 py-1.5 rounded bg-[#182032] hover:bg-[#222d47] border border-[#2d3a5c] text-sky-300 text-xs font-semibold">
                         Descargar PNG Parte
                     </button>
@@ -1103,6 +1115,171 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal: Exportador de StaticTextures para Just Dance / JDNext -->
+    <div id="staticTexturesModal" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden items-center justify-center p-3 sm:p-5">
+        <div class="bg-[#0f131f] border border-[#26314d] rounded-2xl max-w-6xl w-full max-h-[94vh] flex flex-col shadow-2xl overflow-hidden">
+            <!-- Modal Header -->
+            <div class="px-5 py-3.5 border-b border-[#20293f] flex items-center justify-between bg-[#141928]">
+                <div class="flex items-center gap-3 flex-wrap">
+                    <span class="px-2.5 py-0.5 rounded bg-gradient-to-r from-amber-500/20 via-orange-500/20 to-rose-500/20 border border-amber-500/40 text-amber-300 mono text-xs font-bold flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                        JUST DANCE • STATICTEXTURES
+                    </span>
+                    <span class="text-sm font-bold text-white">Exportador de Texturas Estáticas para el Juego (JDNext)</span>
+                    <span class="text-[11px] text-slate-400 hidden md:inline">Corta y exporta exactamente las 7 texturas requeridas por DancerCardCatalog</span>
+                </div>
+                <button onclick="closeStaticTexturesModal()" class="w-7 h-7 rounded bg-[#1e2538] text-slate-300 hover:text-white flex items-center justify-center font-bold text-xs">X</button>
+            </div>
+
+            <!-- Parameters Bar -->
+            <div class="px-5 py-3 bg-[#0a0d15] border-b border-[#1f283d] flex flex-wrap items-center justify-between gap-3">
+                <div class="flex flex-wrap items-center gap-2.5">
+                    <div class="flex items-center gap-1.5 bg-[#121724] border border-[#27324c] rounded px-2.5 py-1">
+                        <span class="text-[10px] text-amber-400 font-bold uppercase">Avatar:</span>
+                        <input id="inpStaticAvatarName" type="text" value="CantTameHerClementine" oninput="onStaticTextureParamsChanged()" class="bg-[#090c13] border border-[#222c44] rounded px-1.5 py-0.5 text-xs text-amber-200 mono w-36 focus:outline-none focus:border-amber-400 font-bold" placeholder="Avatar">
+                    </div>
+
+                    <div class="flex items-center gap-1.5 bg-[#121724] border border-[#27324c] rounded px-2.5 py-1">
+                        <span class="text-[10px] text-sky-400 font-bold uppercase">Variante:</span>
+                        <input id="inpStaticVariantName" type="text" value="Base" oninput="onStaticTextureParamsChanged()" class="bg-[#090c13] border border-[#222c44] rounded px-1.5 py-0.5 text-xs text-sky-200 mono w-24 focus:outline-none focus:border-sky-400 font-bold" placeholder="Base / Skin">
+                    </div>
+
+                    <div class="flex items-center gap-1.5 bg-[#121724] border border-[#27324c] rounded px-2 py-1">
+                        <span class="text-[10px] text-slate-400 font-semibold">Resolución:</span>
+                        <select id="selStaticQuality" onchange="onStaticTextureParamsChanged()" class="bg-[#090c13] border border-[#222c44] rounded px-2 py-0.5 text-xs text-slate-200 focus:outline-none focus:border-amber-400 font-medium">
+                            <option value="hd" selected>HD (512p / 1024p) • Estándar Moderno Just Dance</option>
+                            <option value="sd">SD (256p / 128p) • Clásico / Reducido</option>
+                        </select>
+                    </div>
+
+                    <div class="flex items-center gap-1.5 bg-[#121724] border border-[#27324c] rounded px-2 py-1">
+                        <span class="text-[10px] text-slate-400 font-semibold">Fondo:</span>
+                        <select id="selStaticBg" onchange="onStaticTextureParamsChanged()" class="bg-[#090c13] border border-[#222c44] rounded px-2 py-0.5 text-xs text-slate-200 focus:outline-none focus:border-amber-400 font-medium">
+                            <option value="transparent" selected>✨ Transparente (Requerido Juego)</option>
+                            <option value="green">🟩 Verde Chroma (#00FF00)</option>
+                            <option value="dark">⬛ Oscuro (#090b10)</option>
+                        </select>
+                    </div>
+
+                    <div class="flex items-center gap-1.5 bg-[#121724] border border-[#27324c] rounded px-2 py-1">
+                        <span class="text-[10px] text-slate-400 font-semibold">Pose:</span>
+                        <select id="selStaticPose" onchange="onStaticTextureParamsChanged()" class="bg-[#090c13] border border-[#222c44] rounded px-2 py-0.5 text-xs text-slate-200 focus:outline-none focus:border-amber-400 font-medium">
+                            <option value="current" selected>Fotograma actual del visor</option>
+                            <option value="zero">Pose Base (t = 0s)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Primary Action Buttons -->
+                <div class="flex items-center gap-2 flex-wrap">
+                    <button id="btnSaveToGameFolder" onclick="saveStaticTexturesDirectlyToGameFolder()" class="px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-500 hover:via-teal-500 hover:to-cyan-500 text-white font-bold text-xs shadow-md transition flex items-center gap-1.5" title="Guardar directamente las 7 imágenes en la carpeta del juego">
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                        <span>📁 Guardar en Carpeta del Juego...</span>
+                    </button>
+
+                    <button onclick="downloadStaticTexturesZip()" class="px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 hover:from-amber-400 hover:via-orange-400 hover:to-rose-400 text-white font-bold text-xs shadow-md transition flex items-center gap-1.5" title="Descargar paquete ZIP con las 7 texturas nombradas correctamente">
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        <span>📦 Descargar Pack (.ZIP)</span>
+                    </button>
+
+                    <button onclick="downloadAllStaticTexturesIndividually()" class="px-3 py-1.5 rounded-lg bg-[#182032] hover:bg-[#222c45] border border-[#2c3754] text-slate-200 text-xs font-semibold flex items-center gap-1.5 transition" title="Descarga las 7 imágenes PNG una por una">
+                        <span>⬇️ Todas (7 PNGs)</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Path Helper Notification Banner -->
+            <div class="px-5 py-2 bg-[#090c14] border-b border-[#1b2336] flex items-center justify-between gap-3 text-xs flex-wrap">
+                <div class="flex items-center gap-2 text-slate-300 overflow-hidden text-ellipsis whitespace-nowrap">
+                    <span class="text-amber-400 font-bold">Ruta en el juego:</span>
+                    <code id="lblStaticTexturesPath" class="text-emerald-300 mono text-[11px] bg-[#121622] px-2 py-0.5 rounded border border-[#222c44] select-all">C:\JDLiminal\Game\JDNext_Data\StreamingAssets\DancerCardCatalog\Assets\Data\Spine\Avatars\CantTameHerClementine\StaticTextures</code>
+                </div>
+                <button onclick="copyStaticTexturesGamePath()" class="text-[11px] text-sky-400 hover:text-sky-300 underline font-medium">Copiar Ruta</button>
+            </div>
+
+            <!-- Main Content: Grid + Editor Drawer -->
+            <div class="p-4 flex-1 overflow-y-auto grid grid-cols-1 lg:grid-cols-12 gap-4">
+                <!-- Left: 7 Texture Cards Grid -->
+                <div class="lg:col-span-8 flex flex-col gap-3">
+                    <div class="flex items-center justify-between text-xs text-slate-400 px-1">
+                        <span>Vista previa de las 7 texturas estáticas:</span>
+                        <span class="text-[11px] text-amber-300/80">Haz clic en <b>"✏️ Ajustar"</b> en cualquier textura para personalizar zoom o posición.</span>
+                    </div>
+
+                    <div id="staticCardsGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                        <!-- Dynamic cards inserted by JS -->
+                    </div>
+                </div>
+
+                <!-- Right: Fine-tuning Inspector / Live Crop Editor -->
+                <div class="lg:col-span-4 flex flex-col gap-3 bg-[#0a0d16] p-4 rounded-xl border border-[#20293f]">
+                    <div class="flex items-center justify-between border-b border-[#1e263c] pb-2">
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-xs font-bold text-white">Editor de Encuadre y Zoom</span>
+                            <span id="badgeActiveCropType" class="text-[10px] text-amber-400 font-bold bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/30">Hud</span>
+                        </div>
+                        <button onclick="resetCurrentStaticCrop()" class="text-[10px] text-slate-400 hover:text-amber-300 underline">Restablecer</button>
+                    </div>
+
+                    <!-- Single Large Interactive Preview Canvas -->
+                    <div class="flex flex-col items-center justify-center checkerboard-pattern rounded-lg border border-[#232b42] p-2 relative overflow-hidden min-h-[220px]">
+                        <canvas id="staticEditorCanvas" class="max-h-[200px] max-w-full object-contain filter drop-shadow-lg cursor-grab active:cursor-grabbing"></canvas>
+                        <span class="absolute bottom-1 right-2 text-[9px] text-slate-400 bg-black/60 px-1.5 py-0.5 rounded pointer-events-none">Arrastra para mover encuadre</span>
+                    </div>
+
+                    <div class="flex flex-col gap-2.5">
+                        <div class="flex flex-col gap-1">
+                            <div class="flex justify-between text-[11px] text-slate-300 font-medium">
+                                <span>Zoom:</span>
+                                <span id="lblStaticZoomVal" class="text-amber-300 mono font-bold">100%</span>
+                            </div>
+                            <input id="rngStaticZoom" type="range" min="0.5" max="2.5" step="0.05" value="1.0" oninput="onStaticCropSliderChanged('zoom', this.value)" class="w-full accent-amber-500 cursor-pointer">
+                        </div>
+
+                        <div class="flex flex-col gap-1">
+                            <div class="flex justify-between text-[11px] text-slate-300 font-medium">
+                                <span>Mover Horizontal (X):</span>
+                                <span id="lblStaticPanXVal" class="text-amber-300 mono font-bold">0%</span>
+                            </div>
+                            <input id="rngStaticPanX" type="range" min="-1.0" max="1.0" step="0.02" value="0.0" oninput="onStaticCropSliderChanged('panX', this.value)" class="w-full accent-amber-500 cursor-pointer">
+                        </div>
+
+                        <div class="flex flex-col gap-1">
+                            <div class="flex justify-between text-[11px] text-slate-300 font-medium">
+                                <span>Mover Vertical (Y):</span>
+                                <span id="lblStaticPanYVal" class="text-amber-300 mono font-bold">0%</span>
+                            </div>
+                            <input id="rngStaticPanY" type="range" min="-1.0" max="1.0" step="0.02" value="0.0" oninput="onStaticCropSliderChanged('panY', this.value)" class="w-full accent-amber-500 cursor-pointer">
+                        </div>
+
+                        <!-- Alignment Presets -->
+                        <div class="flex flex-col gap-1 pt-1 border-t border-[#1b2236]">
+                            <span class="text-[10px] text-slate-400 font-semibold uppercase">Alineación rápida:</span>
+                            <div class="grid grid-cols-2 gap-1.5">
+                                <button onclick="applyStaticPresetAlignment('head')" class="px-2 py-1 bg-[#141a29] hover:bg-[#1d263b] border border-[#25304b] rounded text-[11px] text-slate-200">🎯 Rostro</button>
+                                <button onclick="applyStaticPresetAlignment('bust')" class="px-2 py-1 bg-[#141a29] hover:bg-[#1d263b] border border-[#25304b] rounded text-[11px] text-slate-200">👤 Busto / Pecho</button>
+                                <button onclick="applyStaticPresetAlignment('torso')" class="px-2 py-1 bg-[#141a29] hover:bg-[#1d263b] border border-[#25304b] rounded text-[11px] text-slate-200">🧍 Torso / Cadera</button>
+                                <button onclick="applyStaticPresetAlignment('full')" class="px-2 py-1 bg-[#141a29] hover:bg-[#1d263b] border border-[#25304b] rounded text-[11px] text-slate-200">🧍 Completo</button>
+                            </div>
+                        </div>
+
+                        <div class="pt-2 border-t border-[#1b2236] flex flex-col gap-2">
+                            <button id="btnDownloadActiveStatic" onclick="downloadCurrentActiveStaticTexture()" class="w-full py-2 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow transition">
+                                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                <span id="lblBtnDownloadActiveStatic">Descargar esta textura (.png)</span>
+                            </button>
+                            <button onclick="copyCurrentActiveStaticTexture()" class="w-full py-1.5 rounded-lg bg-[#141a29] hover:bg-[#1d263b] border border-[#283450] text-slate-200 text-xs font-semibold flex items-center justify-center gap-1.5 transition">
+                                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                                <span>Copiar al Portapapeles</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <script>
         (function(w){var X={signature:"GIF",version:"89a",trailer:59,extensionIntroducer:33,applicationExtensionLabel:255,graphicControlExtensionLabel:249,imageSeparator:44,signatureSize:3,versionSize:3,globalColorTableFlagMask:128,colorResolutionMask:112,sortFlagMask:8,globalColorTableSizeMask:7,applicationIdentifierSize:8,applicationAuthCodeSize:3,disposalMethodMask:28,userInputFlagMask:2,transparentColorFlagMask:1,localColorTableFlagMask:128,interlaceFlagMask:64,idSortFlagMask:32,localColorTableSizeMask:7};function F(t=256){let e=0,s=new Uint8Array(t);return{get buffer(){return s.buffer},reset(){e=0},bytesView(){return s.subarray(0,e)},bytes(){return s.slice(0,e)},writeByte(r){n(e+1),s[e]=r,e++},writeBytes(r,o=0,i=r.length){n(e+i);for(let c=0;c<i;c++)s[e++]=r[c+o]},writeBytesView(r,o=0,i=r.byteLength){n(e+i),s.set(r.subarray(o,o+i),e),e+=i}};function n(r){var o=s.length;if(o>=r)return;var i=1024*1024;r=Math.max(r,o*(o<i?2:1.125)>>>0),o!=0&&(r=Math.max(r,256));let c=s;s=new Uint8Array(r),e>0&&s.set(c.subarray(0,e),0)}}var O=12,J=5003,lt=[0,1,3,7,15,31,63,127,255,511,1023,2047,4095,8191,16383,32767,65535];function at(t,e,s,n,r=F(512),o=new Uint8Array(256),i=new Int32Array(J),c=new Int32Array(J)){let x=i.length,a=Math.max(2,n);o.fill(0),c.fill(0),i.fill(-1);let l=0,f=0,g=a+1,h=g,b=!1,w=h,_=(1<<w)-1,u=1<<g-1,k=u+1,B=u+2,p=0,A=s[0],z=0;for(let y=x;y<65536;y*=2)++z;z=8-z,r.writeByte(a),I(u);let d=s.length;for(let y=1;y<d;y++){t:{let m=s[y],v=(m<<O)+A,M=m<<z^A;if(i[M]===v){A=c[M];break t}let V=M===0?1:x-M;for(;i[M]>=0;)if(M-=V,M<0&&(M+=x),i[M]===v){A=c[M];break t}I(A),A=m,B<1<<O?(c[M]=B++,i[M]=v):(i.fill(-1),B=u+2,b=!0,I(u))}}return I(A),I(k),r.writeByte(0),r.bytesView();function I(y){for(l&=lt[f],f>0?l|=y<<f:l=y,f+=w;f>=8;)o[p++]=l&255,p>=254&&(r.writeByte(p),r.writeBytesView(o,0,p),p=0),l>>=8,f-=8;if((B>_||b)&&(b?(w=h,_=(1<<w)-1,b=!1):(++w,_=w===O?1<<w:(1<<w)-1)),y==k){for(;f>0;)o[p++]=l&255,p>=254&&(r.writeByte(p),r.writeBytesView(o,0,p),p=0),l>>=8,f-=8;p>0&&(r.writeByte(p),r.writeBytesView(o,0,p),p=0)}}}var $=at;function D(t,e,s){return t<<8&63488|e<<2&992|s>>3}function G(t,e,s,n){return t>>4|e&240|(s&240)<<4|(n&240)<<8}function j(t,e,s){return t>>4<<8|e&240|s>>4}function R(t,e,s){return t<e?e:t>s?s:t}function T(t){return t*t}function tt(t,e,s){var n=0,r=1e100;let o=t[e],i=o.cnt,c=o.ac,x=o.rc,a=o.gc,l=o.bc;for(var f=o.fw;f!=0;f=t[f].fw){let h=t[f],b=h.cnt,w=i*b/(i+b);if(!(w>=r)){var g=0;s&&(g+=w*T(h.ac-c),g>=r)||(g+=w*T(h.rc-x),!(g>=r)&&(g+=w*T(h.gc-a),!(g>=r)&&(g+=w*T(h.bc-l),!(g>=r)&&(r=g,n=f))))}}o.err=r,o.nn=n}function Q(){return{ac:0,rc:0,gc:0,bc:0,cnt:0,nn:0,fw:0,bk:0,tm:0,mtm:0,err:0}}function ut(t,e){let s=e==="rgb444"?4096:65536,n=new Array(s),r=t.length;if(e==="rgba4444")for(let o=0;o<r;++o){let i=t[o],c=i>>24&255,x=i>>16&255,a=i>>8&255,l=i&255,f=G(l,a,x,c),g=f in n?n[f]:n[f]=Q();g.rc+=l,g.gc+=a,g.bc+=x,g.ac+=c,g.cnt++}else if(e==="rgb444")for(let o=0;o<r;++o){let i=t[o],c=i>>16&255,x=i>>8&255,a=i&255,l=j(a,x,c),f=l in n?n[l]:n[l]=Q();f.rc+=a,f.gc+=x,f.bc+=c,f.cnt++}else for(let o=0;o<r;++o){let i=t[o],c=i>>16&255,x=i>>8&255,a=i&255,l=D(a,x,c),f=l in n?n[l]:n[l]=Q();f.rc+=a,f.gc+=x,f.bc+=c,f.cnt++}return n}function H(t,e,s={}){let{format:n="rgb565",clearAlpha:r=!0,clearAlphaColor:o=0,clearAlphaThreshold:i=0,oneBitAlpha:c=!1}=s;if(!t||!t.buffer)throw new Error("quantize() expected RGBA Uint8Array data");if(!(t instanceof Uint8Array)&&!(t instanceof Uint8ClampedArray))throw new Error("quantize() expected RGBA Uint8Array data");let x=new Uint32Array(t.buffer),a=s.useSqrt!==!1,l=n==="rgba4444",f=ut(x,n),g=f.length,h=g-1,b=new Uint32Array(g+1);for(var w=0,u=0;u<g;++u){let C=f[u];if(C!=null){var _=1/C.cnt;l&&(C.ac*=_),C.rc*=_,C.gc*=_,C.bc*=_,f[w++]=C}}T(e)/w<.022&&(a=!1);for(var u=0;u<w-1;++u)f[u].fw=u+1,f[u+1].bk=u,a&&(f[u].cnt=Math.sqrt(f[u].cnt));a&&(f[u].cnt=Math.sqrt(f[u].cnt));var k,B,p;for(u=0;u<w;++u){tt(f,u,!1);var A=f[u].err;for(B=++b[0];B>1&&(p=B>>1,!(f[k=b[p]].err<=A));B=p)b[B]=k;b[B]=u}var z=w-e;for(u=0;u<z;){for(var d;;){var I=b[1];if(d=f[I],d.tm>=d.mtm&&f[d.nn].mtm<=d.tm)break;d.mtm==h?I=b[1]=b[b[0]--]:(tt(f,I,!1),d.tm=u);var A=f[I].err;for(B=1;(p=B+B)<=b[0]&&(p<b[0]&&f[b[p]].err>f[b[p+1]].err&&p++,!(A<=f[k=b[p]].err));B=p)b[B]=k;b[B]=I}var y=f[d.nn],m=d.cnt,v=y.cnt,_=1/(m+v);l&&(d.ac=_*(m*d.ac+v*y.ac)),d.rc=_*(m*d.rc+v*y.rc),d.gc=_*(m*d.gc+v*y.gc),d.bc=_*(m*d.bc+v*y.bc),d.cnt+=y.cnt,d.mtm=++u,f[y.bk].fw=y.fw,f[y.fw].bk=y.bk,y.mtm=h}let M=[];var V=0;for(u=0;;++V){let L=R(Math.round(f[u].rc),0,255),C=R(Math.round(f[u].gc),0,255),Y=R(Math.round(f[u].bc),0,255),E=255;if(l){if(E=R(Math.round(f[u].ac),0,255),c){let st=typeof c=="number"?c:127;E=E<=st?0:255}r&&E<=i&&(L=C=Y=o,E=0)}let K=l?[L,C,Y,E]:[L,C,Y];if(xt(M,K)||M.push(K),(u=f[u].fw)==0)break}return M}function xt(t,e){for(let s=0;s<t.length;s++){let n=t[s],r=n[0]===e[0]&&n[1]===e[1]&&n[2]===e[2],o=n.length>=4&&e.length>=4?n[3]===e[3]:!0;if(r&&o)return!0}return!1}function U(t,e){var s=0,n;for(n=0;n<t.length;n++){let r=t[n]-e[n];s+=r*r}return s}function P(t,e){return e>1?Math.round(t/e)*e:t}function et(t,{roundRGB:e=5,roundAlpha:s=10,oneBitAlpha:n=null}={}){let r=new Uint32Array(t.buffer);for(let o=0;o<r.length;o++){let i=r[o],c=i>>24&255,x=i>>16&255,a=i>>8&255,l=i&255;if(c=P(c,s),n){let f=typeof n=="number"?n:127;c=c<=f?0:255}l=P(l,e),a=P(a,e),x=P(x,e),r[o]=c<<24|x<<16|a<<8|l<<0}}function nt(t,e,s="rgb565"){if(!t||!t.buffer)throw new Error("quantize() expected RGBA Uint8Array data");if(!(t instanceof Uint8Array)&&!(t instanceof Uint8ClampedArray))throw new Error("quantize() expected RGBA Uint8Array data");if(e.length>256)throw new Error("applyPalette() only works with 256 colors or less");let n=new Uint32Array(t.buffer),r=n.length,o=s==="rgb444"?4096:65536,i=new Uint8Array(r),c=new Array(o),x=s==="rgba4444";if(s==="rgba4444")for(let a=0;a<r;a++){let l=n[a],f=l>>24&255,g=l>>16&255,h=l>>8&255,b=l&255,w=G(b,h,g,f),_=w in c?c[w]:c[w]=gt(b,h,g,f,e);i[a]=_}else{let a=s==="rgb444"?j:D;for(let l=0;l<r;l++){let f=n[l],g=f>>16&255,h=f>>8&255,b=f&255,w=a(b,h,g),_=w in c?c[w]:c[w]=bt(b,h,g,e);i[l]=_}}return i}function gt(t,e,s,n,r){let o=0,i=1e100;for(let c=0;c<r.length;c++){let x=r[c],a=x[3],l=q(a-n);if(l>i)continue;let f=x[0];if(l+=q(f-t),l>i)continue;let g=x[1];if(l+=q(g-e),l>i)continue;let h=x[2];l+=q(h-s),!(l>i)&&(i=l,o=c)}return o}function bt(t,e,s,n){let r=0,o=1e100;for(let i=0;i<n.length;i++){let c=n[i],x=c[0],a=q(x-t);if(a>o)continue;let l=c[1];if(a+=q(l-e),a>o)continue;let f=c[2];a+=q(f-s),!(a>o)&&(o=a,r=i)}return r}function rt(t,e,s=5){if(!t.length||!e.length)return;let n=t.map(i=>i.slice(0,3)),r=s*s,o=t[0].length;for(let i=0;i<e.length;i++){let c=e[i];c.length<o?c=[c[0],c[1],c[2],255]:c.length>o?c=c.slice(0,3):c=c.slice();let x=N(n,c.slice(0,3),U),a=x[0],l=x[1];l>0&&l<=r&&(t[a]=c)}}function q(t){return t*t}function W(t,e,s=U){let n=Infinity,r=-1;for(let o=0;o<t.length;o++){let i=t[o],c=s(e,i);c<n&&(n=c,r=o)}return r}function N(t,e,s=U){let n=Infinity,r=-1;for(let o=0;o<t.length;o++){let i=t[o],c=s(e,i);c<n&&(n=c,r=o)}return[r,n]}function ot(t,e,s=U){return t[W(t,e,s)]}function ct(t={}){let{initialCapacity:e=4096,auto:s=!0}=t,n=F(e),r=5003,o=new Uint8Array(256),i=new Int32Array(r),c=new Int32Array(r),x=!1;return{reset(){n.reset(),x=!1},finish(){n.writeByte(X.trailer)},bytes(){return n.bytes()},bytesView(){return n.bytesView()},get buffer(){return n.buffer},get stream(){return n},writeHeader:a,writeFrame(l,f,g,h={}){let{transparent:b=!1,transparentIndex:w=0,delay:_=0,palette:u=null,repeat:k=0,colorDepth:B=8,dispose:p=-1}=h,A=!1;if(s?x||(A=!0,a(),x=!0):A=Boolean(h.first),f=Math.max(0,Math.floor(f)),g=Math.max(0,Math.floor(g)),A){if(!u)throw new Error("First frame must include a { palette } option");pt(n,f,g,u,B),it(n,u),k>=0&&dt(n,k)}let z=Math.round(_/10);wt(n,p,z,b,w);let d=Boolean(u)&&!A;ht(n,f,g,d?u:null),d&&it(n,u),yt(n,l,f,g,B,o,i,c)}};function a(){ft(n,"GIF89a")}}function wt(t,e,s,n,r){t.writeByte(33),t.writeByte(249),t.writeByte(4),r<0&&(r=0,n=!1);var o,i;n?(o=1,i=2):(o=0,i=0),e>=0&&(i=e&7),i<<=2;let c=0;t.writeByte(0|i|c|o),S(t,s),t.writeByte(r||0),t.writeByte(0)}function pt(t,e,s,n,r=8){let o=1,i=0,c=Z(n.length)-1,x=o<<7|r-1<<4|i<<3|c,a=0,l=0;S(t,e),S(t,s),t.writeBytes([x,a,l])}function dt(t,e){t.writeByte(33),t.writeByte(255),t.writeByte(11),ft(t,"NETSCAPE2.0"),t.writeByte(3),t.writeByte(1),S(t,e),t.writeByte(0)}function it(t,e){let s=1<<Z(e.length);for(let n=0;n<s;n++){let r=[0,0,0];n<e.length&&(r=e[n]),t.writeByte(r[0]),t.writeByte(r[1]),t.writeByte(r[2])}}function ht(t,e,s,n){if(t.writeByte(44),S(t,0),S(t,0),S(t,e),S(t,s),n){let r=0,o=0,i=Z(n.length)-1;t.writeByte(128|r|o|0|i)}else t.writeByte(0)}function yt(t,e,s,n,r=8,o,i,c){$(s,n,e,r,t,o,i,c)}function S(t,e){t.writeByte(e&255),t.writeByte(e>>8&255)}function ft(t,e){for(var s=0;s<e.length;s++)t.writeByte(e.charCodeAt(s))}function Z(t){return Math.max(Math.ceil(Math.log2(t)),1)}var Bt=ct;w.gifenc={GIFEncoder:ct,applyPalette:nt,default:Bt,nearestColor:ot,nearestColorIndex:W,nearestColorIndexWithDistance:N,prequantize:et,quantize:H,snapColorsToPalette:rt};})(typeof window!=="undefined"?window:(typeof global!=="undefined"?global:this));
@@ -7177,6 +7354,750 @@ ${defaultLayersCode}
             initApplication();
             initMcpAgentBridge();
         });
+
+        // =========================================================================
+        // JUST DANCE (JDNEXT) STATICTEXTURES ENGINE
+        // =========================================================================
+        const JD_STATIC_SPECS = [
+            {
+                type: 'Banner',
+                label: 'Banner Horizontal',
+                desc: 'Banner ancho para catálogo y menús principales',
+                resHD: { w: 512, h: 228 },
+                resSD: { w: 256, h: 114 },
+                aspect: 512 / 228,
+                defaultCrop: { heightRatio: 0.34, topRatio: 0.00, focus: 'torso_top' }
+            },
+            {
+                type: 'Cursor',
+                label: 'Cursor / Icono',
+                desc: 'Icono del rostro para selector y cursor en pantalla',
+                resHD: { w: 128, h: 128 },
+                resSD: { w: 256, h: 256 },
+                aspect: 1.0,
+                defaultCrop: { heightRatio: 0.22, topRatio: 0.00, focus: 'head' }
+            },
+            {
+                type: 'DancerCard',
+                label: 'Dancer Card (Tarjeta)',
+                desc: 'Tarjeta vertical completa del bailarín (9:16)',
+                resHD: { w: 576, h: 1024 },
+                resSD: { w: 144, h: 256 },
+                aspect: 576 / 1024,
+                defaultCrop: { heightRatio: 1.06, topRatio: -0.03, focus: 'full' }
+            },
+            {
+                type: 'Full',
+                label: 'Cuerpo Completo (1:1)',
+                desc: 'Vista cuadrada centrada de cuerpo completo con margen',
+                resHD: { w: 1024, h: 1024 },
+                resSD: { w: 256, h: 256 },
+                aspect: 1.0,
+                defaultCrop: { heightRatio: 1.10, topRatio: -0.05, focus: 'full' }
+            },
+            {
+                type: 'Hud',
+                label: 'HUD en Partida',
+                desc: 'Avatar para la interfaz de puntuación durante la canción',
+                resHD: { w: 512, h: 284 },
+                resSD: { w: 256, h: 142 },
+                aspect: 512 / 284,
+                defaultCrop: { heightRatio: 0.44, topRatio: -0.01, focus: 'bust' }
+            },
+            {
+                type: 'Portrait',
+                label: 'Retrato (3:4)',
+                desc: 'Retrato 3/4 vertical para pantallas de carga y jugador',
+                resHD: { w: 768, h: 1024 },
+                resSD: { w: 192, h: 256 },
+                aspect: 768 / 1024,
+                defaultCrop: { heightRatio: 0.88, topRatio: -0.02, focus: 'three_quarter' }
+            },
+            {
+                type: 'Square',
+                label: 'Cuadrado / Casilla',
+                desc: 'Icono cuadrado de torso para la cuadrícula del vestidor',
+                resHD: { w: 512, h: 512 },
+                resSD: { w: 256, h: 256 },
+                aspect: 1.0,
+                defaultCrop: { heightRatio: 0.64, topRatio: -0.02, focus: 'torso' }
+            }
+        ];
+
+        studio.staticCropOverrides = studio.staticCropOverrides || {};
+        studio.selectedStaticType = 'Hud';
+        studio.staticEditorDragging = false;
+        studio.staticEditorLastMouse = { x: 0, y: 0 };
+
+        function getStaticAvatarName() {
+            const inp = document.getElementById('inpStaticAvatarName');
+            const raw = (inp && inp.value.trim()) || studio.avatarName || 'CantTameHerClementine';
+            return raw.replace(/[^a-zA-Z0-9_]/g, '');
+        }
+
+        function getStaticVariantName() {
+            const inp = document.getElementById('inpStaticVariantName');
+            const raw = (inp && inp.value.trim()) || 'Base';
+            return raw.replace(/[^a-zA-Z0-9_]/g, '');
+        }
+
+        function getStaticFileName(type) {
+            const av = getStaticAvatarName();
+            const va = getStaticVariantName();
+            return `${av}_${va}_${type}.png`;
+        }
+
+        function getStaticTargetDirectoryPath() {
+            const av = getStaticAvatarName();
+            return `C:\\JDLiminal\\Game\\JDNext_Data\\StreamingAssets\\DancerCardCatalog\\Assets\\Data\\Spine\\Avatars\\${av}\\StaticTextures`;
+        }
+
+        function copyStaticTexturesGamePath() {
+            const p = getStaticTargetDirectoryPath();
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(p).then(() => {
+                    alert("¡Ruta copiada al portapapeles!\n" + p);
+                }).catch(() => {
+                    prompt("Copia la ruta de la carpeta StaticTextures:", p);
+                });
+            } else {
+                prompt("Copia la ruta de la carpeta StaticTextures:", p);
+            }
+        }
+
+        function computeCurrentPoseBoundingBox(t = 0) {
+            const savedTime = studio.anim.time;
+            const savedGust = studio.anim.gust;
+            const savedGustVel = studio.anim.gustVel;
+            const savedState = studio.systemState;
+
+            studio.systemState = 'animate';
+            studio.anim.gust = 0;
+            studio.anim.gustVel = 0;
+            studio.anim.time = t;
+            solveSkeletonAndDeformParts(0);
+
+            let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+            let headX = 0, headY = 0, headCount = 0;
+
+            for (let p = 0; p < studio.parts.length; p++) {
+                const part = studio.parts[p];
+                if (!part.visible) continue;
+                const verts = part.mesh.vertices;
+                const pName = (part.name || '').toLowerCase();
+                const isHeadPart = pName.includes('head') || pName.includes('cara') || pName.includes('face') || pName.includes('ojos') || pName.includes('bangs') || pName.includes('hair') || pName.includes('pelo');
+
+                for (let v = 0; v < verts.length; v++) {
+                    const vx = verts[v].dx;
+                    const vy = verts[v].dy;
+                    if (vx < minX) minX = vx;
+                    if (vx > maxX) maxX = vx;
+                    if (vy < minY) minY = vy;
+                    if (vy > maxY) maxY = vy;
+                    if (isHeadPart) {
+                        headX += vx;
+                        headY += vy;
+                        headCount++;
+                    }
+                }
+            }
+
+            studio.anim.time = savedTime;
+            studio.anim.gust = savedGust;
+            studio.anim.gustVel = savedGustVel;
+            studio.systemState = savedState;
+            solveSkeletonAndDeformParts(0);
+
+            if (minX === Infinity || maxX <= minX || maxY <= minY) {
+                return {
+                    minX: 0, minY: 0, maxX: RefWidth, maxY: RefHeight,
+                    width: RefWidth, height: RefHeight,
+                    centerX: RefWidth * 0.5,
+                    headX: RefWidth * 0.5,
+                    headY: RefHeight * 0.15
+                };
+            }
+
+            const charW = maxX - minX;
+            const charH = maxY - minY;
+            const charCenterX = minX + charW * 0.5;
+
+            // Check if head bone or head parts exist for head tracking
+            let computedHeadX = charCenterX;
+            let computedHeadY = minY + charH * 0.14;
+            const headBone = studio.bones.find(b => b.id === 'head' || b.role === 'head' || ((b.label || '').toLowerCase().includes('cabeza')));
+            if (headBone) {
+                computedHeadX = (headBone.x1 + headBone.x2) * 0.5 * (RefWidth / 520);
+                computedHeadY = (headBone.y1 + headBone.y2) * 0.5 * (RefHeight / 700);
+            } else if (headCount > 0) {
+                computedHeadX = headX / headCount;
+                computedHeadY = headY / headCount;
+            }
+
+            return {
+                minX, minY, maxX, maxY,
+                width: charW,
+                height: charH,
+                centerX: charCenterX,
+                headX: computedHeadX,
+                headY: computedHeadY
+            };
+        }
+
+        function computeStaticCropBox(spec, quality = 'hd', poseTime = 0) {
+            const bbox = computeCurrentPoseBoundingBox(poseTime);
+            const charW = bbox.width;
+            const charH = bbox.height;
+
+            const res = (quality === 'sd') ? spec.resSD : spec.resHD;
+            const aspect = res.w / res.h;
+
+            const ovr = studio.staticCropOverrides[spec.type] || { zoom: 1.0, panX: 0, panY: 0 };
+            const zoom = Math.max(0.2, ovr.zoom || 1.0);
+            const panX = (ovr.panX || 0) * (charW * 0.35);
+            const panY = (ovr.panY || 0) * (charH * 0.35);
+
+            const baseCropH = Math.max(60, (charH * spec.defaultCrop.heightRatio) / zoom);
+            const baseCropW = baseCropH * aspect;
+
+            let cropX = 0, cropY = 0;
+
+            if (spec.defaultCrop.focus === 'head') {
+                cropX = (bbox.headX - baseCropW * 0.5) + panX;
+                cropY = (bbox.headY - baseCropH * 0.45) + panY;
+            } else {
+                cropX = (bbox.centerX - baseCropW * 0.5) + panX;
+                const topAnchor = bbox.minY + (charH * (spec.defaultCrop.topRatio || 0));
+                cropY = topAnchor + panY;
+            }
+
+            return {
+                x: cropX,
+                y: cropY,
+                width: baseCropW,
+                height: baseCropH
+            };
+        }
+
+        function renderStaticTexture(spec, canvas, quality = 'hd', bgMode = 'transparent', poseTime = 0) {
+            if (!canvas) return;
+            const res = (quality === 'sd') ? spec.resSD : spec.resHD;
+            canvas.width = res.w;
+            canvas.height = res.h;
+            const ctx = canvas.getContext('2d', { alpha: true });
+            if (!ctx) return;
+
+            const cropBox = computeStaticCropBox(spec, quality, poseTime);
+            renderAnimationSnapshot(ctx, res.w, res.h, cropBox, bgMode, poseTime);
+        }
+
+        function openStaticTexturesModal() {
+            if (!studio.parts || studio.parts.length === 0) {
+                alert("Por favor carga o crea un avatar primero.");
+                return;
+            }
+
+            const inpAv = document.getElementById('inpStaticAvatarName');
+            if (inpAv) {
+                inpAv.value = getSanitizedAvatarName();
+            }
+
+            const modal = document.getElementById('staticTexturesModal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+
+            initStaticTextureCards();
+            refreshAllStaticPreviews();
+            setupStaticEditorInteractions();
+        }
+        window.openStaticTexturesModal = openStaticTexturesModal;
+
+        function closeStaticTexturesModal() {
+            const modal = document.getElementById('staticTexturesModal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
+        window.closeStaticTexturesModal = closeStaticTexturesModal;
+
+        function onStaticTextureParamsChanged() {
+            const pathLbl = document.getElementById('lblStaticTexturesPath');
+            if (pathLbl) {
+                pathLbl.textContent = getStaticTargetDirectoryPath();
+            }
+
+            refreshAllStaticPreviews();
+        }
+
+        function initStaticTextureCards() {
+            const container = document.getElementById('staticCardsGrid');
+            if (!container) return;
+
+            container.innerHTML = '';
+            JD_STATIC_SPECS.forEach(spec => {
+                const card = document.createElement('div');
+                card.id = `staticCard_${spec.type}`;
+                card.className = "flex flex-col gap-2 p-3 bg-[#111624] border border-[#212b42] rounded-xl hover:border-amber-500/50 transition shadow";
+
+                card.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-xs font-bold text-white">${spec.label}</span>
+                            <span id="badgeDim_${spec.type}" class="text-[9px] mono text-amber-300 bg-amber-500/10 px-1 py-0.5 rounded border border-amber-500/30 font-semibold">512x228</span>
+                        </div>
+                        <span class="text-[10px] text-slate-400 font-mono">${spec.type}</span>
+                    </div>
+
+                    <div class="flex-1 min-h-[110px] max-h-[140px] checkerboard-pattern rounded-lg border border-[#232b40] flex items-center justify-center p-1.5 overflow-hidden relative cursor-pointer" onclick="selectActiveStaticType('${spec.type}')">
+                        <canvas id="staticCanvas_${spec.type}" class="max-h-[125px] max-w-full object-contain filter drop-shadow"></canvas>
+                    </div>
+
+                    <div class="flex items-center justify-between gap-1 pt-1 border-t border-[#1b2336]">
+                        <span id="lblFile_${spec.type}" class="text-[10px] mono text-emerald-300 font-bold overflow-hidden text-ellipsis whitespace-nowrap max-w-[130px]">file.png</span>
+                        <div class="flex items-center gap-1 shrink-0">
+                            <button onclick="selectActiveStaticType('${spec.type}')" class="px-2 py-1 rounded bg-[#182030] hover:bg-[#25324c] text-[10px] text-slate-200 font-medium" title="Ajustar encuadre y zoom">✏️</button>
+                            <button onclick="downloadSingleStaticTexture('${spec.type}')" class="px-2 py-1 rounded bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 border border-amber-500/30 text-[10px] font-semibold" title="Descargar PNG">⬇️</button>
+                            <button onclick="copySingleStaticTextureToClipboard('${spec.type}')" class="px-2 py-1 rounded bg-[#182030] hover:bg-[#25324c] text-[10px] text-slate-200 font-medium" title="Copiar al portapapeles">📋</button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function refreshAllStaticPreviews() {
+            const quality = document.getElementById('selStaticQuality') ? document.getElementById('selStaticQuality').value : 'hd';
+            const bgMode = document.getElementById('selStaticBg') ? document.getElementById('selStaticBg').value : 'transparent';
+            const poseChoice = document.getElementById('selStaticPose') ? document.getElementById('selStaticPose').value : 'current';
+            const poseTime = (poseChoice === 'zero') ? 0 : (studio.anim.time || 0);
+
+            JD_STATIC_SPECS.forEach(spec => {
+                const canvas = document.getElementById(`staticCanvas_${spec.type}`);
+                const badgeDim = document.getElementById(`badgeDim_${spec.type}`);
+                const lblFile = document.getElementById(`lblFile_${spec.type}`);
+                const res = (quality === 'sd') ? spec.resSD : spec.resHD;
+
+                if (badgeDim) badgeDim.textContent = `${res.w}x${res.h}`;
+                if (lblFile) lblFile.textContent = getStaticFileName(spec.type);
+
+                if (canvas) {
+                    renderStaticTexture(spec, canvas, quality, bgMode, poseTime);
+                }
+            });
+
+            refreshActiveStaticEditorCanvas();
+        }
+
+        function selectActiveStaticType(type) {
+            studio.selectedStaticType = type;
+            const badge = document.getElementById('badgeActiveCropType');
+            if (badge) badge.textContent = type;
+
+            const ovr = studio.staticCropOverrides[type] || { zoom: 1.0, panX: 0, panY: 0 };
+            const rngZoom = document.getElementById('rngStaticZoom');
+            const rngPanX = document.getElementById('rngStaticPanX');
+            const rngPanY = document.getElementById('rngStaticPanY');
+            const lblZoom = document.getElementById('lblStaticZoomVal');
+            const lblPanX = document.getElementById('lblStaticPanXVal');
+            const lblPanY = document.getElementById('lblStaticPanYVal');
+
+            if (rngZoom) rngZoom.value = ovr.zoom || 1.0;
+            if (rngPanX) rngPanX.value = ovr.panX || 0.0;
+            if (rngPanY) rngPanY.value = ovr.panY || 0.0;
+
+            if (lblZoom) lblZoom.textContent = Math.round((ovr.zoom || 1.0) * 100) + '%';
+            if (lblPanX) lblPanX.textContent = Math.round((ovr.panX || 0.0) * 100) + '%';
+            if (lblPanY) lblPanY.textContent = Math.round((ovr.panY || 0.0) * 100) + '%';
+
+            const btnDownActive = document.getElementById('lblBtnDownloadActiveStatic');
+            if (btnDownActive) btnDownActive.textContent = `Descargar ${type} (.png)`;
+
+            // Highlight selected card
+            JD_STATIC_SPECS.forEach(s => {
+                const c = document.getElementById(`staticCard_${s.type}`);
+                if (c) {
+                    if (s.type === type) {
+                        c.classList.add('border-amber-400', 'ring-1', 'ring-amber-400/50');
+                    } else {
+                        c.classList.remove('border-amber-400', 'ring-1', 'ring-amber-400/50');
+                    }
+                }
+            });
+
+            refreshActiveStaticEditorCanvas();
+        }
+
+        function onStaticCropSliderChanged(param, val) {
+            const type = studio.selectedStaticType || 'Hud';
+            studio.staticCropOverrides[type] = studio.staticCropOverrides[type] || { zoom: 1.0, panX: 0, panY: 0 };
+
+            const numVal = parseFloat(val);
+            studio.staticCropOverrides[type][param] = numVal;
+
+            if (param === 'zoom') {
+                const lbl = document.getElementById('lblStaticZoomVal');
+                if (lbl) lbl.textContent = Math.round(numVal * 100) + '%';
+            } else if (param === 'panX') {
+                const lbl = document.getElementById('lblStaticPanXVal');
+                if (lbl) lbl.textContent = Math.round(numVal * 100) + '%';
+            } else if (param === 'panY') {
+                const lbl = document.getElementById('lblStaticPanYVal');
+                if (lbl) lbl.textContent = Math.round(numVal * 100) + '%';
+            }
+
+            // Re-render both active card and editor canvas
+            const quality = document.getElementById('selStaticQuality') ? document.getElementById('selStaticQuality').value : 'hd';
+            const bgMode = document.getElementById('selStaticBg') ? document.getElementById('selStaticBg').value : 'transparent';
+            const poseChoice = document.getElementById('selStaticPose') ? document.getElementById('selStaticPose').value : 'current';
+            const poseTime = (poseChoice === 'zero') ? 0 : (studio.anim.time || 0);
+
+            const spec = JD_STATIC_SPECS.find(s => s.type === type);
+            if (spec) {
+                const cardCanvas = document.getElementById(`staticCanvas_${type}`);
+                if (cardCanvas) renderStaticTexture(spec, cardCanvas, quality, bgMode, poseTime);
+            }
+
+            refreshActiveStaticEditorCanvas();
+        }
+
+        function applyStaticPresetAlignment(preset) {
+            const type = studio.selectedStaticType || 'Hud';
+            studio.staticCropOverrides[type] = studio.staticCropOverrides[type] || { zoom: 1.0, panX: 0, panY: 0 };
+
+            if (preset === 'head') {
+                studio.staticCropOverrides[type].zoom = 1.4;
+                studio.staticCropOverrides[type].panX = 0;
+                studio.staticCropOverrides[type].panY = -0.15;
+            } else if (preset === 'bust') {
+                studio.staticCropOverrides[type].zoom = 1.1;
+                studio.staticCropOverrides[type].panX = 0;
+                studio.staticCropOverrides[type].panY = -0.05;
+            } else if (preset === 'torso') {
+                studio.staticCropOverrides[type].zoom = 0.9;
+                studio.staticCropOverrides[type].panX = 0;
+                studio.staticCropOverrides[type].panY = 0.05;
+            } else if (preset === 'full') {
+                studio.staticCropOverrides[type].zoom = 0.8;
+                studio.staticCropOverrides[type].panX = 0;
+                studio.staticCropOverrides[type].panY = 0.10;
+            }
+
+            selectActiveStaticType(type);
+            onStaticCropSliderChanged('zoom', studio.staticCropOverrides[type].zoom);
+        }
+
+        function resetCurrentStaticCrop() {
+            const type = studio.selectedStaticType || 'Hud';
+            delete studio.staticCropOverrides[type];
+            selectActiveStaticType(type);
+            onStaticCropSliderChanged('zoom', 1.0);
+        }
+
+        function refreshActiveStaticEditorCanvas() {
+            const canvas = document.getElementById('staticEditorCanvas');
+            if (!canvas) return;
+            const type = studio.selectedStaticType || 'Hud';
+            const spec = JD_STATIC_SPECS.find(s => s.type === type) || JD_STATIC_SPECS[4];
+
+            const quality = document.getElementById('selStaticQuality') ? document.getElementById('selStaticQuality').value : 'hd';
+            const bgMode = document.getElementById('selStaticBg') ? document.getElementById('selStaticBg').value : 'transparent';
+            const poseChoice = document.getElementById('selStaticPose') ? document.getElementById('selStaticPose').value : 'current';
+            const poseTime = (poseChoice === 'zero') ? 0 : (studio.anim.time || 0);
+
+            renderStaticTexture(spec, canvas, quality, bgMode, poseTime);
+        }
+
+        function setupStaticEditorInteractions() {
+            const canvas = document.getElementById('staticEditorCanvas');
+            if (!canvas || canvas.dataset.hasEvents) return;
+            canvas.dataset.hasEvents = 'true';
+
+            canvas.addEventListener('mousedown', e => {
+                studio.staticEditorDragging = true;
+                studio.staticEditorLastMouse = { x: e.clientX, y: e.clientY };
+            });
+
+            window.addEventListener('mousemove', e => {
+                if (!studio.staticEditorDragging) return;
+                const dx = e.clientX - studio.staticEditorLastMouse.x;
+                const dy = e.clientY - studio.staticEditorLastMouse.y;
+                studio.staticEditorLastMouse = { x: e.clientX, y: e.clientY };
+
+                const type = studio.selectedStaticType || 'Hud';
+                studio.staticCropOverrides[type] = studio.staticCropOverrides[type] || { zoom: 1.0, panX: 0, panY: 0 };
+
+                // Scale drag delta to slider scale
+                const curPanX = (studio.staticCropOverrides[type].panX || 0) - (dx / 180);
+                const curPanY = (studio.staticCropOverrides[type].panY || 0) - (dy / 180);
+
+                studio.staticCropOverrides[type].panX = Math.max(-1.0, Math.min(1.0, curPanX));
+                studio.staticCropOverrides[type].panY = Math.max(-1.0, Math.min(1.0, curPanY));
+
+                selectActiveStaticType(type);
+                onStaticCropSliderChanged('panX', studio.staticCropOverrides[type].panX);
+            });
+
+            window.addEventListener('mouseup', () => {
+                studio.staticEditorDragging = false;
+            });
+
+            canvas.addEventListener('wheel', e => {
+                e.preventDefault();
+                const type = studio.selectedStaticType || 'Hud';
+                studio.staticCropOverrides[type] = studio.staticCropOverrides[type] || { zoom: 1.0, panX: 0, panY: 0 };
+                const delta = e.deltaY < 0 ? 0.05 : -0.05;
+                const newZoom = Math.max(0.5, Math.min(2.5, (studio.staticCropOverrides[type].zoom || 1.0) + delta));
+                studio.staticCropOverrides[type].zoom = newZoom;
+                selectActiveStaticType(type);
+                onStaticCropSliderChanged('zoom', newZoom);
+            }, { passive: false });
+        }
+
+        // Generate individual PNG blob for a static texture
+        async function generateStaticTextureBlob(spec, quality = 'hd', bgMode = 'transparent', poseTime = 0) {
+            const offCanvas = document.createElement('canvas');
+            renderStaticTexture(spec, offCanvas, quality, bgMode, poseTime);
+            return new Promise(resolve => offCanvas.toBlob(resolve, 'image/png'));
+        }
+
+        async function downloadSingleStaticTexture(type) {
+            const spec = JD_STATIC_SPECS.find(s => s.type === type);
+            if (!spec) return;
+
+            const quality = document.getElementById('selStaticQuality') ? document.getElementById('selStaticQuality').value : 'hd';
+            const bgMode = document.getElementById('selStaticBg') ? document.getElementById('selStaticBg').value : 'transparent';
+            const poseChoice = document.getElementById('selStaticPose') ? document.getElementById('selStaticPose').value : 'current';
+            const poseTime = (poseChoice === 'zero') ? 0 : (studio.anim.time || 0);
+
+            const blob = await generateStaticTextureBlob(spec, quality, bgMode, poseTime);
+            const fileName = getStaticFileName(type);
+
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            a.style.display = 'none';
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => {
+                if (a.parentNode) a.parentNode.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 3000);
+        }
+
+        function downloadCurrentActiveStaticTexture() {
+            const type = studio.selectedStaticType || 'Hud';
+            downloadSingleStaticTexture(type);
+        }
+
+        async function copySingleStaticTextureToClipboard(type) {
+            const spec = JD_STATIC_SPECS.find(s => s.type === type);
+            if (!spec) return;
+
+            const quality = document.getElementById('selStaticQuality') ? document.getElementById('selStaticQuality').value : 'hd';
+            const bgMode = document.getElementById('selStaticBg') ? document.getElementById('selStaticBg').value : 'transparent';
+            const poseChoice = document.getElementById('selStaticPose') ? document.getElementById('selStaticPose').value : 'current';
+            const poseTime = (poseChoice === 'zero') ? 0 : (studio.anim.time || 0);
+
+            const blob = await generateStaticTextureBlob(spec, quality, bgMode, poseTime);
+            try {
+                await navigator.clipboard.write([
+                    new ClipboardItem({ 'image/png': blob })
+                ]);
+                alert(`¡Textura ${spec.label} copiada al portapapeles!`);
+            } catch (err) {
+                downloadSingleStaticTexture(type);
+            }
+        }
+
+        function copyCurrentActiveStaticTexture() {
+            const type = studio.selectedStaticType || 'Hud';
+            copySingleStaticTextureToClipboard(type);
+        }
+
+        async function downloadAllStaticTexturesIndividually() {
+            for (let i = 0; i < JD_STATIC_SPECS.length; i++) {
+                const spec = JD_STATIC_SPECS[i];
+                await downloadSingleStaticTexture(spec.type);
+                await new Promise(r => setTimeout(r, 250));
+            }
+        }
+
+        // Pure JS zero-dependency ZIP Builder (RFC 1950/1951 PKZIP 2.0 with STORE method)
+        function buildZipBuffer(files) {
+            const localHeaders = [];
+            const centralHeaders = [];
+            let offset = 0;
+
+            const now = new Date();
+            const dosTime = (now.getHours() << 11) | (now.getMinutes() << 5) | (Math.floor(now.getSeconds() / 2));
+            const dosDate = ((now.getFullYear() - 1980) << 9) | ((now.getMonth() + 1) << 5) | now.getDate();
+
+            for (const f of files) {
+                const nameBytes = new TextEncoder().encode(f.name);
+                const dataBytes = new Uint8Array(f.data);
+                const crc = apngCrc32(dataBytes);
+                const size = dataBytes.length;
+                const localOffset = offset;
+
+                // Local file header: 30 bytes + name + data
+                const lh = new Uint8Array(30 + nameBytes.length);
+                const lv = new DataView(lh.buffer);
+                lv.setUint32(0, 0x04034b50, true);
+                lv.setUint16(4, 20, true); // version needed
+                lv.setUint16(6, 0, true);  // flags
+                lv.setUint16(8, 0, true);  // store (no compression)
+                lv.setUint16(10, dosTime, true);
+                lv.setUint16(12, dosDate, true);
+                lv.setUint32(14, crc, true);
+                lv.setUint32(18, size, true);
+                lv.setUint32(22, size, true);
+                lv.setUint16(26, nameBytes.length, true);
+                lv.setUint16(28, 0, true);
+                lh.set(nameBytes, 30);
+
+                localHeaders.push(lh);
+                localHeaders.push(dataBytes);
+                offset += lh.length + size;
+
+                // Central directory header: 46 bytes + name
+                const ch = new Uint8Array(46 + nameBytes.length);
+                const cv = new DataView(ch.buffer);
+                cv.setUint32(0, 0x02014b50, true);
+                cv.setUint16(4, 20, true); // version made by
+                cv.setUint16(6, 20, true); // version needed
+                cv.setUint16(8, 0, true);  // flags
+                cv.setUint16(10, 0, true); // store
+                cv.setUint16(12, dosTime, true);
+                cv.setUint16(14, dosDate, true);
+                cv.setUint32(16, crc, true);
+                cv.setUint32(20, size, true);
+                cv.setUint32(24, size, true);
+                cv.setUint16(28, nameBytes.length, true);
+                cv.setUint16(30, 0, true); // extra len
+                cv.setUint16(32, 0, true); // comment len
+                cv.setUint16(34, 0, true); // disk start
+                cv.setUint16(36, 0, true); // internal attr
+                cv.setUint32(38, 0, true); // external attr
+                cv.setUint32(42, localOffset, true);
+                ch.set(nameBytes, 46);
+
+                centralHeaders.push(ch);
+            }
+
+            const cdOffset = offset;
+            let cdSize = 0;
+            for (const ch of centralHeaders) cdSize += ch.length;
+
+            // End of central directory record: 22 bytes
+            const eocd = new Uint8Array(22);
+            const ev = new DataView(eocd.buffer);
+            ev.setUint32(0, 0x06054b50, true);
+            ev.setUint16(4, 0, true); // disk num
+            ev.setUint16(6, 0, true); // cd disk num
+            ev.setUint16(8, files.length, true); // entries on disk
+            ev.setUint16(10, files.length, true); // total entries
+            ev.setUint32(12, cdSize, true);
+            ev.setUint32(16, cdOffset, true);
+            ev.setUint16(20, 0, true); // comment len
+
+            let totalLen = offset + cdSize + 22;
+            const zipBytes = new Uint8Array(totalLen);
+            let ptr = 0;
+            for (const part of localHeaders) {
+                zipBytes.set(part, ptr);
+                ptr += part.length;
+            }
+            for (const part of centralHeaders) {
+                zipBytes.set(part, ptr);
+                ptr += part.length;
+            }
+            zipBytes.set(eocd, ptr);
+
+            return zipBytes;
+        }
+
+        async function downloadStaticTexturesZip() {
+            const quality = document.getElementById('selStaticQuality') ? document.getElementById('selStaticQuality').value : 'hd';
+            const bgMode = document.getElementById('selStaticBg') ? document.getElementById('selStaticBg').value : 'transparent';
+            const poseChoice = document.getElementById('selStaticPose') ? document.getElementById('selStaticPose').value : 'current';
+            const poseTime = (poseChoice === 'zero') ? 0 : (studio.anim.time || 0);
+
+            const fileList = [];
+            for (const spec of JD_STATIC_SPECS) {
+                const blob = await generateStaticTextureBlob(spec, quality, bgMode, poseTime);
+                const ab = await blob.arrayBuffer();
+                fileList.push({
+                    name: getStaticFileName(spec.type),
+                    data: ab
+                });
+            }
+
+            const zipBytes = buildZipBuffer(fileList);
+            const zipBlob = new Blob([zipBytes], { type: 'application/zip' });
+            const av = getStaticAvatarName();
+            const va = getStaticVariantName();
+            const zipName = `${av}_${va}_StaticTextures.zip`;
+
+            const url = URL.createObjectURL(zipBlob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = zipName;
+            a.style.display = 'none';
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => {
+                if (a.parentNode) a.parentNode.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 3000);
+        }
+
+        // Direct folder save via File System Access API
+        async function saveStaticTexturesDirectlyToGameFolder() {
+            const av = getStaticAvatarName();
+            const va = getStaticVariantName();
+
+            if (!window.showDirectoryPicker) {
+                alert("Tu navegador no soporta la selección directa de carpetas del sistema. Descargaremos el archivo ZIP para que puedas descomprimirlo en:\n" + getStaticTargetDirectoryPath());
+                downloadStaticTexturesZip();
+                return;
+            }
+
+            try {
+                alert("Por favor selecciona la carpeta 'StaticTextures' de tu avatar en:\n" + getStaticTargetDirectoryPath());
+                const dirHandle = await window.showDirectoryPicker({
+                    id: 'jdStaticTexturesDirPicker',
+                    mode: 'readwrite'
+                });
+
+                const quality = document.getElementById('selStaticQuality') ? document.getElementById('selStaticQuality').value : 'hd';
+                const bgMode = document.getElementById('selStaticBg') ? document.getElementById('selStaticBg').value : 'transparent';
+                const poseChoice = document.getElementById('selStaticPose') ? document.getElementById('selStaticPose').value : 'current';
+                const poseTime = (poseChoice === 'zero') ? 0 : (studio.anim.time || 0);
+
+                let savedCount = 0;
+                for (const spec of JD_STATIC_SPECS) {
+                    const blob = await generateStaticTextureBlob(spec, quality, bgMode, poseTime);
+                    const fileName = getStaticFileName(spec.type);
+                    const fileHandle = await dirHandle.getFileHandle(fileName, { create: true });
+                    const writable = await fileHandle.createWritable();
+                    await writable.write(blob);
+                    await writable.close();
+                    savedCount++;
+                }
+
+                alert(`¡Éxito! Se guardaron directamente las ${savedCount} imágenes en la carpeta:\n${dirHandle.name}`);
+            } catch (err) {
+                if (err.name === 'AbortError') return;
+                console.warn("Direct directory picker failed or permission denied:", err);
+                alert("No se pudo acceder a la carpeta directamente (" + err.message + ").\nDescargaremos el paquete ZIP con las 7 texturas.");
+                downloadStaticTexturesZip();
+            }
+        }
+
     </script>
 </body>
 </html>
