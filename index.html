@@ -150,7 +150,7 @@
 
             <div class="flex items-center gap-1.5 bg-[#141926] px-2 py-0.5 rounded border border-[#242c42]" title="Nombre del Avatar para exportar .cs, .json y atlas">
                 <span class="text-[10px] text-slate-400 font-semibold">Avatar:</span>
-                <input type="text" id="inpHeaderAvatarName" value="LiamAvatar" oninput="onAvatarNameChanged(this.value)" class="w-28 bg-[#0b0e16] border border-[#26304a] rounded px-1.5 py-0.5 text-[10px] mono text-emerald-300 font-bold focus:outline-none focus:border-emerald-500" placeholder="Nombre Avatar">
+                <input type="text" id="inpHeaderAvatarName" value="CustomAvatar" oninput="onAvatarNameChanged(this.value)" class="w-28 bg-[#0b0e16] border border-[#26304a] rounded px-1.5 py-0.5 text-[10px] mono text-emerald-300 font-bold focus:outline-none focus:border-emerald-500" placeholder="Nombre Avatar">
             </div>
 
             <div class="h-5 w-px bg-[#22293c]"></div>
@@ -905,15 +905,15 @@
             <div class="px-4 pt-3 bg-[#0c1018] border-b border-[#22293f] flex flex-wrap items-center justify-between gap-2">
                 <div class="flex gap-2 pb-2 flex-wrap items-center">
                     <button id="expTab_atlas" onclick="switchExportTab('atlas')" class="px-3 py-1.5 rounded text-xs font-semibold mode-animate-active">Vista Previa del Atlas Unico</button>
-                    <button id="expTab_json" onclick="switchExportTab('json')" class="px-3 py-1.5 rounded text-xs font-semibold bg-[#181f30] text-slate-300 hover:text-white">Archivo LiamAvatar.json</button>
+                    <button id="expTab_json" onclick="switchExportTab('json')" class="px-3 py-1.5 rounded text-xs font-semibold bg-[#181f30] text-slate-300 hover:text-white">Archivo CustomAvatar.json</button>
                     <button id="expTab_cs" onclick="switchExportTab('cs')" class="px-3 py-1.5 rounded text-xs font-semibold bg-[#181f30] text-slate-300 hover:text-white">Script C# Unity</button>
                     <div class="flex items-center gap-1.5 bg-[#141a29] border border-[#28334e] rounded px-2 py-1">
                         <span class="text-[10px] text-emerald-400 font-bold uppercase">Avatar:</span>
-                        <input id="inpExportAvatarName" type="text" value="LiamAvatar" oninput="onAvatarNameChanged(this.value)" class="bg-[#090d14] border border-[#26314d] rounded px-1.5 py-0.5 text-[11px] text-emerald-300 mono w-32 focus:outline-none focus:border-emerald-500 font-bold" placeholder="Nombre Avatar">
+                        <input id="inpExportAvatarName" type="text" value="CustomAvatar" oninput="onAvatarNameChanged(this.value)" class="bg-[#090d14] border border-[#26314d] rounded px-1.5 py-0.5 text-[11px] text-emerald-300 mono w-32 focus:outline-none focus:border-emerald-500 font-bold" placeholder="Nombre Avatar">
                     </div>
                     <div class="flex items-center gap-1 bg-[#141a29] border border-[#28334e] rounded px-2 py-1">
                         <span class="text-[10px] text-slate-400 font-semibold">Clase C#:</span>
-                        <input id="inpExportCsName" type="text" value="LiamAvatar2UnityRuntime" oninput="onCsClassNameChanged()" class="bg-[#090d14] border border-[#26314d] rounded px-1.5 py-0.5 text-[11px] text-sky-300 mono w-44 focus:outline-none focus:border-sky-500 font-bold">
+                        <input id="inpExportCsName" type="text" value="CustomAvatar2UnityRuntime" oninput="onCsClassNameChanged()" class="bg-[#090d14] border border-[#26314d] rounded px-1.5 py-0.5 text-[11px] text-sky-300 mono w-44 focus:outline-none focus:border-sky-500 font-bold">
                         <button onclick="cycleExportCsClassName()" class="px-1.5 py-0.5 rounded bg-[#1e273d] hover:bg-[#2a3654] text-[10px] text-slate-200 font-semibold">Cambiar</button>
                     </div>
                 </div>
@@ -922,13 +922,13 @@
                         Guardar en CustomAvatars
                     </button>
                     <button id="btnDownloadAtlasPng" onclick="downloadAtlasPng()" class="px-3 py-1.5 rounded bg-teal-600 hover:bg-teal-500 text-white text-xs font-semibold shadow">
-                        1. Descargar LiamAvatar_Atlas.png
+                        1. Descargar CustomAvatar_Atlas.png
                     </button>
                     <button id="btnDownloadExportJson" onclick="downloadExportJson()" class="px-3 py-1.5 rounded bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold shadow">
-                        2. Descargar LiamAvatar.json
+                        2. Descargar CustomAvatar.json
                     </button>
                     <button id="btnDownloadCsFile" onclick="downloadExportCs()" class="px-3 py-1.5 rounded bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow">
-                        3. Descargar LiamAvatar2UnityRuntime.cs
+                        3. Descargar CustomAvatar2UnityRuntime.cs
                     </button>
                     <button onclick="closeExportModal(); openStaticTexturesModal();" class="px-2.5 py-1.5 rounded bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white text-xs font-semibold shadow flex items-center gap-1">
                         Texturas CustomAvatars
@@ -945,7 +945,7 @@
             <div class="px-4 py-1.5 bg-[#080b12] border-b border-[#1b2236] flex items-center justify-between text-xs flex-wrap gap-2">
                 <div class="flex items-center gap-2 text-slate-300">
                     <span class="text-amber-400 font-bold">Ruta destino:</span>
-                    <code id="lblCustomAvatarsUnityPath" class="text-emerald-300 mono text-[11px] bg-[#121622] px-2 py-0.5 rounded border border-[#222c44] select-all">C:\JDLiminal\Game\CustomAvatars\LiamAvatar</code>
+                    <code id="lblCustomAvatarsUnityPath" class="text-emerald-300 mono text-[11px] bg-[#121622] px-2 py-0.5 rounded border border-[#222c44] select-all">C:\JDLiminal\Game\CustomAvatars\CustomAvatar</code>
                 </div>
                 <button onclick="copyCustomAvatarsGamePath()" class="text-[11px] text-sky-400 hover:text-sky-300 underline font-medium">Copiar Ruta</button>
             </div>
@@ -987,7 +987,7 @@
                     <div class="flex flex-col gap-1">
                         <label class="text-[11px] font-semibold text-slate-300">Nombre del Avatar / Archivo</label>
                         <div class="flex items-center gap-1 bg-[#121622] border border-[#28324d] rounded px-2.5 py-1.5">
-                            <input id="inpGifAvatarName" type="text" value="LiamAvatar" oninput="onAvatarNameChanged(this.value)" class="bg-transparent text-emerald-300 mono text-xs font-bold w-full focus:outline-none" placeholder="Nombre">
+                            <input id="inpGifAvatarName" type="text" value="CustomAvatar" oninput="onAvatarNameChanged(this.value)" class="bg-transparent text-emerald-300 mono text-xs font-bold w-full focus:outline-none" placeholder="Nombre">
                             <span id="lblAnimExt" class="text-[11px] text-pink-400 mono font-bold">.png</span>
                         </div>
                     </div>
@@ -1143,7 +1143,7 @@
                 <div class="flex flex-wrap items-center gap-2.5">
                     <div class="flex items-center gap-1.5 bg-[#121724] border border-[#27324c] rounded px-2.5 py-1">
                         <span class="text-[10px] text-amber-400 font-bold uppercase">Avatar:</span>
-                        <input id="inpStaticAvatarName" type="text" value="CantTameHerClementine" oninput="onStaticTextureParamsChanged()" class="bg-[#090c13] border border-[#222c44] rounded px-1.5 py-0.5 text-xs text-amber-200 mono w-36 focus:outline-none focus:border-amber-400 font-bold" placeholder="Avatar">
+                        <input id="inpStaticAvatarName" type="text" value="CustomAvatar" oninput="onStaticTextureParamsChanged()" class="bg-[#090c13] border border-[#222c44] rounded px-1.5 py-0.5 text-xs text-amber-200 mono w-36 focus:outline-none focus:border-amber-400 font-bold" placeholder="Avatar">
                     </div>
 
                     <div class="flex items-center gap-1.5 bg-[#121724] border border-[#27324c] rounded px-2.5 py-1">
@@ -1197,7 +1197,7 @@
             <div class="px-5 py-2 bg-[#090c14] border-b border-[#1b2336] flex items-center justify-between gap-3 text-xs flex-wrap">
                 <div class="flex items-center gap-2 text-slate-300 overflow-hidden text-ellipsis whitespace-nowrap">
                     <span class="text-amber-400 font-bold">Ruta:</span>
-                    <code id="lblStaticTexturesPath" class="text-emerald-300 mono text-[11px] bg-[#121622] px-2 py-0.5 rounded border border-[#222c44] select-all">C:\JDLiminal\Game\CustomAvatars\CantTameHerClementine</code>
+                    <code id="lblStaticTexturesPath" class="text-emerald-300 mono text-[11px] bg-[#121622] px-2 py-0.5 rounded border border-[#222c44] select-all">C:\JDLiminal\Game\CustomAvatars\CustomAvatar</code>
                 </div>
                 <button onclick="copyStaticTexturesGamePath()" class="text-[11px] text-sky-400 hover:text-sky-300 underline font-medium">Copiar Ruta</button>
             </div>
@@ -1286,7 +1286,7 @@
         let RefHeight = 2752;
 
         const studio = {
-            avatarName: 'LiamAvatar',
+            avatarName: 'CustomAvatar',
             systemState: 'setup',
             activeTool: 'bone',
             activePosePreset: 'dynamic',
@@ -1541,7 +1541,7 @@
 
         function serializeStudioSnapshot(includeImages = false) {
             return {
-                avatarName: studio.avatarName || 'LiamAvatar',
+                avatarName: studio.avatarName || 'CustomAvatar',
                 refWidth: RefWidth,
                 refHeight: RefHeight,
                 activePosePreset: studio.activePosePreset,
@@ -1779,7 +1779,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'Proyecto_LiamAvatar2Unity.l2u';
+            a.download = 'Proyecto_CustomAvatar.l2u';
             a.click();
             URL.revokeObjectURL(url);
         }
@@ -1809,94 +1809,40 @@
             g.lineCap = 'round';
             g.lineJoin = 'round';
 
+            const fillCol = '#ffffff';
+            const strokeCol = '#1e293b';
+            const lineW = 3.5;
+
             if (partType === 'Cabeza') {
                 g.save();
-                g.translate(245, 130);
-                g.fillStyle = '#181622';
-                g.strokeStyle = '#0d0c14';
-                g.lineWidth = 2.5;
+                g.fillStyle = fillCol;
+                g.strokeStyle = strokeCol;
+                g.lineWidth = lineW;
+
                 g.beginPath();
-                g.arc(0, -10, 46, 0, Math.PI * 2);
+                g.roundRect(234, 150, 22, 28, 6);
                 g.fill();
                 g.stroke();
 
-                g.fillStyle = '#e7d4fa';
-                g.strokeStyle = '#4a355f';
-                g.lineWidth = 2.2;
                 g.beginPath();
-                g.roundRect(-13, 18, 26, 32, 6);
+                g.arc(245, 118, 36, 0, Math.PI * 2);
                 g.fill();
                 g.stroke();
-
-                g.fillStyle = '#f8f0ff';
-                g.beginPath();
-                g.arc(0, 0, 35, 0, Math.PI * 2);
-                g.fill();
-                g.stroke();
-
-                g.strokeStyle = '#23192e';
-                g.fillStyle = '#23192e';
-                g.lineWidth = 2.4;
-                g.beginPath();
-                g.moveTo(-20, -2);
-                g.quadraticCurveTo(-13, -9, -6, -1);
-                g.stroke();
-                g.beginPath();
-                g.arc(14, -2, 4.5, 0, Math.PI * 2);
-                g.fill();
-
-                g.fillStyle = '#ffffff';
-                g.strokeStyle = '#4a355f';
-                g.lineWidth = 2;
-                g.beginPath();
-                g.moveTo(-10, 12);
-                g.quadraticCurveTo(2, 20, 12, 12);
-                g.closePath();
-                g.fill();
-                g.stroke();
-
-                g.strokeStyle = '#2c2238';
-                g.lineWidth = 2.1;
-                g.fillStyle = 'rgba(255,255,255,0.14)';
-                g.beginPath();
-                g.arc(-13, -1, 12, 0, Math.PI * 2);
-                g.moveTo(26, -1);
-                g.arc(14, -1, 12, 0, Math.PI * 2);
-                g.fill();
-                g.stroke();
-
-                g.fillStyle = '#1d1a27';
-                g.beginPath();
-                g.moveTo(-40, -10);
-                g.bezierCurveTo(-44, -44, 44, -44, 40, -10);
-                g.quadraticCurveTo(18, -24, 10, -4);
-                g.quadraticCurveTo(0, -22, -12, -6);
-                g.quadraticCurveTo(-24, -20, -40, -10);
-                g.closePath();
-                g.fill();
                 g.restore();
 
             } else if (partType === 'Brazo1') {
                 g.save();
-                g.fillStyle = '#f5ebff';
-                g.strokeStyle = '#4a355f';
-                g.lineWidth = 2.2;
-                g.beginPath();
-                g.arc(98, 315, 16, 0, Math.PI * 2);
-                g.fill();
-                g.stroke();
+                g.fillStyle = fillCol;
+                g.strokeStyle = strokeCol;
+                g.lineWidth = lineW;
 
-                const grad = g.createLinearGradient(215, 185, 95, 315);
-                grad.addColorStop(0, '#96919c');
-                grad.addColorStop(1, '#75707c');
-                g.fillStyle = grad;
-                g.strokeStyle = '#2d2836';
-                g.lineWidth = 2.6;
                 g.beginPath();
-                g.moveTo(216, 178);
-                g.quadraticCurveTo(155, 222, 96, 294);
-                g.lineTo(116, 316);
-                g.quadraticCurveTo(175, 252, 226, 212);
+                g.moveTo(212, 168);
+                g.quadraticCurveTo(168, 196, 126, 242);
+                g.quadraticCurveTo(100, 278, 86, 304);
+                g.arc(96, 312, 13, Math.PI * 0.9, Math.PI * 0.1, true);
+                g.quadraticCurveTo(124, 286, 148, 252);
+                g.quadraticCurveTo(182, 218, 212, 196);
                 g.closePath();
                 g.fill();
                 g.stroke();
@@ -1904,63 +1850,36 @@
 
             } else if (partType === 'Torso') {
                 g.save();
-                const tGrad = g.createLinearGradient(200, 165, 310, 345);
-                tGrad.addColorStop(0, '#9a95a0');
-                tGrad.addColorStop(1, '#6f6a76');
-                g.fillStyle = tGrad;
-                g.strokeStyle = '#2d2836';
-                g.lineWidth = 2.6;
-                g.beginPath();
-                g.roundRect(202, 168, 106, 168, 22);
-                g.fill();
-                g.stroke();
+                g.fillStyle = fillCol;
+                g.strokeStyle = strokeCol;
+                g.lineWidth = lineW;
 
-                g.fillStyle = '#8b8691';
                 g.beginPath();
-                g.ellipse(255, 168, 46, 18, 0, 0, Math.PI * 2);
-                g.fill();
-                g.stroke();
-
-                g.fillStyle = '#797480';
-                g.beginPath();
-                g.moveTo(224, 272);
-                g.lineTo(286, 272);
-                g.lineTo(296, 314);
-                g.lineTo(214, 314);
+                g.moveTo(212, 178);
+                g.lineTo(278, 178);
+                g.quadraticCurveTo(286, 215, 276, 265);
+                g.quadraticCurveTo(272, 305, 274, 335);
+                g.lineTo(216, 335);
+                g.quadraticCurveTo(218, 305, 214, 265);
+                g.quadraticCurveTo(204, 215, 212, 178);
                 g.closePath();
                 g.fill();
-                g.stroke();
-
-                g.strokeStyle = '#1b1922';
-                g.lineWidth = 4.8;
-                g.beginPath();
-                g.moveTo(242, 176);
-                g.lineTo(244, 242);
-                g.moveTo(268, 176);
-                g.lineTo(272, 246);
                 g.stroke();
                 g.restore();
 
             } else if (partType === 'Brazo2') {
                 g.save();
-                g.fillStyle = '#f5ebff';
-                g.strokeStyle = '#4a355f';
-                g.lineWidth = 2.2;
-                g.beginPath();
-                g.arc(386, 192, 15, 0, Math.PI * 2);
-                g.fill();
-                g.stroke();
+                g.fillStyle = fillCol;
+                g.strokeStyle = strokeCol;
+                g.lineWidth = lineW;
 
-                g.fillStyle = '#85808b';
-                g.strokeStyle = '#2d2836';
-                g.lineWidth = 2.5;
                 g.beginPath();
-                g.moveTo(292, 184);
-                g.lineTo(342, 236);
-                g.lineTo(382, 198);
-                g.lineTo(368, 178);
-                g.lineTo(338, 204);
-                g.lineTo(298, 168);
+                g.moveTo(278, 168);
+                g.quadraticCurveTo(320, 198, 356, 230);
+                g.quadraticCurveTo(376, 212, 396, 185);
+                g.arc(388, 182, 13, -Math.PI * 0.2, Math.PI * 0.9, true);
+                g.quadraticCurveTo(365, 215, 344, 236);
+                g.quadraticCurveTo(312, 212, 278, 196);
                 g.closePath();
                 g.fill();
                 g.stroke();
@@ -1968,97 +1887,48 @@
 
             } else if (partType === 'Falda') {
                 g.save();
-                g.strokeStyle = '#181620';
-                g.lineWidth = 6.2;
-                g.beginPath();
-                g.moveTo(212, 330);
-                g.bezierCurveTo(175, 355, 175, 405, 206, 396);
-                g.stroke();
+                g.fillStyle = fillCol;
+                g.strokeStyle = strokeCol;
+                g.lineWidth = lineW;
 
-                g.fillStyle = '#282630';
-                g.strokeStyle = '#121117';
-                g.lineWidth = 2.6;
                 g.beginPath();
-                g.moveTo(204, 322);
-                g.lineTo(306, 322);
-                g.lineTo(336, 404);
-                g.lineTo(176, 404);
+                g.moveTo(216, 333);
+                g.lineTo(274, 333);
+                g.quadraticCurveTo(288, 365, 282, 385);
+                g.quadraticCurveTo(245, 375, 208, 385);
+                g.quadraticCurveTo(202, 365, 216, 333);
                 g.closePath();
                 g.fill();
                 g.stroke();
-
-                g.strokeStyle = '#16151c';
-                g.lineWidth = 2;
-                for (let i = 1; i <= 5; i++) {
-                    const tx = 204 + i * 17;
-                    const bx = 176 + i * 26.5;
-                    g.beginPath();
-                    g.moveTo(tx, 326);
-                    g.lineTo(bx, 402);
-                    g.stroke();
-                }
                 g.restore();
 
             } else if (partType === 'Piernas') {
                 g.save();
-                if (legVariant === 'calcetas') {
-                    g.strokeStyle = '#f5ebff';
-                    g.lineWidth = 34;
-                    g.beginPath();
-                    g.moveTo(222, 342);
-                    g.lineTo(210, 455);
-                    g.moveTo(286, 342);
-                    g.lineTo(318, 438);
-                    g.stroke();
+                g.fillStyle = fillCol;
+                g.strokeStyle = strokeCol;
+                g.lineWidth = lineW;
 
-                    g.strokeStyle = '#24222c';
-                    g.lineWidth = 32;
-                    g.beginPath();
-                    g.moveTo(210, 448);
-                    g.lineTo(192, 582);
-                    g.moveTo(318, 435);
-                    g.lineTo(256, 542);
-                    g.stroke();
-                } else {
-                    g.fillStyle = '#24222b';
-                    g.strokeStyle = '#111016';
-                    g.lineWidth = 2.6;
-                    g.beginPath();
-                    g.moveTo(205, 326);
-                    g.lineTo(306, 326);
-                    g.lineTo(342, 445);
-                    g.lineTo(272, 548);
-                    g.lineTo(242, 532);
-                    g.lineTo(288, 442);
-                    g.lineTo(254, 386);
-                    g.lineTo(214, 588);
-                    g.lineTo(176, 580);
-                    g.lineTo(202, 455);
-                    g.closePath();
-                    g.fill();
-                    g.stroke();
-
-                    g.fillStyle = '#f46d75';
-                    g.fillRect(202, 412, 24, 4.5);
-                    g.fillRect(306, 404, 22, 4.5);
-                }
-
-                g.fillStyle = '#f8f5ff';
-                g.strokeStyle = '#534168';
-                g.lineWidth = 2.2;
                 g.beginPath();
-                g.roundRect(168, 576, 46, 52, 14);
+                g.moveTo(212, 380);
+                g.quadraticCurveTo(210, 465, 196, 575);
+                g.quadraticCurveTo(168, 580, 162, 595);
+                g.quadraticCurveTo(175, 608, 196, 602);
+                g.quadraticCurveTo(208, 598, 216, 582);
+                g.quadraticCurveTo(230, 470, 236, 380);
+                g.closePath();
                 g.fill();
                 g.stroke();
 
-                g.save();
-                g.translate(252, 542);
-                g.rotate(0.24);
                 g.beginPath();
-                g.roundRect(-20, -12, 44, 50, 14);
+                g.moveTo(254, 380);
+                g.quadraticCurveTo(285, 455, 246, 555);
+                g.quadraticCurveTo(238, 565, 235, 578);
+                g.quadraticCurveTo(248, 588, 265, 580);
+                g.quadraticCurveTo(274, 572, 272, 558);
+                g.quadraticCurveTo(312, 455, 278, 380);
+                g.closePath();
                 g.fill();
                 g.stroke();
-                g.restore();
                 g.restore();
             }
 
@@ -2076,130 +1946,121 @@
             g.lineCap = 'round';
             g.lineJoin = 'round';
 
-            if (subType === 'CabelloFrontal') {
-                g.fillStyle = '#1d1a27';
+            const fillCol = '#ffffff';
+            const strokeCol = '#1e293b';
+            const lineW = 3.5;
+
+            g.fillStyle = fillCol;
+            g.strokeStyle = strokeCol;
+            g.lineWidth = lineW;
+
+            if (subType === 'CabezaBase') {
                 g.beginPath();
-                g.arc(245, 118, 42, Math.PI * 0.95, Math.PI * 2.05);
-                g.fill();
-            } else if (subType === 'Lentes') {
-                g.strokeStyle = '#2c2238';
-                g.lineWidth = 2.2;
-                g.beginPath();
-                g.arc(232, 129, 12, 0, Math.PI * 2);
-                g.moveTo(244, 129);
-                g.arc(259, 129, 12, 0, Math.PI * 2);
-                g.stroke();
-            } else if (subType === 'OjosBoca') {
-                g.strokeStyle = '#23192e';
-                g.fillStyle = '#23192e';
-                g.lineWidth = 2.4;
-                g.beginPath();
-                g.moveTo(225, 128);
-                g.quadraticCurveTo(232, 121, 239, 129);
-                g.stroke();
-                g.beginPath();
-                g.arc(259, 128, 4.5, 0, Math.PI * 2);
-                g.fill();
-                g.beginPath();
-                g.moveTo(236, 143);
-                g.quadraticCurveTo(246, 150, 256, 143);
-                g.stroke();
-            } else if (subType === 'CabezaBase') {
-                g.fillStyle = '#e7d4fa';
-                g.strokeStyle = '#4a355f';
-                g.lineWidth = 2.2;
-                g.beginPath();
-                g.roundRect(232, 148, 26, 32, 6);
+                g.roundRect(234, 150, 22, 28, 6);
                 g.fill();
                 g.stroke();
-                g.fillStyle = '#f8f0ff';
                 g.beginPath();
-                g.arc(245, 130, 35, 0, Math.PI * 2);
+                g.arc(245, 118, 36, 0, Math.PI * 2);
                 g.fill();
                 g.stroke();
-            } else if (subType === 'Cordones') {
-                g.strokeStyle = '#1b1922';
-                g.lineWidth = 4.8;
+            } else if (subType === 'Brazo1Hombro') {
                 g.beginPath();
-                g.moveTo(242, 176);
-                g.lineTo(244, 242);
-                g.moveTo(268, 176);
-                g.lineTo(272, 246);
+                g.moveTo(212, 168);
+                g.quadraticCurveTo(168, 196, 138, 230);
+                g.lineTo(158, 246);
+                g.quadraticCurveTo(182, 218, 212, 196);
+                g.closePath();
+                g.fill();
                 g.stroke();
             } else if (subType === 'Brazo1Antebrazo') {
-                g.strokeStyle = '#75707c';
-                g.lineWidth = 26;
                 g.beginPath();
-                g.moveTo(155, 248);
-                g.lineTo(104, 308);
-                g.stroke();
-                g.fillStyle = '#f5ebff';
-                g.beginPath();
-                g.arc(98, 315, 15, 0, Math.PI * 2);
+                g.moveTo(138, 230);
+                g.quadraticCurveTo(112, 272, 86, 304);
+                g.arc(96, 312, 13, Math.PI * 0.9, Math.PI * 0.1, true);
+                g.quadraticCurveTo(124, 286, 158, 246);
+                g.closePath();
                 g.fill();
-            } else if (subType === 'Brazo1Hombro') {
-                g.strokeStyle = '#908b96';
-                g.lineWidth = 28;
+                g.stroke();
+            } else if (subType === 'Torso') {
                 g.beginPath();
-                g.moveTo(214, 194);
-                g.lineTo(155, 248);
+                g.moveTo(212, 178);
+                g.lineTo(278, 178);
+                g.quadraticCurveTo(286, 215, 276, 265);
+                g.quadraticCurveTo(272, 305, 274, 335);
+                g.lineTo(216, 335);
+                g.quadraticCurveTo(218, 305, 214, 265);
+                g.quadraticCurveTo(204, 215, 212, 178);
+                g.closePath();
+                g.fill();
+                g.stroke();
+            } else if (subType === 'Brazo2Hombro') {
+                g.beginPath();
+                g.moveTo(278, 168);
+                g.quadraticCurveTo(320, 198, 344, 218);
+                g.lineTo(332, 236);
+                g.quadraticCurveTo(304, 212, 278, 196);
+                g.closePath();
+                g.fill();
                 g.stroke();
             } else if (subType === 'Brazo2Antebrazo') {
-                g.strokeStyle = '#75707c';
-                g.lineWidth = 25;
                 g.beginPath();
-                g.moveTo(338, 224);
-                g.lineTo(380, 194);
-                g.stroke();
-                g.fillStyle = '#f5ebff';
-                g.beginPath();
-                g.arc(386, 190, 14, 0, Math.PI * 2);
+                g.moveTo(344, 218);
+                g.quadraticCurveTo(376, 212, 396, 185);
+                g.arc(388, 182, 13, -Math.PI * 0.2, Math.PI * 0.9, true);
+                g.quadraticCurveTo(365, 215, 332, 236);
+                g.closePath();
                 g.fill();
-            } else if (subType === 'Brazo2Hombro') {
-                g.strokeStyle = '#88838e';
-                g.lineWidth = 27;
-                g.beginPath();
-                g.moveTo(296, 186);
-                g.lineTo(338, 224);
                 g.stroke();
-            } else if (subType === 'Correa') {
-                g.strokeStyle = '#181620';
-                g.lineWidth = 6.2;
+            } else if (subType === 'FaldaExtra') {
                 g.beginPath();
-                g.moveTo(212, 330);
-                g.bezierCurveTo(175, 355, 175, 405, 206, 396);
+                g.moveTo(216, 333);
+                g.lineTo(274, 333);
+                g.quadraticCurveTo(288, 365, 282, 385);
+                g.quadraticCurveTo(245, 375, 208, 385);
+                g.quadraticCurveTo(202, 365, 216, 333);
+                g.closePath();
+                g.fill();
                 g.stroke();
             } else if (subType === 'Muslos') {
-                g.strokeStyle = '#f5ebff';
-                g.lineWidth = 34;
                 g.beginPath();
-                g.moveTo(222, 342);
-                g.lineTo(210, 455);
-                g.moveTo(286, 342);
-                g.lineTo(318, 438);
+                g.moveTo(212, 380);
+                g.quadraticCurveTo(210, 435, 204, 470);
+                g.lineTo(228, 470);
+                g.quadraticCurveTo(232, 435, 236, 380);
+                g.closePath();
+                g.fill();
+                g.stroke();
+
+                g.beginPath();
+                g.moveTo(254, 380);
+                g.quadraticCurveTo(280, 425, 292, 455);
+                g.lineTo(270, 465);
+                g.quadraticCurveTo(260, 425, 246, 380);
+                g.closePath();
+                g.fill();
                 g.stroke();
             } else if (subType === 'PiernasTenis') {
-                g.strokeStyle = '#24222c';
-                g.lineWidth = 32;
                 g.beginPath();
-                g.moveTo(210, 448);
-                g.lineTo(192, 582);
-                g.moveTo(318, 435);
-                g.lineTo(256, 542);
-                g.stroke();
-                g.fillStyle = '#f8f5ff';
-                g.strokeStyle = '#534168';
-                g.lineWidth = 2.2;
-                g.beginPath();
-                g.roundRect(168, 576, 46, 52, 14);
-                g.roundRect(234, 532, 44, 50, 14);
+                g.moveTo(204, 470);
+                g.quadraticCurveTo(200, 525, 196, 575);
+                g.quadraticCurveTo(168, 580, 162, 595);
+                g.quadraticCurveTo(175, 608, 196, 602);
+                g.quadraticCurveTo(208, 598, 216, 582);
+                g.quadraticCurveTo(222, 525, 228, 470);
+                g.closePath();
                 g.fill();
                 g.stroke();
-            } else if (subType === 'CabelloTrasero') {
-                g.fillStyle = '#181622';
+
                 g.beginPath();
-                g.arc(245, 122, 48, 0, Math.PI * 2);
+                g.moveTo(292, 455);
+                g.quadraticCurveTo(270, 505, 246, 555);
+                g.quadraticCurveTo(238, 565, 235, 578);
+                g.quadraticCurveTo(248, 588, 265, 580);
+                g.quadraticCurveTo(274, 572, 272, 558);
+                g.quadraticCurveTo(285, 505, 270, 465);
+                g.closePath();
                 g.fill();
+                g.stroke();
             }
 
             g.restore();
@@ -2222,7 +2083,7 @@
                     },
                     {
                         id: 'Brazo1',
-                        name: 'Brazo 1 (Izq Pantalla)',
+                        name: 'Brazo 1 (Izq)',
                         color: '#10b981',
                         allowedBones: ['upperArmR', 'forearmR'],
                         anchor: { parentBone: 'torso', nx: 0.41, ny: 0.28, radiusPct: 14, strength: 0.90 },
@@ -2238,7 +2099,7 @@
                     },
                     {
                         id: 'Brazo2',
-                        name: 'Brazo 2 (Der Pantalla)',
+                        name: 'Brazo 2 (Der)',
                         color: '#34d399',
                         allowedBones: ['upperArmL', 'forearmL'],
                         anchor: { parentBone: 'torso', nx: 0.57, ny: 0.28, radiusPct: 14, strength: 0.90 },
@@ -2246,7 +2107,7 @@
                     },
                     {
                         id: 'Falda',
-                        name: 'Falda',
+                        name: 'Cadera / Pelvis',
                         color: '#c084fc',
                         allowedBones: ['torso', 'strap'],
                         anchor: { parentBone: 'torso', nx: 0.49, ny: 0.48, radiusPct: 13, strength: 0.85 },
@@ -2254,7 +2115,7 @@
                     },
                     {
                         id: 'Piernas',
-                        name: studio.legVariantStyle === 'calcetas' ? 'PiernasConCalcetasYTenis' : 'PiernasConPantalonYTenis',
+                        name: 'Piernas',
                         color: '#f59e0b',
                         allowedBones: ['torso', 'upperLegR', 'lowerLegR', 'upperLegL', 'lowerLegL'],
                         anchor: { parentBone: 'torso', nx: 0.49, ny: 0.49, radiusPct: 12, strength: 0.85 },
@@ -4752,9 +4613,9 @@
         function getSanitizedAvatarName(overrideName) {
             const inpModal = typeof document !== 'undefined' ? document.getElementById('inpExportAvatarName') : null;
             const inpHeader = typeof document !== 'undefined' ? document.getElementById('inpHeaderAvatarName') : null;
-            const raw = (overrideName || (inpModal && inpModal.value) || (inpHeader && inpHeader.value) || (studio && studio.avatarName) || 'LiamAvatar').trim();
+            const raw = (overrideName || (inpModal && inpModal.value) || (inpHeader && inpHeader.value) || (studio && studio.avatarName) || 'CustomAvatar').trim();
             let clean = raw.replace(/\.[a-zA-Z0-9]+$/i, '').replace(/[^a-zA-Z0-9_]/g, '');
-            if (!clean || /^[0-9]/.test(clean)) clean = 'LiamAvatar';
+            if (!clean || /^[0-9]/.test(clean)) clean = 'CustomAvatar';
             return clean;
         }
 
@@ -5048,7 +4909,7 @@ public class ${className} : MonoBehaviour
         if (sharedAtlasTexture == null)
         {
             string[] guids = AssetDatabase.FindAssets("${avatarName}_Atlas t:Texture2D");
-            if (guids == null || guids.Length == 0) guids = AssetDatabase.FindAssets("LiamAvatar_Atlas t:Texture2D");
+            if (guids == null || guids.Length == 0) guids = AssetDatabase.FindAssets("CustomAvatar_Atlas t:Texture2D");
             if (guids != null && guids.Length > 0)
             {
                 string path = AssetDatabase.GUIDToAssetPath(guids[0]);
@@ -5067,7 +4928,7 @@ public class ${className} : MonoBehaviour
         if (jsonFile == null)
         {
             string[] jGuids = AssetDatabase.FindAssets("${avatarName} t:TextAsset");
-            if (jGuids == null || jGuids.Length == 0) jGuids = AssetDatabase.FindAssets("LiamAvatar t:TextAsset");
+            if (jGuids == null || jGuids.Length == 0) jGuids = AssetDatabase.FindAssets("CustomAvatar t:TextAsset");
             if (jGuids != null && jGuids.Length > 0)
             {
                 string jPath = AssetDatabase.GUIDToAssetPath(jGuids[0]);
@@ -7405,7 +7266,7 @@ ${defaultLayersCode}
 
         function getStaticAvatarName() {
             const inp = document.getElementById('inpStaticAvatarName');
-            const raw = (inp && inp.value.trim()) || studio.avatarName || 'CantTameHerClementine';
+            const raw = (inp && inp.value.trim()) || studio.avatarName || 'CustomAvatar';
             return raw.replace(/[^a-zA-Z0-9_]/g, '');
         }
 
