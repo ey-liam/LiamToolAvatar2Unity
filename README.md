@@ -3,7 +3,9 @@
 Herramienta web (single-file HTML) para crear, riggear y animar **avatares 2D en alta resolución (1536x2752)** estilo Just Dance y exportarlos listos para Unity con empaquetador de **Atlas de Texturas Inteligente**.
 
 - **Google Sites**: https://sites.google.com/view/liamtoolavatar2unity/full-page-embed
-- **GitHub Pages (Auto-actualizable)**: https://ey-liam.github.io/LiamToolAvatar2Unity/
+- **GitHub Pages**: https://ey-liam.github.io/LiamToolAvatar2Unity/
+
+AMBOS SITIOS WEB SE VAN ACTUALIZANDO SOLOS CONFORME VOY ACTUALIZANDO LA TOOL
 
 ## Características Principales
 
