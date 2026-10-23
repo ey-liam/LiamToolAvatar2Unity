@@ -1004,6 +1004,10 @@
                             <input type="checkbox" id="chkGifTransparent" checked class="rounded bg-[#121622] border-[#28324d] text-pink-500 focus:ring-0">
                             <span class="text-xs text-slate-200 font-medium">Fondo Transparente (Sin fondo)</span>
                         </label>
+                        <label class="flex items-center gap-2 cursor-pointer" title="Fusiona micro-variaciones de tonos oscuros y ropa para que los colores no parpadeen">
+                            <input type="checkbox" id="chkGifStabilizeColors" checked class="rounded bg-[#121622] border-[#28324d] text-pink-500 focus:ring-0">
+                            <span class="text-xs text-slate-200 font-medium">Estabilizar Colores (Anti-parpadeo)</span>
+                        </label>
                         <label class="flex items-center gap-2 cursor-pointer">
                             <input type="checkbox" id="chkGifLoopForever" checked class="rounded bg-[#121622] border-[#28324d] text-pink-500 focus:ring-0">
                             <span class="text-xs text-slate-200 font-medium">Bucle Infinito (Loop continuo)</span>
@@ -6064,6 +6068,7 @@ ${defaultLayersCode}
             const fps = parseInt(document.getElementById('selGifFps').value, 10) || 20;
             const isTransparent = document.getElementById('chkGifTransparent').checked;
             const isLoop = document.getElementById('chkGifLoopForever').checked;
+            const shouldStabilize = document.getElementById('chkGifStabilizeColors') ? document.getElementById('chkGifStabilizeColors').checked : true;
 
             studio.gifCancel = false;
 
@@ -6153,14 +6158,32 @@ ${defaultLayersCode}
             };
 
             try {
-                progressText.textContent = "Analizando paleta de colores de alta fidelidad...";
+                progressText.textContent = "Analizando paleta de colores estabilizada...";
                 progressPct.textContent = "5%";
                 progressBar.style.width = "5%";
                 await new Promise(r => setTimeout(r, 0));
 
-                const sampleCount = Math.min(10, totalFrames);
-                const sampleStep = Math.max(1, Math.floor(totalFrames / sampleCount));
                 const samplePixels = [];
+
+                // 1. Muestrear texturas originales de las partes (colores puros del arte original)
+                for (let pIdx = 0; pIdx < studio.parts.length; pIdx++) {
+                    const part = studio.parts[pIdx];
+                    if (!part.visible || !part.bakedCanvas) continue;
+                    try {
+                        const pctx = part.bakedCanvas.getContext('2d');
+                        const pData = pctx.getImageData(0, 0, part.bakedCanvas.width, part.bakedCanvas.height).data;
+                        const step = (pData.length / 4 > 60000) ? 8 : 4;
+                        for (let p = 0; p < pData.length; p += step * 4) {
+                            if (!isTransparent || pData[p + 3] >= 64) {
+                                samplePixels.push(pData[p], pData[p + 1], pData[p + 2], 255);
+                            }
+                        }
+                    } catch (e) {}
+                }
+
+                // 2. Muestrear fotogramas renderizados para capturar transformaciones
+                const sampleCount = Math.min(8, totalFrames);
+                const sampleStep = Math.max(1, Math.floor(totalFrames / sampleCount));
 
                 for (let s = 0; s < totalFrames; s += sampleStep) {
                     renderFrameAt((s / totalFrames) * dur);
@@ -6175,13 +6198,43 @@ ${defaultLayersCode}
                     }
                 }
 
+                function colorDistSq(c1, c2) {
+                    const rmean = (c1[0] + c2[0]) >> 1;
+                    const r = c1[0] - c2[0];
+                    const g = c1[1] - c2[1];
+                    const b = c1[2] - c2[2];
+                    return (((512 + rmean) * r * r) >> 8) + 4 * g * g + (((767 - rmean) * b * b) >> 8);
+                }
+
+                function prunePalettePerceptual(pal, threshold = 28) {
+                    const threshSq = threshold * threshold;
+                    const result = [];
+                    for (let i = 0; i < pal.length; i++) {
+                        const color = pal[i];
+                        let exists = false;
+                        for (let j = 0; j < result.length; j++) {
+                            if (colorDistSq(result[j], color) < threshSq) {
+                                exists = true;
+                                break;
+                            }
+                        }
+                        if (!exists) result.push(color);
+                    }
+                    return result;
+                }
+
                 let masterPalette, opaquePalette;
                 if (samplePixels.length === 0) {
                     opaquePalette = [[200, 200, 200], [40, 40, 40]];
                 } else {
                     const sampleBuffer = new Uint8Array(samplePixels);
                     const maxColors = isTransparent ? 255 : 256;
-                    opaquePalette = window.gifenc.quantize(sampleBuffer, maxColors, { format: 'rgb565' });
+                    const rawPalette = window.gifenc.quantize(sampleBuffer, maxColors, { format: 'rgb565' });
+                    if (shouldStabilize) {
+                        opaquePalette = prunePalettePerceptual(rawPalette, 28);
+                    } else {
+                        opaquePalette = rawPalette;
+                    }
                 }
 
                 if (isTransparent) {
