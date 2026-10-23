@@ -1539,14 +1539,27 @@
                             <span>Fondo de Video / Chroma Key</span>
                             <span class="text-[10px] text-emerald-400 font-bold">🎬 Para Editores de Video</span>
                         </label>
-                        <select id="selWebmBg" class="bg-[#0b0e16] border border-emerald-500/50 rounded px-2 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-emerald-400 font-medium">
-                            <option value="transparent" selected>✨ Transparente (Canal Alpha VP9)</option>
-                            <option value="green">🟩 Chroma Key Verde (#00FF00) • Pantalla Verde</option>
+                        <select id="selWebmBg" onchange="onWebmBgChanged()" class="bg-[#0b0e16] border border-emerald-500/50 rounded px-2 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-emerald-400 font-medium">
+                            <option value="green" selected>🟩 Chroma Key Verde (#00FF00) • Ultra Fluido (Recomendado)</option>
+                            <option value="transparent">✨ Transparente (Canal Alpha WebM VP9/VP8)</option>
                             <option value="blue">🟦 Chroma Key Azul (#0000FF) • Pantalla Azul</option>
                             <option value="red">🟥 Chroma Key Rojo (#FF0000) • Pantalla Roja</option>
                             <option value="dark">⬛ Fondo Oscuro Estudio (#090b10)</option>
                         </select>
-                        <span class="text-[10px] text-slate-400 leading-tight">Usa <b>Chroma Key</b> para incrustar fácilmente en Premiere, CapCut, DaVinci, OBS, etc.</span>
+                        <span class="text-[10px] text-slate-400 leading-tight">Usa <b>Chroma Key</b> para máxima fluidez y para incrustar fácilmente en Premiere, CapCut, DaVinci, OBS, etc.</span>
+                    </div>
+
+                    <!-- Selector de Códec WebM -->
+                    <div id="rowWebmCodec" class="hidden flex flex-col gap-1 p-2.5 bg-[#121622] border border-cyan-500/40 rounded-lg">
+                        <label class="text-[11px] font-semibold text-cyan-300 flex items-center justify-between">
+                            <span>Códec de Video WebM</span>
+                            <span class="text-[10px] text-cyan-400 font-bold">⚡ Fluidez y Rendimiento</span>
+                        </label>
+                        <select id="selWebmCodec" class="bg-[#0b0e16] border border-cyan-500/50 rounded px-2 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-cyan-400 font-medium">
+                            <option value="vp8" selected>VP8 • Ultra Fluido (Recomendado, 0 tirones, decodificación rápida)</option>
+                            <option value="vp9">VP9 • Máxima Compresión (Más pesado para CPU)</option>
+                        </select>
+                        <span class="text-[10px] text-slate-400 leading-tight"><b>VP8</b> evita los tirones de reproducción y se reproduce suave a 60 FPS en cualquier dispositivo.</span>
                     </div>
 
                     <div class="flex flex-col gap-2 pt-1 border-t border-[#1e2538]">
@@ -6548,6 +6561,7 @@ ${defaultLayersCode}
             const btnGenText = document.getElementById('lblBtnGenerateText');
             const btnDownText = document.getElementById('lblBtnDownloadText');
 
+            const rowWebmCodec = document.getElementById('rowWebmCodec');
             if (fmt === 'webm') {
                 if (extLabel) extLabel.textContent = '.webm';
                 if (fmtBadge) {
@@ -6555,6 +6569,7 @@ ${defaultLayersCode}
                     fmtBadge.className = "text-[10px] text-emerald-400 font-bold";
                 }
                 if (rowWebmBg) rowWebmBg.classList.remove('hidden');
+                if (rowWebmCodec) rowWebmCodec.classList.remove('hidden');
                 if (rowTransCheck) rowTransCheck.classList.add('hidden');
                 if (rowStab) rowStab.classList.add('hidden');
                 if (btnGenText) btnGenText.textContent = "✨ Generar Video (WebM HD)";
@@ -6600,6 +6615,7 @@ ${defaultLayersCode}
                     fmtBadge.className = "text-[10px] text-pink-400 font-bold";
                 }
                 if (rowWebmBg) rowWebmBg.classList.add('hidden');
+                if (rowWebmCodec) rowWebmCodec.classList.add('hidden');
                 if (rowTransCheck) rowTransCheck.classList.remove('hidden');
                 if (rowStab) rowStab.classList.add('hidden');
                 if (btnGenText) btnGenText.textContent = "✨ Generar Animación (APNG)";
@@ -6649,6 +6665,7 @@ ${defaultLayersCode}
                     fmtBadge.className = "text-[10px] text-amber-400 font-bold";
                 }
                 if (rowWebmBg) rowWebmBg.classList.add('hidden');
+                if (rowWebmCodec) rowWebmCodec.classList.add('hidden');
                 if (rowTransCheck) rowTransCheck.classList.remove('hidden');
                 if (rowStab) rowStab.classList.remove('hidden');
                 if (btnGenText) btnGenText.textContent = "✨ Generar GIF Animado";
@@ -7076,6 +7093,17 @@ ${defaultLayersCode}
             return result;
         }
 
+        function onWebmBgChanged() {
+            const selWebmBg = document.getElementById('selWebmBg');
+            const selWebmCodec = document.getElementById('selWebmCodec');
+            if (!selWebmBg || !selWebmCodec) return;
+            if (selWebmBg.value === 'transparent') {
+                selWebmCodec.value = 'vp9';
+            } else {
+                selWebmCodec.value = 'vp8';
+            }
+        }
+
         async function generateAnimation() {
             if (!studio.parts || studio.parts.length === 0) {
                 alert("Por favor carga o crea un avatar primero.");
@@ -7221,15 +7249,29 @@ ${defaultLayersCode}
                     finalizeAnimationOutput(apngBlob, 'apng', targetW, targetH, totalFrames, fps, dur);
 
                 } else if (format === 'webm') {
-                    // WebM Video (VP9/VP8 with Alpha or Chroma Key)
+                    // WebM Video (VP8 / VP9 with Alpha or Chroma Key)
                     if (typeof MediaRecorder === 'undefined') {
                         throw new Error("Tu navegador no soporta MediaRecorder para video WebM.");
                     }
 
                     const isAlpha = (bgMode === 'transparent');
-                    const candidateMimes = isAlpha
-                        ? ['video/webm;codecs=vp9,opus', 'video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm']
-                        : ['video/webm;codecs=vp9,opus', 'video/webm;codecs=vp9', 'video/webm;codecs=vp8,opus', 'video/webm;codecs=vp8', 'video/webm'];
+                    const codecChoice = (document.getElementById('selWebmCodec') ? document.getElementById('selWebmCodec').value : 'vp8');
+
+                    // Candidate codecs strictly WITHOUT audio (no opus) to prevent audio-sync stalling in video players
+                    let candidateMimes = [];
+                    if (codecChoice === 'vp8') {
+                        candidateMimes = [
+                            'video/webm;codecs=vp8',
+                            'video/webm;codecs=vp9',
+                            'video/webm'
+                        ];
+                    } else {
+                        candidateMimes = [
+                            'video/webm;codecs=vp9',
+                            'video/webm;codecs=vp8',
+                            'video/webm'
+                        ];
+                    }
 
                     let chosenMime = '';
                     for (const cand of candidateMimes) {
@@ -7240,21 +7282,22 @@ ${defaultLayersCode}
                     }
                     if (!chosenMime) chosenMime = 'video/webm';
 
-                    // Bitrate scaled for optimal balance between crystal clarity and smooth hardware decoding
-                    let chosenBitrate = 18000000;
+                    // Bitrate scaled for 2D animation: avoids decoder buffer starvation and micro-stutter
+                    let chosenBitrate = 9000000;
                     if (targetH >= 2160) {
-                        chosenBitrate = 36000000; // 36 Mbps for 4K / 2752p (ultra-sharp VP9 without decoding lag)
+                        chosenBitrate = 22000000; // 22 Mbps for 4K / 2752p (ultra-sharp 2D with silky playback)
                     } else if (targetH >= 1440) {
-                        chosenBitrate = 28000000; // 28 Mbps for 1440p 2K
+                        chosenBitrate = 14000000; // 14 Mbps for 1440p 2K
                     } else if (targetH >= 1080) {
-                        chosenBitrate = 22000000; // 22 Mbps for 1080p Full HD
+                        chosenBitrate = 9000000;  // 9 Mbps for 1080p Full HD (broadcast quality)
                     } else if (targetH >= 720) {
-                        chosenBitrate = 14000000; // 14 Mbps for 720p HD
+                        chosenBitrate = 5000000;  // 5 Mbps for 720p HD
                     } else {
-                        chosenBitrate = 6000000;  // 6 Mbps for 480p SD
+                        chosenBitrate = 2500000;  // 2.5 Mbps for 480p SD
                     }
 
-                    progressText.textContent = "Iniciando codificador de video WebM " + targetH + "p (" + (isAlpha ? 'Alpha' : 'Chroma Key') + ")...";
+                    const codecName = chosenMime.replace('video/webm;codecs=', '').replace('video/webm', 'VP8').toUpperCase();
+                    progressText.textContent = "Iniciando codificador WebM " + targetH + "p (" + codecName + ")...";
                     progressPct.textContent = "0%";
                     progressBar.style.width = "0%";
                     await new Promise(r => setTimeout(r, 0));
@@ -7271,8 +7314,17 @@ ${defaultLayersCode}
                     offCanvas.style.zIndex = '-9999';
                     document.body.appendChild(offCanvas);
 
-                    const stream = offCanvas.captureStream(fps);
+                    // Use captureStream(0) for deterministic 1:1 frame delivery without background timer collisions
+                    let stream;
+                    let isManualStream = false;
+                    try {
+                        stream = offCanvas.captureStream(0);
+                        isManualStream = true;
+                    } catch (e) {
+                        stream = offCanvas.captureStream(fps);
+                    }
                     const [videoTrack] = stream.getVideoTracks();
+
                     const recorder = new MediaRecorder(stream, {
                         mimeType: chosenMime,
                         videoBitsPerSecond: chosenBitrate
@@ -7288,16 +7340,17 @@ ${defaultLayersCode}
                         recorder.onerror = reject;
                     });
 
-                    recorder.start(100);
+                    // Start recorder WITHOUT timeslice to avoid 100ms cluster fragmentation
+                    recorder.start();
 
                     // Initial frame setup
                     renderAnimationSnapshot(offCtx, targetW, targetH, cropBox, bgMode, 0);
-                    if (videoTrack && typeof videoTrack.requestFrame === 'function') {
+                    if (isManualStream && videoTrack && typeof videoTrack.requestFrame === 'function') {
                         videoTrack.requestFrame();
                     }
                     await new Promise(r => setTimeout(r, 30));
 
-                    // Synchronized wall-clock pacing: avoids frame drift and ensures exact playback speed
+                    // Precise wall-clock synchronization
                     const frameIntervalMs = (dur * 1000) / totalFrames;
                     const loopStartTime = performance.now();
 
@@ -7310,7 +7363,7 @@ ${defaultLayersCode}
                         const t = (f / totalFrames) * dur;
                         renderAnimationSnapshot(offCtx, targetW, targetH, cropBox, bgMode, t);
 
-                        if (videoTrack && typeof videoTrack.requestFrame === 'function') {
+                        if (isManualStream && videoTrack && typeof videoTrack.requestFrame === 'function') {
                             videoTrack.requestFrame();
                         }
 
