@@ -7478,7 +7478,7 @@ ${defaultLayersCode}
             solveSkeletonAndDeformParts(0);
 
             let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-            let headX = 0, headY = 0, headCount = 0;
+            let headXSum = 0, headYSum = 0, headCount = 0;
 
             for (let p = 0; p < studio.parts.length; p++) {
                 const part = studio.parts[p];
@@ -7490,14 +7490,16 @@ ${defaultLayersCode}
                 for (let v = 0; v < verts.length; v++) {
                     const vx = verts[v].dx;
                     const vy = verts[v].dy;
-                    if (vx < minX) minX = vx;
-                    if (vx > maxX) maxX = vx;
-                    if (vy < minY) minY = vy;
-                    if (vy > maxY) maxY = vy;
-                    if (isHeadPart) {
-                        headX += vx;
-                        headY += vy;
-                        headCount++;
+                    if (typeof vx === 'number' && !isNaN(vx) && typeof vy === 'number' && !isNaN(vy)) {
+                        if (vx < minX) minX = vx;
+                        if (vx > maxX) maxX = vx;
+                        if (vy < minY) minY = vy;
+                        if (vy > maxY) maxY = vy;
+                        if (isHeadPart) {
+                            headXSum += vx;
+                            headYSum += vy;
+                            headCount++;
+                        }
                     }
                 }
             }
@@ -7509,29 +7511,33 @@ ${defaultLayersCode}
             solveSkeletonAndDeformParts(0);
 
             if (minX === Infinity || maxX <= minX || maxY <= minY) {
-                return {
-                    minX: 0, minY: 0, maxX: RefWidth, maxY: RefHeight,
-                    width: RefWidth, height: RefHeight,
-                    centerX: RefWidth * 0.5,
-                    headX: RefWidth * 0.5,
-                    headY: RefHeight * 0.15
-                };
+                minX = RefWidth * 0.25;
+                maxX = RefWidth * 0.75;
+                minY = RefHeight * 0.15;
+                maxY = RefHeight * 0.85;
             }
 
             const charW = maxX - minX;
             const charH = maxY - minY;
             const charCenterX = minX + charW * 0.5;
 
-            // Check if head bone or head parts exist for head tracking
+            // Ultra-robust Head Centroid Calculation:
             let computedHeadX = charCenterX;
             let computedHeadY = minY + charH * 0.14;
-            const headBone = studio.bones.find(b => b.id === 'head' || b.role === 'head' || ((b.label || '').toLowerCase().includes('cabeza')));
-            if (headBone) {
-                computedHeadX = (headBone.x1 + headBone.x2) * 0.5 * (RefWidth / 520);
-                computedHeadY = (headBone.y1 + headBone.y2) * 0.5 * (RefHeight / 700);
-            } else if (headCount > 0) {
-                computedHeadX = headX / headCount;
-                computedHeadY = headY / headCount;
+
+            if (headCount > 0) {
+                computedHeadX = headXSum / headCount;
+                computedHeadY = headYSum / headCount;
+            } else {
+                const headBone = studio.bones.find(b => b.id === 'head' || b.role === 'head' || ((b.label || '').toLowerCase().includes('cabeza')));
+                if (headBone) {
+                    const hx1 = typeof headBone.nx1 === 'number' ? headBone.nx1 : (typeof headBone.x1 === 'number' ? headBone.x1 : 0.5);
+                    const hx2 = typeof headBone.nx2 === 'number' ? headBone.nx2 : (typeof headBone.x2 === 'number' ? headBone.x2 : 0.5);
+                    const hy1 = typeof headBone.ny1 === 'number' ? headBone.ny1 : (typeof headBone.y1 === 'number' ? headBone.y1 : 0.15);
+                    const hy2 = typeof headBone.ny2 === 'number' ? headBone.ny2 : (typeof headBone.y2 === 'number' ? headBone.y2 : 0.15);
+                    computedHeadX = (hx1 + hx2) * 0.5 * RefWidth;
+                    computedHeadY = (hy1 + hy2) * 0.5 * RefHeight;
+                }
             }
 
             return {
@@ -7554,21 +7560,25 @@ ${defaultLayersCode}
 
             const ovr = studio.staticCropOverrides[spec.type] || { zoom: 1.0, panX: 0, panY: 0 };
             const zoom = Math.max(0.2, ovr.zoom || 1.0);
-            const panX = (ovr.panX || 0) * (charW * 0.35);
-            const panY = (ovr.panY || 0) * (charH * 0.35);
 
             const baseCropH = Math.max(60, (charH * spec.defaultCrop.heightRatio) / zoom);
             const baseCropW = baseCropH * aspect;
 
+            // Pan proportional to visible crop dimensions:
+            // Positive panX moves avatar to the RIGHT
+            // Positive panY moves avatar DOWN
+            const panX = (ovr.panX || 0) * (baseCropW * 0.70);
+            const panY = (ovr.panY || 0) * (baseCropH * 0.70);
+
             let cropX = 0, cropY = 0;
 
             if (spec.defaultCrop.focus === 'head') {
-                cropX = (bbox.headX - baseCropW * 0.5) + panX;
-                cropY = (bbox.headY - baseCropH * 0.45) + panY;
+                cropX = (bbox.headX - baseCropW * 0.5) - panX;
+                cropY = (bbox.headY - baseCropH * 0.45) - panY;
             } else {
-                cropX = (bbox.centerX - baseCropW * 0.5) + panX;
+                cropX = (bbox.centerX - baseCropW * 0.5) - panX;
                 const topAnchor = bbox.minY + (charH * (spec.defaultCrop.topRatio || 0));
-                cropY = topAnchor + panY;
+                cropY = topAnchor - panY;
             }
 
             return {
@@ -7611,6 +7621,7 @@ ${defaultLayersCode}
             initStaticTextureCards();
             refreshAllStaticPreviews();
             setupStaticEditorInteractions();
+            selectActiveStaticType(studio.selectedStaticType || 'Cursor');
         }
         window.openStaticTexturesModal = openStaticTexturesModal;
 
@@ -7640,10 +7651,15 @@ ${defaultLayersCode}
             JD_STATIC_SPECS.forEach(spec => {
                 const card = document.createElement('div');
                 card.id = `staticCard_${spec.type}`;
-                card.className = "flex flex-col gap-2 p-3 bg-[#111624] border border-[#212b42] rounded-xl hover:border-amber-500/50 transition shadow";
+                card.className = "flex flex-col gap-2 p-3 bg-[#111624] border border-[#212b42] rounded-xl hover:border-amber-500/50 transition shadow cursor-pointer";
+                card.onclick = (e) => {
+                    // Do not intercept button clicks
+                    if (e.target.closest('button')) return;
+                    selectActiveStaticType(spec.type);
+                };
 
                 card.innerHTML = `
-                    <div class="flex items-center justify-between">
+                    <div class="flex items-center justify-between pointer-events-none">
                         <div class="flex items-center gap-1.5">
                             <span class="text-xs font-bold text-white">${spec.label}</span>
                             <span id="badgeDim_${spec.type}" class="text-[9px] mono text-amber-300 bg-amber-500/10 px-1 py-0.5 rounded border border-amber-500/30 font-semibold">512x228</span>
@@ -7651,14 +7667,14 @@ ${defaultLayersCode}
                         <span class="text-[10px] text-slate-400 font-mono">${spec.type}</span>
                     </div>
 
-                    <div class="flex-1 min-h-[110px] max-h-[140px] checkerboard-pattern rounded-lg border border-[#232b40] flex items-center justify-center p-1.5 overflow-hidden relative cursor-pointer" onclick="selectActiveStaticType('${spec.type}')">
-                        <canvas id="staticCanvas_${spec.type}" class="max-h-[125px] max-w-full object-contain filter drop-shadow"></canvas>
+                    <div class="flex-1 min-h-[110px] max-h-[140px] checkerboard-pattern rounded-lg border border-[#232b40] flex items-center justify-center p-1.5 overflow-hidden relative">
+                        <canvas id="staticCanvas_${spec.type}" class="max-h-[125px] max-w-full object-contain filter drop-shadow pointer-events-none"></canvas>
                     </div>
 
                     <div class="flex items-center justify-between gap-1 pt-1 border-t border-[#1b2336]">
                         <span id="lblFile_${spec.type}" class="text-[10px] mono text-emerald-300 font-bold overflow-hidden text-ellipsis whitespace-nowrap max-w-[130px]">file.png</span>
                         <div class="flex items-center gap-1 shrink-0">
-                            <button onclick="selectActiveStaticType('${spec.type}')" class="px-2 py-1 rounded bg-[#182030] hover:bg-[#25324c] text-[10px] text-slate-200 font-medium" title="Ajustar encuadre y zoom">✏️</button>
+                            <button onclick="selectActiveStaticType('${spec.type}')" class="px-2 py-1 rounded bg-[#182030] hover:bg-[#25324c] text-[10px] text-amber-300 font-bold flex items-center gap-1 border border-[#2b3954]" title="Ajustar encuadre y zoom">✏️ Ajustar</button>
                             <button onclick="downloadSingleStaticTexture('${spec.type}')" class="px-2 py-1 rounded bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 border border-amber-500/30 text-[10px] font-semibold" title="Descargar PNG">⬇️</button>
                             <button onclick="copySingleStaticTextureToClipboard('${spec.type}')" class="px-2 py-1 rounded bg-[#182030] hover:bg-[#25324c] text-[10px] text-slate-200 font-medium" title="Copiar al portapapeles">📋</button>
                         </div>
@@ -7704,9 +7720,9 @@ ${defaultLayersCode}
             const lblPanX = document.getElementById('lblStaticPanXVal');
             const lblPanY = document.getElementById('lblStaticPanYVal');
 
-            if (rngZoom) rngZoom.value = ovr.zoom || 1.0;
-            if (rngPanX) rngPanX.value = ovr.panX || 0.0;
-            if (rngPanY) rngPanY.value = ovr.panY || 0.0;
+            if (rngZoom) rngZoom.value = (ovr.zoom !== undefined) ? ovr.zoom : 1.0;
+            if (rngPanX) rngPanX.value = (ovr.panX !== undefined) ? ovr.panX : 0.0;
+            if (rngPanY) rngPanY.value = (ovr.panY !== undefined) ? ovr.panY : 0.0;
 
             if (lblZoom) lblZoom.textContent = Math.round((ovr.zoom || 1.0) * 100) + '%';
             if (lblPanX) lblPanX.textContent = Math.round((ovr.panX || 0.0) * 100) + '%';
@@ -7720,9 +7736,9 @@ ${defaultLayersCode}
                 const c = document.getElementById(`staticCard_${s.type}`);
                 if (c) {
                     if (s.type === type) {
-                        c.classList.add('border-amber-400', 'ring-1', 'ring-amber-400/50');
+                        c.classList.add('border-amber-400', 'ring-2', 'ring-amber-400/50');
                     } else {
-                        c.classList.remove('border-amber-400', 'ring-1', 'ring-amber-400/50');
+                        c.classList.remove('border-amber-400', 'ring-2', 'ring-amber-400/50');
                     }
                 }
             });
@@ -7768,21 +7784,21 @@ ${defaultLayersCode}
             studio.staticCropOverrides[type] = studio.staticCropOverrides[type] || { zoom: 1.0, panX: 0, panY: 0 };
 
             if (preset === 'head') {
-                studio.staticCropOverrides[type].zoom = 1.4;
+                studio.staticCropOverrides[type].zoom = 1.35;
                 studio.staticCropOverrides[type].panX = 0;
-                studio.staticCropOverrides[type].panY = -0.15;
+                studio.staticCropOverrides[type].panY = 0.40;
             } else if (preset === 'bust') {
                 studio.staticCropOverrides[type].zoom = 1.1;
                 studio.staticCropOverrides[type].panX = 0;
-                studio.staticCropOverrides[type].panY = -0.05;
+                studio.staticCropOverrides[type].panY = 0.15;
             } else if (preset === 'torso') {
-                studio.staticCropOverrides[type].zoom = 0.9;
+                studio.staticCropOverrides[type].zoom = 0.95;
                 studio.staticCropOverrides[type].panX = 0;
-                studio.staticCropOverrides[type].panY = 0.05;
+                studio.staticCropOverrides[type].panY = -0.10;
             } else if (preset === 'full') {
-                studio.staticCropOverrides[type].zoom = 0.8;
+                studio.staticCropOverrides[type].zoom = 0.85;
                 studio.staticCropOverrides[type].panX = 0;
-                studio.staticCropOverrides[type].panY = 0.10;
+                studio.staticCropOverrides[type].panY = -0.20;
             }
 
             selectActiveStaticType(type);
@@ -7829,15 +7845,43 @@ ${defaultLayersCode}
                 const type = studio.selectedStaticType || 'Hud';
                 studio.staticCropOverrides[type] = studio.staticCropOverrides[type] || { zoom: 1.0, panX: 0, panY: 0 };
 
-                // Scale drag delta to slider scale
-                const curPanX = (studio.staticCropOverrides[type].panX || 0) - (dx / 180);
-                const curPanY = (studio.staticCropOverrides[type].panY || 0) - (dy / 180);
+                const rect = canvas.getBoundingClientRect();
+                const cw = rect.width || 200;
+                const ch = rect.height || 200;
 
-                studio.staticCropOverrides[type].panX = Math.max(-1.0, Math.min(1.0, curPanX));
-                studio.staticCropOverrides[type].panY = Math.max(-1.0, Math.min(1.0, curPanY));
+                // Dragging right moves avatar right (positive panX)
+                // Dragging down moves avatar down (positive panY)
+                const deltaX = (dx / cw) * 1.5;
+                const deltaY = (dy / ch) * 1.5;
 
-                selectActiveStaticType(type);
-                onStaticCropSliderChanged('panX', studio.staticCropOverrides[type].panX);
+                const curX = Math.max(-1.0, Math.min(1.0, (studio.staticCropOverrides[type].panX || 0) + deltaX));
+                const curY = Math.max(-1.0, Math.min(1.0, (studio.staticCropOverrides[type].panY || 0) + deltaY));
+
+                studio.staticCropOverrides[type].panX = curX;
+                studio.staticCropOverrides[type].panY = curY;
+
+                const rngPanX = document.getElementById('rngStaticPanX');
+                const rngPanY = document.getElementById('rngStaticPanY');
+                const lblPanX = document.getElementById('lblStaticPanXVal');
+                const lblPanY = document.getElementById('lblStaticPanYVal');
+
+                if (rngPanX) rngPanX.value = curX;
+                if (rngPanY) rngPanY.value = curY;
+                if (lblPanX) lblPanX.textContent = Math.round(curX * 100) + '%';
+                if (lblPanY) lblPanY.textContent = Math.round(curY * 100) + '%';
+
+                const quality = document.getElementById('selStaticQuality') ? document.getElementById('selStaticQuality').value : 'hd';
+                const bgMode = document.getElementById('selStaticBg') ? document.getElementById('selStaticBg').value : 'transparent';
+                const poseChoice = document.getElementById('selStaticPose') ? document.getElementById('selStaticPose').value : 'current';
+                const poseTime = (poseChoice === 'zero') ? 0 : (studio.anim.time || 0);
+
+                const spec = JD_STATIC_SPECS.find(s => s.type === type);
+                if (spec) {
+                    const cardCanvas = document.getElementById(`staticCanvas_${type}`);
+                    if (cardCanvas) renderStaticTexture(spec, cardCanvas, quality, bgMode, poseTime);
+                }
+
+                refreshActiveStaticEditorCanvas();
             });
 
             window.addEventListener('mouseup', () => {
@@ -7851,8 +7895,24 @@ ${defaultLayersCode}
                 const delta = e.deltaY < 0 ? 0.05 : -0.05;
                 const newZoom = Math.max(0.5, Math.min(2.5, (studio.staticCropOverrides[type].zoom || 1.0) + delta));
                 studio.staticCropOverrides[type].zoom = newZoom;
-                selectActiveStaticType(type);
-                onStaticCropSliderChanged('zoom', newZoom);
+
+                const rngZoom = document.getElementById('rngStaticZoom');
+                const lblZoom = document.getElementById('lblStaticZoomVal');
+                if (rngZoom) rngZoom.value = newZoom;
+                if (lblZoom) lblZoom.textContent = Math.round(newZoom * 100) + '%';
+
+                const quality = document.getElementById('selStaticQuality') ? document.getElementById('selStaticQuality').value : 'hd';
+                const bgMode = document.getElementById('selStaticBg') ? document.getElementById('selStaticBg').value : 'transparent';
+                const poseChoice = document.getElementById('selStaticPose') ? document.getElementById('selStaticPose').value : 'current';
+                const poseTime = (poseChoice === 'zero') ? 0 : (studio.anim.time || 0);
+
+                const spec = JD_STATIC_SPECS.find(s => s.type === type);
+                if (spec) {
+                    const cardCanvas = document.getElementById(`staticCanvas_${type}`);
+                    if (cardCanvas) renderStaticTexture(spec, cardCanvas, quality, bgMode, poseTime);
+                }
+
+                refreshActiveStaticEditorCanvas();
             }, { passive: false });
         }
 
