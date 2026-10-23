@@ -6226,7 +6226,7 @@ ${defaultLayersCode}
                     return (((512 + rmean) * r * r) >> 8) + 4 * g * g + (((767 - rmean) * b * b) >> 8);
                 }
 
-                function prunePalettePerceptual(pal, threshold = 8) {
+                function prunePalettePerceptual(pal, threshold = 11) {
                     const threshSq = threshold * threshold;
                     const result = [];
                     for (let i = 0; i < pal.length; i++) {
@@ -6248,10 +6248,13 @@ ${defaultLayersCode}
                     opaquePalette = [[200, 200, 200], [40, 40, 40]];
                 } else {
                     const sampleBuffer = new Uint8Array(samplePixels);
+                    if (shouldStabilize && window.gifenc && window.gifenc.prequantize) {
+                        window.gifenc.prequantize(sampleBuffer, { roundRGB: 3 });
+                    }
                     const maxColors = isTransparent ? 255 : 256;
                     const rawPalette = window.gifenc.quantize(sampleBuffer, maxColors, { format: 'rgb565' });
                     if (shouldStabilize) {
-                        opaquePalette = prunePalettePerceptual(rawPalette, 8);
+                        opaquePalette = prunePalettePerceptual(rawPalette, 11);
                     } else {
                         opaquePalette = rawPalette;
                     }
@@ -6273,6 +6276,9 @@ ${defaultLayersCode}
 
                     const imgData = offCtx.getImageData(0, 0, targetW, targetH);
                     const rgba = imgData.data;
+                    if (shouldStabilize && window.gifenc && window.gifenc.prequantize) {
+                        window.gifenc.prequantize(rgba, { roundRGB: 3 });
+                    }
 
                     let index;
                     if (isTransparent) {
