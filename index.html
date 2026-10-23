@@ -237,12 +237,14 @@
                 <span>Exportar Unity</span>
             </button>
 
-            <button onclick="openGifModal()" class="px-3 py-1.5 rounded bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 hover:from-purple-500 hover:via-pink-500 hover:to-rose-500 text-white text-[11px] font-semibold flex items-center gap-1.5 shadow transition" title="Exportar animación transparente (APNG / WebM / GIF)">
+            <button onclick="openGifModal()" class="px-3 py-1.5 rounded bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 hover:from-purple-500 hover:via-pink-500 hover:to-rose-500 text-white text-[11px] font-semibold flex items-center gap-1.5 shadow transition" title="Exportar animación como GIF transparente sin fondo">
                 <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
                     <rect x="2" y="2" width="20" height="20" rx="4"/>
-                    <path d="M7 9h2a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1H8v2h2"/><path d="M12 9v6"/><path d="M15 9h3v2h-2v1h2v2"/>
+                    <path d="M7 9h2a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1H8v2h2"/>
+                    <path d="M12 9v6"/>
+                    <path d="M15 9h3v2h-2v1h2v2"/>
                 </svg>
-                <span>Exportar Animación</span>
+                <span>Exportar GIF</span>
             </button>
         </div>
     </header>
@@ -943,9 +945,9 @@
                 <div class="flex items-center gap-3">
                     <span class="px-2 py-0.5 rounded bg-gradient-to-r from-pink-500/20 to-purple-500/20 border border-pink-500/40 text-pink-300 mono text-xs font-bold flex items-center gap-1.5">
                         <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="2" width="20" height="20" rx="4"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
-                        ANIMATION EXPORTER
+                        GIF PREVIEW EXPORTER
                     </span>
-                    <span class="text-sm font-bold text-white">Exportador de Animación Transparente (APNG • WebM • GIF)</span>
+                    <span class="text-sm font-bold text-white">Exportador de Animación GIF Transparente (Sin Fondo)</span>
                 </div>
                 <button onclick="closeGifModal()" class="w-7 h-7 rounded bg-[#1e2538] text-slate-300 hover:text-white flex items-center justify-center font-bold text-xs">X</button>
             </div>
@@ -953,22 +955,10 @@
             <div class="p-5 flex-1 overflow-y-auto grid grid-cols-1 md:grid-cols-12 gap-5">
                 <div class="md:col-span-5 flex flex-col gap-3.5 bg-[#0b0e16] p-4 rounded-xl border border-[#20273a]">
                     <div class="flex flex-col gap-1">
-                        <label class="text-[11px] font-semibold text-slate-300 flex items-center justify-between">
-                            <span>Formato de Exportación</span>
-                            <span class="text-[10px] text-pink-400 font-bold">✨ APNG Recomendado</span>
-                        </label>
-                        <select id="selExportFormat" onchange="onExportFormatChanged()" class="bg-[#121622] border border-pink-500/60 rounded px-2.5 py-1.5 text-xs text-pink-200 font-bold focus:outline-none focus:border-pink-400">
-                            <option value="apng" selected>APNG (.png) • Calidad Perfecta (Millones de colores, 0% parpadeo)</option>
-                            <option value="webm">WebM (.webm) • Video HD Transparente 60 FPS</option>
-                            <option value="gif">GIF (.gif) • Clásico Universal (256 colores)</option>
-                        </select>
-                    </div>
-
-                    <div class="flex flex-col gap-1">
                         <label class="text-[11px] font-semibold text-slate-300">Nombre del Avatar / Archivo</label>
                         <div class="flex items-center gap-1 bg-[#121622] border border-[#28324d] rounded px-2.5 py-1.5">
                             <input id="inpGifAvatarName" type="text" value="LiamAvatar" oninput="onAvatarNameChanged(this.value)" class="bg-transparent text-emerald-300 mono text-xs font-bold w-full focus:outline-none" placeholder="Nombre">
-                            <span id="lblAnimExt" class="text-[11px] text-pink-400 mono font-bold">.png</span>
+                            <span id="lblAnimExt" class="text-[11px] text-pink-400 mono font-bold">.gif</span>
                         </div>
                     </div>
 
@@ -987,7 +977,6 @@
                                 <option value="360">360 px (Ligero / Redes)</option>
                                 <option value="480" selected>480 px (Recomendado)</option>
                                 <option value="640">640 px (Alta Calidad HD)</option>
-                                <option value="960">960 px (Ultra HD)</option>
                             </select>
                         </div>
                     </div>
@@ -999,8 +988,6 @@
                                 <option value="15">15 FPS (Ligero)</option>
                                 <option value="20">20 FPS (Estándar)</option>
                                 <option value="24" selected>24 FPS (Cinemático)</option>
-                                <option value="30">30 FPS (Fluido)</option>
-                                <option value="60">60 FPS (Máxima Suavidad)</option>
                             </select>
                         </div>
                         <div class="flex flex-col gap-1">
@@ -1017,12 +1004,10 @@
                             <input type="checkbox" id="chkGifTransparent" checked class="rounded bg-[#121622] border-[#28324d] text-pink-500 focus:ring-0">
                             <span class="text-xs text-slate-200 font-medium">Fondo Transparente (Sin fondo)</span>
                         </label>
-                        <div id="rowGifStabilize" class="hidden">
-                            <label class="flex items-center gap-2 cursor-pointer" title="Fusiona micro-variaciones de tonos oscuros y ropa para que los colores no parpadeen">
-                                <input type="checkbox" id="chkGifStabilizeColors" checked class="rounded bg-[#121622] border-[#28324d] text-pink-500 focus:ring-0">
-                                <span class="text-xs text-slate-200 font-medium">Estabilizar Colores GIF (Anti-parpadeo)</span>
-                            </label>
-                        </div>
+                        <label class="flex items-center gap-2 cursor-pointer" title="Fusiona micro-variaciones de tonos oscuros y ropa para que los colores no parpadeen">
+                            <input type="checkbox" id="chkGifStabilizeColors" checked class="rounded bg-[#121622] border-[#28324d] text-pink-500 focus:ring-0">
+                            <span class="text-xs text-slate-200 font-medium">Estabilizar Colores (Anti-parpadeo)</span>
+                        </label>
                         <label class="flex items-center gap-2 cursor-pointer">
                             <input type="checkbox" id="chkGifLoopForever" checked class="rounded bg-[#121622] border-[#28324d] text-pink-500 focus:ring-0">
                             <span class="text-xs text-slate-200 font-medium">Bucle Infinito (Loop continuo)</span>
@@ -1032,7 +1017,7 @@
                     <div class="mt-2 flex flex-col gap-2">
                         <button id="btnGenerateGif" onclick="generateAnimation()" class="w-full py-2.5 rounded-lg bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 hover:from-purple-500 hover:via-pink-500 hover:to-rose-500 text-white font-bold text-xs shadow-lg transition flex items-center justify-center gap-2">
                             <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
-                            <span id="lblBtnGenerateText">✨ Generar Animación (APNG)</span>
+                            <span id="lblBtnGenerateText">✨ Generar GIF Animado</span>
                         </button>
                     </div>
 
@@ -1054,11 +1039,10 @@
                             <div class="w-12 h-12 rounded-full bg-[#141926] border border-[#232b42] flex items-center justify-center text-pink-400/60">
                                 <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="4"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
                             </div>
-                            <span class="text-xs font-medium text-slate-400">Vista previa de la animación transparente</span>
-                            <span class="text-[10px] text-slate-500 max-w-xs text-center">Configura el formato deseado (APNG, WebM o GIF) y presiona "Generar Animación" para ver el resultado sin fondo.</span>
+                            <span class="text-xs font-medium text-slate-400">Vista previa del GIF transparente</span>
+                            <span class="text-[10px] text-slate-500 max-w-xs text-center">Presiona "Generar GIF Animado" para procesar la animación sin fondo lista para compartir.</span>
                         </div>
-                        <img id="gifResultImg" class="hidden max-h-[340px] max-w-full object-contain filter drop-shadow-xl" alt="Preview Animation">
-                        <video id="animResultVideo" class="hidden max-h-[340px] max-w-full object-contain filter drop-shadow-xl" autoplay loop muted playsinline controls></video>
+                        <img id="gifResultImg" class="hidden max-h-[340px] max-w-full object-contain filter drop-shadow-xl" alt="Preview GIF">
                     </div>
 
                     <div id="gifResultActions" class="hidden p-3 bg-[#0d101a] border border-[#22293d] rounded-xl flex items-center justify-between gap-3 flex-wrap">
@@ -1069,15 +1053,15 @@
                         <div class="flex items-center gap-2 flex-wrap">
                             <button id="btnDownloadGif" onclick="downloadCurrentAnimation()" class="px-3.5 py-2 rounded-lg bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-bold text-xs flex items-center gap-1.5 shadow transition">
                                 <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                                <span id="lblBtnDownloadText">Descargar .PNG (APNG)</span>
+                                <span id="lblBtnDownloadText">Descargar .GIF</span>
                             </button>
-                            <button onclick="openAnimationInNewTab()" class="px-3 py-2 rounded-lg bg-sky-600/30 hover:bg-sky-600/40 border border-sky-500/40 text-sky-200 text-xs font-semibold flex items-center gap-1.5 transition" title="Abrir animación en una pestaña nueva para guardar">
+                            <button onclick="openAnimationInNewTab()" class="px-3 py-2 rounded-lg bg-sky-600/30 hover:bg-sky-600/40 border border-sky-500/40 text-sky-200 text-xs font-semibold flex items-center gap-1.5 transition" title="Abrir GIF en una pestaña nueva para guardar">
                                 <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
                                 <span>Abrir en Pestaña</span>
                             </button>
                             <button id="btnCopyGif" onclick="copyAnimationToClipboard()" class="px-3 py-2 rounded-lg bg-[#182032] hover:bg-[#232c45] border border-[#2b3754] text-slate-200 text-xs font-semibold flex items-center gap-1.5 transition">
                                 <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                                <span>Copiar</span>
+                                <span>Copiar GIF</span>
                             </button>
                         </div>
                     </div>
@@ -5994,162 +5978,7 @@ ${defaultLayersCode}
             a.click();
         }
 
-        function onExportFormatChanged() {
-            const sel = document.getElementById('selExportFormat');
-            const fmt = sel ? sel.value : 'apng';
-            const extSpan = document.getElementById('lblAnimExt');
-            const rowStab = document.getElementById('rowGifStabilize');
-            const btnText = document.getElementById('lblBtnGenerateText');
-            const btnDownloadText = document.getElementById('lblBtnDownloadText');
-
-            const extMap = { apng: '.png', webm: '.webm', gif: '.gif' };
-            const ext = extMap[fmt] || '.png';
-            if (extSpan) extSpan.textContent = ext;
-
-            if (rowStab) {
-                if (fmt === 'gif') rowStab.classList.remove('hidden');
-                else rowStab.classList.add('hidden');
-            }
-
-            if (btnText) {
-                if (fmt === 'apng') btnText.textContent = "✨ Generar Animación (APNG)";
-                else if (fmt === 'webm') btnText.textContent = "✨ Generar Video (WebM)";
-                else btnText.textContent = "✨ Generar GIF Animado";
-            }
-
-            if (btnDownloadText) {
-                if (fmt === 'apng') btnDownloadText.textContent = "Descargar .PNG (APNG)";
-                else if (fmt === 'webm') btnDownloadText.textContent = "Descargar .WebM";
-                else btnDownloadText.textContent = "Descargar .GIF";
-            }
-        }
-
-        // APNG (Animated PNG) Encoding Engine
-        const apngCrcTable = new Uint32Array(256);
-        for (let n = 0; n < 256; n++) {
-            let c = n;
-            for (let k = 0; k < 8; k++) {
-                if (c & 1) c = 0xedb88320 ^ (c >>> 1);
-                else c = c >>> 1;
-            }
-            apngCrcTable[n] = c;
-        }
-
-        function apngCrc32(buf, start = 0, len = buf.length) {
-            let c = 0xffffffff;
-            const end = start + len;
-            for (let i = start; i < end; i++) {
-                c = apngCrcTable[(c ^ buf[i]) & 0xff] ^ (c >>> 8);
-            }
-            return (c ^ 0xffffffff) >>> 0;
-        }
-
-        function makeApngChunk(typeStr, data) {
-            const len = data.length;
-            const chunk = new Uint8Array(12 + len);
-            const view = new DataView(chunk.buffer);
-            view.setUint32(0, len);
-            for (let i = 0; i < 4; i++) {
-                chunk[4 + i] = typeStr.charCodeAt(i);
-            }
-            chunk.set(data, 8);
-            const crc = apngCrc32(chunk, 4, 4 + len);
-            view.setUint32(8 + len, crc);
-            return chunk;
-        }
-
-        function parsePngChunks(pngBytes) {
-            const view = new DataView(pngBytes.buffer, pngBytes.byteOffset, pngBytes.byteLength);
-            let offset = 8;
-            let ihdrChunk = null;
-            const idatParts = [];
-
-            while (offset < pngBytes.length) {
-                const length = view.getUint32(offset);
-                const typeStr = String.fromCharCode(
-                    pngBytes[offset + 4],
-                    pngBytes[offset + 5],
-                    pngBytes[offset + 6],
-                    pngBytes[offset + 7]
-                );
-                const data = pngBytes.subarray(offset + 8, offset + 8 + length);
-                if (typeStr === 'IHDR') {
-                    ihdrChunk = pngBytes.subarray(offset, offset + 12 + length);
-                } else if (typeStr === 'IDAT') {
-                    idatParts.push(data);
-                } else if (typeStr === 'IEND') {
-                    break;
-                }
-                offset += 12 + length;
-            }
-
-            let totalIdatLen = 0;
-            for (let i = 0; i < idatParts.length; i++) totalIdatLen += idatParts[i].length;
-            const mergedIdat = new Uint8Array(totalIdatLen);
-            let cur = 0;
-            for (let i = 0; i < idatParts.length; i++) {
-                mergedIdat.set(idatParts[i], cur);
-                cur += idatParts[i].length;
-            }
-            return { ihdrChunk, idatData: mergedIdat };
-        }
-
-        function buildApng(framePngBytesList, width, height, fps = 20, loop = true) {
-            const chunks = [];
-            chunks.push(new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10]));
-
-            const firstParsed = parsePngChunks(framePngBytesList[0]);
-            chunks.push(firstParsed.ihdrChunk);
-
-            const acTLData = new Uint8Array(8);
-            const acTLView = new DataView(acTLData.buffer);
-            acTLView.setUint32(0, framePngBytesList.length);
-            acTLView.setUint32(4, loop ? 0 : 1);
-            chunks.push(makeApngChunk('acTL', acTLData));
-
-            let seq = 0;
-            const delayNum = Math.round(1000 / fps);
-            const delayDen = 1000;
-
-            for (let f = 0; f < framePngBytesList.length; f++) {
-                const parsed = (f === 0) ? firstParsed : parsePngChunks(framePngBytesList[f]);
-
-                const fcTLData = new Uint8Array(26);
-                const fcTLView = new DataView(fcTLData.buffer);
-                fcTLView.setUint32(0, seq++);
-                fcTLView.setUint32(4, width);
-                fcTLView.setUint32(8, height);
-                fcTLView.setUint32(12, 0);
-                fcTLView.setUint32(16, 0);
-                fcTLView.setUint16(20, delayNum);
-                fcTLView.setUint16(22, delayDen);
-                fcTLView.setUint8(24, 1);
-                fcTLView.setUint8(25, 0);
-                chunks.push(makeApngChunk('fcTL', fcTLData));
-
-                if (f === 0) {
-                    chunks.push(makeApngChunk('IDAT', parsed.idatData));
-                } else {
-                    const fdATData = new Uint8Array(4 + parsed.idatData.length);
-                    const fdATView = new DataView(fdATData.buffer);
-                    fdATView.setUint32(0, seq++);
-                    fdATData.set(parsed.idatData, 4);
-                    chunks.push(makeApngChunk('fdAT', fdATData));
-                }
-            }
-
-            chunks.push(makeApngChunk('IEND', new Uint8Array(0)));
-
-            let totalLen = 0;
-            for (let i = 0; i < chunks.length; i++) totalLen += chunks[i].length;
-            const result = new Uint8Array(totalLen);
-            let cur = 0;
-            for (let i = 0; i < chunks.length; i++) {
-                result.set(chunks[i], cur);
-                cur += chunks[i].length;
-            }
-            return result;
-        }
+        function onExportFormatChanged() {} // Compatibilidad retroactiva
 
         function openGifModal() {
             if (!studio.parts || studio.parts.length === 0) {
@@ -6168,8 +5997,6 @@ ${defaultLayersCode}
 
             const lblDur = document.getElementById('lblGifDuration');
             if (lblDur) lblDur.textContent = (studio.anim.duration || 2.0).toFixed(2) + 's';
-
-            onExportFormatChanged();
 
             modal.classList.remove('hidden');
             modal.classList.add('flex');
@@ -6289,27 +6116,26 @@ ${defaultLayersCode}
             ctx.restore();
         }
 
-        function finalizeAnimationOutput(blob, format, targetW, targetH, totalFrames, fps, dur) {
-            studio.currentAnimBlob = blob;
+        function finalizeGifOutput(blob, targetW, targetH, totalFrames, fps, dur) {
             studio.currentGifBlob = blob;
-            studio.currentAnimFormat = format;
+            studio.currentAnimBlob = blob;
+            studio.currentAnimFormat = 'gif';
 
-            if (studio.currentAnimUrl) {
-                URL.revokeObjectURL(studio.currentAnimUrl);
+            if (studio.currentGifUrl) {
+                URL.revokeObjectURL(studio.currentGifUrl);
             }
             const url = URL.createObjectURL(blob);
-            studio.currentAnimUrl = url;
             studio.currentGifUrl = url;
+            studio.currentAnimUrl = url;
 
             const reader = new FileReader();
             reader.onloadend = () => {
-                studio.currentAnimDataUrl = reader.result;
                 studio.currentGifDataUrl = reader.result;
+                studio.currentAnimDataUrl = reader.result;
             };
             reader.readAsDataURL(blob);
 
             const resultImg = document.getElementById('gifResultImg');
-            const resultVideo = document.getElementById('animResultVideo');
             const placeholder = document.getElementById('gifPlaceholder');
             const resultActions = document.getElementById('gifResultActions');
             const sandboxNotice = document.getElementById('gifSandboxNotice');
@@ -6318,19 +6144,9 @@ ${defaultLayersCode}
             if (resultActions) resultActions.classList.remove('hidden');
             if (sandboxNotice) sandboxNotice.classList.remove('hidden');
 
-            if (format === 'webm') {
-                if (resultImg) resultImg.classList.add('hidden');
-                if (resultVideo) {
-                    resultVideo.src = url;
-                    resultVideo.classList.remove('hidden');
-                    resultVideo.play().catch(() => {});
-                }
-            } else {
-                if (resultVideo) resultVideo.classList.add('hidden');
-                if (resultImg) {
-                    resultImg.src = url;
-                    resultImg.classList.remove('hidden');
-                }
+            if (resultImg) {
+                resultImg.src = url;
+                resultImg.classList.remove('hidden');
             }
 
             const sizeKb = (blob.size / 1024).toFixed(1);
@@ -6342,13 +6158,37 @@ ${defaultLayersCode}
             if (infoDetails) infoDetails.textContent = targetW + 'x' + targetH + ' px • ' + totalFrames + ' frames @ ' + fps + ' FPS (' + dur.toFixed(2) + 's)';
         }
 
+        function colorDistSq(c1, c2) {
+            const rmean = (c1[0] + c2[0]) >> 1;
+            const r = c1[0] - c2[0];
+            const g = c1[1] - c2[1];
+            const b = c1[2] - c2[2];
+            return (((512 + rmean) * r * r) >> 8) + 4 * g * g + (((767 - rmean) * b * b) >> 8);
+        }
+
+        function prunePalettePerceptual(pal, threshold = 8) {
+            const threshSq = threshold * threshold;
+            const result = [];
+            for (let i = 0; i < pal.length; i++) {
+                const color = pal[i];
+                let exists = false;
+                for (let j = 0; j < result.length; j++) {
+                    if (colorDistSq(result[j], color) < threshSq) {
+                        exists = true;
+                        break;
+                    }
+                }
+                if (!exists) result.push(color);
+            }
+            return result;
+        }
+
         async function generateAnimation() {
             if (!studio.parts || studio.parts.length === 0) {
                 alert("Por favor carga o crea un avatar primero.");
                 return;
             }
 
-            const format = document.getElementById('selExportFormat') ? document.getElementById('selExportFormat').value : 'apng';
             const cropMode = document.getElementById('selGifCropMode').value;
             const targetH = parseInt(document.getElementById('selGifHeight').value, 10) || 480;
             const fps = parseInt(document.getElementById('selGifFps').value, 10) || 24;
@@ -6364,7 +6204,6 @@ ${defaultLayersCode}
             const progressText = document.getElementById('gifProgressText');
             const btnGen = document.getElementById('btnGenerateGif');
             const resultImg = document.getElementById('gifResultImg');
-            const resultVideo = document.getElementById('animResultVideo');
             const placeholder = document.getElementById('gifPlaceholder');
             const resultActions = document.getElementById('gifResultActions');
 
@@ -6372,7 +6211,6 @@ ${defaultLayersCode}
             btnGen.disabled = true;
             btnGen.classList.add('opacity-50', 'cursor-not-allowed');
             if (resultImg) resultImg.classList.add('hidden');
-            if (resultVideo) resultVideo.classList.add('hidden');
             if (resultActions) resultActions.classList.add('hidden');
             if (placeholder) placeholder.classList.remove('hidden');
 
@@ -6406,252 +6244,127 @@ ${defaultLayersCode}
             studio.anim.gustVel = 0;
 
             try {
-                if (format === 'apng') {
-                    // APNG (Animated PNG) - 32-bit TrueColor + 8-bit Alpha
-                    progressText.textContent = "Preparando renderizado APNG en alta fidelidad...";
-                    progressPct.textContent = "0%";
-                    progressBar.style.width = "0%";
-                    await new Promise(r => setTimeout(r, 0));
-
-                    const frameBytesList = [];
-                    for (let f = 0; f < totalFrames; f++) {
-                        if (studio.gifCancel) break;
-
-                        const t = (f / totalFrames) * dur;
-                        renderAnimationSnapshot(offCtx, targetW, targetH, cropBox, isTransparent, t);
-
-                        const blob = await new Promise(res => offCanvas.toBlob(res, 'image/png'));
-                        const ab = await blob.arrayBuffer();
-                        frameBytesList.push(new Uint8Array(ab));
-
-                        const pct = Math.round(((f + 1) / totalFrames) * 90);
-                        progressBar.style.width = pct + '%';
-                        progressPct.textContent = pct + '%';
-                        progressText.textContent = "Renderizando fotograma " + (f + 1) + " de " + totalFrames + " (" + pct + "%)...";
-
-                        await new Promise(r => setTimeout(r, 0));
-                    }
-
-                    if (studio.gifCancel) return;
-
-                    progressText.textContent = "Empaquetando APNG de 32-bit con transparencia suave...";
-                    await new Promise(r => setTimeout(r, 0));
-
-                    const apngBytes = buildApng(frameBytesList, targetW, targetH, fps, isLoop);
-                    const apngBlob = new Blob([apngBytes], { type: 'image/png' });
-
-                    finalizeAnimationOutput(apngBlob, 'apng', targetW, targetH, totalFrames, fps, dur);
-
-                } else if (format === 'webm') {
-                    // WebM - Modern HD Video with Alpha
-                    if (typeof MediaRecorder === 'undefined') {
-                        throw new Error("Tu navegador no soporta MediaRecorder para video WebM. Por favor selecciona APNG o GIF.");
-                    }
-
-                    let mimeType = '';
-                    const types = [
-                        'video/webm;codecs=vp9,opus',
-                        'video/webm;codecs=vp9',
-                        'video/webm;codecs=vp8,opus',
-                        'video/webm;codecs=vp8',
-                        'video/webm'
-                    ];
-                    for (const t of types) {
-                        if (MediaRecorder.isTypeSupported(t)) {
-                            mimeType = t;
-                            break;
-                        }
-                    }
-                    if (!mimeType) mimeType = 'video/webm';
-
-                    const stream = offCanvas.captureStream(fps);
-                    const recorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: 10000000 });
-                    const chunks = [];
-                    recorder.ondataavailable = e => { if (e.data && e.data.size > 0) chunks.push(e.data); };
-
-                    const stopPromise = new Promise((resolve, reject) => {
-                        recorder.onstop = () => resolve(new Blob(chunks, { type: mimeType }));
-                        recorder.onerror = reject;
-                    });
-
-                    recorder.start();
-
-                    for (let f = 0; f < totalFrames; f++) {
-                        if (studio.gifCancel) {
-                            recorder.stop();
-                            return;
-                        }
-
-                        const t = (f / totalFrames) * dur;
-                        renderAnimationSnapshot(offCtx, targetW, targetH, cropBox, isTransparent, t);
-
-                        const pct = Math.round(((f + 1) / totalFrames) * 90);
-                        progressBar.style.width = pct + '%';
-                        progressPct.textContent = pct + '%';
-                        progressText.textContent = "Grabando video WebM " + (f + 1) + " de " + totalFrames + "...";
-
-                        await new Promise(r => setTimeout(r, frameDelayMs));
-                    }
-
-                    recorder.stop();
-                    progressText.textContent = "Finalizando codificación WebM...";
-                    const webmBlob = await stopPromise;
-
-                    finalizeAnimationOutput(webmBlob, 'webm', targetW, targetH, totalFrames, fps, dur);
-
-                } else {
-                    // GIF - 256 colors with calibrated palette stabilization
-                    if (!window.gifenc || !window.gifenc.GIFEncoder) {
-                        throw new Error("El codificador de GIF no está disponible.");
-                    }
-
-                    progressText.textContent = "Analizando paleta de colores estabilizada...";
-                    progressPct.textContent = "5%";
-                    progressBar.style.width = "5%";
-                    await new Promise(r => setTimeout(r, 0));
-
-                    const samplePixels = [];
-
-                    for (let pIdx = 0; pIdx < studio.parts.length; pIdx++) {
-                        const part = studio.parts[pIdx];
-                        if (!part.visible || !part.bakedCanvas) continue;
-                        try {
-                            const pctx = part.bakedCanvas.getContext('2d');
-                            const pData = pctx.getImageData(0, 0, part.bakedCanvas.width, part.bakedCanvas.height).data;
-                            const step = (pData.length / 4 > 60000) ? 8 : 4;
-                            for (let p = 0; p < pData.length; p += step * 4) {
-                                if (!isTransparent || pData[p + 3] >= 64) {
-                                    samplePixels.push(pData[p], pData[p + 1], pData[p + 2], 255);
-                                }
-                            }
-                        } catch (e) {}
-                    }
-
-                    const sampleCount = Math.min(8, totalFrames);
-                    const sampleStep = Math.max(1, Math.floor(totalFrames / sampleCount));
-
-                    for (let s = 0; s < totalFrames; s += sampleStep) {
-                        renderAnimationSnapshot(offCtx, targetW, targetH, cropBox, isTransparent, (s / totalFrames) * dur);
-                        const imgData = offCtx.getImageData(0, 0, targetW, targetH);
-                        const data = imgData.data;
-                        const pixelStep = (data.length / 4 > 60000) ? 8 : 4;
-                        for (let p = 0; p < data.length; p += pixelStep * 4) {
-                            const a = data[p + 3];
-                            if (!isTransparent || a >= 64) {
-                                samplePixels.push(data[p], data[p + 1], data[p + 2], 255);
-                            }
-                        }
-                    }
-
-                    function colorDistSq(c1, c2) {
-                        const rmean = (c1[0] + c2[0]) >> 1;
-                        const r = c1[0] - c2[0];
-                        const g = c1[1] - c2[1];
-                        const b = c1[2] - c2[2];
-                        return (((512 + rmean) * r * r) >> 8) + 4 * g * g + (((767 - rmean) * b * b) >> 8);
-                    }
-
-                    function prunePalettePerceptual(pal, threshold = 11) {
-                        const threshSq = threshold * threshold;
-                        const result = [];
-                        for (let i = 0; i < pal.length; i++) {
-                            const color = pal[i];
-                            let exists = false;
-                            for (let j = 0; j < result.length; j++) {
-                                if (colorDistSq(result[j], color) < threshSq) {
-                                    exists = true;
-                                    break;
-                                }
-                            }
-                            if (!exists) result.push(color);
-                        }
-                        return result;
-                    }
-
-                    let masterPalette, opaquePalette;
-                    if (samplePixels.length === 0) {
-                        opaquePalette = [[200, 200, 200], [40, 40, 40]];
-                    } else {
-                        const sampleBuffer = new Uint8Array(samplePixels);
-                        if (shouldStabilize && window.gifenc && window.gifenc.prequantize) {
-                            window.gifenc.prequantize(sampleBuffer, { roundRGB: 3 });
-                        }
-                        const maxColors = isTransparent ? 255 : 256;
-                        const rawPalette = window.gifenc.quantize(sampleBuffer, maxColors, { format: 'rgb565' });
-                        if (shouldStabilize) {
-                            opaquePalette = prunePalettePerceptual(rawPalette, 11);
-                        } else {
-                            opaquePalette = rawPalette;
-                        }
-                    }
-
-                    if (isTransparent) {
-                        masterPalette = [[0, 0, 0], ...opaquePalette];
-                    } else {
-                        masterPalette = opaquePalette;
-                    }
-
-                    const gif = window.gifenc.GIFEncoder();
-
-                    for (let f = 0; f < totalFrames; f++) {
-                        if (studio.gifCancel) break;
-
-                        const t = (f / totalFrames) * dur;
-                        renderAnimationSnapshot(offCtx, targetW, targetH, cropBox, isTransparent, t);
-
-                        const imgData = offCtx.getImageData(0, 0, targetW, targetH);
-                        const rgba = imgData.data;
-                        if (shouldStabilize && window.gifenc && window.gifenc.prequantize) {
-                            window.gifenc.prequantize(rgba, { roundRGB: 3 });
-                        }
-
-                        let index;
-                        if (isTransparent) {
-                            const mappedOpaque = window.gifenc.applyPalette(rgba, opaquePalette, 'rgb565');
-                            index = new Uint8Array(targetW * targetH);
-                            for (let i = 0; i < targetW * targetH; i++) {
-                                if (rgba[i * 4 + 3] < 64) {
-                                    index[i] = 0;
-                                } else {
-                                    index[i] = mappedOpaque[i] + 1;
-                                }
-                            }
-                        } else {
-                            index = window.gifenc.applyPalette(rgba, masterPalette, 'rgb565');
-                        }
-
-                        gif.writeFrame(index, targetW, targetH, {
-                            palette: (f === 0) ? masterPalette : null,
-                            delay: frameDelayMs,
-                            transparent: isTransparent,
-                            transparentIndex: 0,
-                            dispose: isTransparent ? 2 : 1,
-                            repeat: isLoop ? 0 : -1
-                        });
-
-                        const pct = Math.round(10 + ((f + 1) / totalFrames) * 90);
-                        progressBar.style.width = pct + '%';
-                        progressPct.textContent = pct + '%';
-                        progressText.textContent = "Renderizando fotograma " + (f + 1) + " de " + totalFrames + " (" + pct + "%)...";
-
-                        await new Promise(r => setTimeout(r, 0));
-                    }
-
-                    if (studio.gifCancel) return;
-
-                    progressText.textContent = "Finalizando compresión GIF...";
-                    await new Promise(r => setTimeout(r, 0));
-
-                    gif.finish();
-                    const bytes = gif.bytes();
-                    const gifBlob = new Blob([bytes], { type: 'image/gif' });
-
-                    finalizeAnimationOutput(gifBlob, 'gif', targetW, targetH, totalFrames, fps, dur);
+                if (!window.gifenc || !window.gifenc.GIFEncoder) {
+                    throw new Error("El codificador de GIF no está disponible.");
                 }
 
+                progressText.textContent = "Analizando paleta de colores del avatar...";
+                progressPct.textContent = "5%";
+                progressBar.style.width = "5%";
+                await new Promise(r => setTimeout(r, 0));
+
+                const samplePixels = [];
+
+                // Muestrear texturas horneadas de las partes
+                for (let pIdx = 0; pIdx < studio.parts.length; pIdx++) {
+                    const part = studio.parts[pIdx];
+                    if (!part.visible || !part.bakedCanvas) continue;
+                    try {
+                        const pctx = part.bakedCanvas.getContext('2d');
+                        const pData = pctx.getImageData(0, 0, part.bakedCanvas.width, part.bakedCanvas.height).data;
+                        const step = (pData.length / 4 > 60000) ? 8 : 4;
+                        for (let p = 0; p < pData.length; p += step * 4) {
+                            if (!isTransparent || pData[p + 3] >= 64) {
+                                samplePixels.push(pData[p], pData[p + 1], pData[p + 2], 255);
+                            }
+                        }
+                    } catch (e) {}
+                }
+
+                // Muestrear fotogramas representativos de la animación
+                const sampleCount = Math.min(8, totalFrames);
+                const sampleStep = Math.max(1, Math.floor(totalFrames / sampleCount));
+
+                for (let s = 0; s < totalFrames; s += sampleStep) {
+                    renderAnimationSnapshot(offCtx, targetW, targetH, cropBox, isTransparent, (s / totalFrames) * dur);
+                    const imgData = offCtx.getImageData(0, 0, targetW, targetH);
+                    const data = imgData.data;
+                    const pixelStep = (data.length / 4 > 60000) ? 8 : 4;
+                    for (let p = 0; p < data.length; p += pixelStep * 4) {
+                        const a = data[p + 3];
+                        if (!isTransparent || a >= 64) {
+                            samplePixels.push(data[p], data[p + 1], data[p + 2], 255);
+                        }
+                    }
+                }
+
+                let masterPalette, opaquePalette;
+                if (samplePixels.length === 0) {
+                    opaquePalette = [[200, 200, 200], [40, 40, 40]];
+                } else {
+                    const sampleBuffer = new Uint8Array(samplePixels);
+                    const maxColors = isTransparent ? 255 : 256;
+                    const rawPalette = window.gifenc.quantize(sampleBuffer, maxColors, { format: 'rgb565' });
+                    if (shouldStabilize) {
+                        opaquePalette = prunePalettePerceptual(rawPalette, 8);
+                    } else {
+                        opaquePalette = rawPalette;
+                    }
+                }
+
+                if (isTransparent) {
+                    masterPalette = [[0, 0, 0], ...opaquePalette];
+                } else {
+                    masterPalette = opaquePalette;
+                }
+
+                const gif = window.gifenc.GIFEncoder();
+
+                for (let f = 0; f < totalFrames; f++) {
+                    if (studio.gifCancel) break;
+
+                    const t = (f / totalFrames) * dur;
+                    renderAnimationSnapshot(offCtx, targetW, targetH, cropBox, isTransparent, t);
+
+                    const imgData = offCtx.getImageData(0, 0, targetW, targetH);
+                    const rgba = imgData.data;
+
+                    let index;
+                    if (isTransparent) {
+                        const mappedOpaque = window.gifenc.applyPalette(rgba, opaquePalette, 'rgb565');
+                        index = new Uint8Array(targetW * targetH);
+                        for (let i = 0; i < targetW * targetH; i++) {
+                            if (rgba[i * 4 + 3] < 64) {
+                                index[i] = 0;
+                            } else {
+                                index[i] = mappedOpaque[i] + 1;
+                            }
+                        }
+                    } else {
+                        index = window.gifenc.applyPalette(rgba, masterPalette, 'rgb565');
+                    }
+
+                    gif.writeFrame(index, targetW, targetH, {
+                        palette: (f === 0) ? masterPalette : null,
+                        delay: frameDelayMs,
+                        transparent: isTransparent,
+                        transparentIndex: 0,
+                        dispose: isTransparent ? 2 : 1,
+                        repeat: isLoop ? 0 : -1
+                    });
+
+                    const pct = Math.round(10 + ((f + 1) / totalFrames) * 90);
+                    progressBar.style.width = pct + '%';
+                    progressPct.textContent = pct + '%';
+                    progressText.textContent = "Renderizando fotograma " + (f + 1) + " de " + totalFrames + " (" + pct + "%)...";
+
+                    await new Promise(r => setTimeout(r, 0));
+                }
+
+                if (studio.gifCancel) return;
+
+                progressText.textContent = "Finalizando compresión GIF...";
+                await new Promise(r => setTimeout(r, 0));
+
+                gif.finish();
+                const bytes = gif.bytes();
+                const gifBlob = new Blob([bytes], { type: 'image/gif' });
+
+                finalizeGifOutput(gifBlob, targetW, targetH, totalFrames, fps, dur);
+
             } catch (err) {
-                console.error("Error generating animation:", err);
-                alert("Ocurrió un error al generar la animación: " + (err.message || err));
+                console.error("Error generating GIF:", err);
+                alert("Ocurrió un error al generar el GIF: " + (err.message || err));
             } finally {
                 studio.anim.time = savedTime;
                 studio.anim.gust = savedGust;
@@ -6666,17 +6379,14 @@ ${defaultLayersCode}
         }
         window.generateGifAnimation = generateAnimation;
 
-        function downloadCurrentAnimation() {
-            if (!studio.currentAnimBlob && !studio.currentGifBlob) {
-                alert("Primero genera la animación para poder descargarla.");
+        function downloadCurrentGif() {
+            if (!studio.currentGifBlob) {
+                alert("Primero genera el GIF para poder descargarlo.");
                 return;
             }
-            const blob = studio.currentAnimBlob || studio.currentGifBlob;
-            const format = studio.currentAnimFormat || 'gif';
-            const ext = (format === 'apng') ? 'png' : (format === 'webm' ? 'webm' : 'gif');
             const avatarName = getSanitizedAvatarName();
-            const fileName = avatarName + '_anim.' + ext;
-            const targetUrl = studio.currentAnimDataUrl || studio.currentAnimUrl || studio.currentGifDataUrl || studio.currentGifUrl;
+            const fileName = avatarName + '_anim.gif';
+            const targetUrl = studio.currentGifDataUrl || studio.currentGifUrl;
 
             try {
                 const a = document.createElement('a');
@@ -6696,41 +6406,34 @@ ${defaultLayersCode}
             const notice = document.getElementById('gifSandboxNotice');
             if (notice) notice.classList.remove('hidden');
         }
-        window.downloadCurrentGif = downloadCurrentAnimation;
+        window.downloadCurrentAnimation = downloadCurrentGif;
 
-        function openAnimationInNewTab() {
-            if (!studio.currentAnimBlob && !studio.currentGifBlob) {
-                alert("Primero genera la animación para poder abrirla.");
+        function openGifInNewTab() {
+            if (!studio.currentGifBlob) {
+                alert("Primero genera el GIF para poder abrirlo.");
                 return;
             }
-            const targetUrl = studio.currentAnimDataUrl || studio.currentAnimUrl || studio.currentGifDataUrl || studio.currentGifUrl;
-            const format = studio.currentAnimFormat || 'gif';
-            const ext = (format === 'apng') ? 'png' : (format === 'webm' ? 'webm' : 'gif');
+            const targetUrl = studio.currentGifDataUrl || studio.currentGifUrl;
             const avatarName = getSanitizedAvatarName();
-            const fileName = avatarName + '_anim.' + ext;
+            const fileName = avatarName + '_anim.gif';
             const win = window.open();
             if (win) {
-                const isVideo = (format === 'webm');
-                const mediaTag = isVideo
-                    ? '<video src="' + targetUrl + '" autoplay loop muted playsinline controls style="max-height:75vh;max-width:90vw;object-fit:contain;filter:drop-shadow(0 10px 25px rgba(0,0,0,0.6));border-radius:8px;"></video>'
-                    : '<img src="' + targetUrl + '" style="max-height:75vh;max-width:90vw;object-fit:contain;filter:drop-shadow(0 10px 25px rgba(0,0,0,0.6));border-radius:8px;" alt="' + avatarName + '">';
-
                 win.document.write(`
                     <!DOCTYPE html>
                     <html lang="es">
                     <head>
                         <meta charset="UTF-8">
-                        <title>${avatarName} - Preview ${ext.toUpperCase()}</title>
+                        <title>${avatarName} - Preview GIF</title>
                         <meta name="viewport" content="width=device-width, initial-scale=1">
                     </head>
                     <body style="margin:0;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#0c0f18;background-image:linear-gradient(45deg,#151b29 25%,transparent 25%),linear-gradient(-45deg,#151b29 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#151b29 75%),linear-gradient(-45deg,transparent 75%,#151b29 75%);background-size:20px 20px;font-family:sans-serif;color:#e2e8f0;padding:20px;box-sizing:border-box;">
-                        ${mediaTag}
+                        <img src="${targetUrl}" style="max-height:75vh;max-width:90vw;object-fit:contain;filter:drop-shadow(0 10px 25px rgba(0,0,0,0.6));border-radius:8px;" alt="${avatarName}">
                         <div style="margin-top:20px;display:flex;flex-direction:column;align-items:center;gap:10px;">
                             <a href="${targetUrl}" download="${fileName}" style="display:inline-block;padding:10px 22px;background:linear-gradient(135deg,#db2777,#9333ea);color:white;text-decoration:none;border-radius:8px;font-weight:bold;font-size:14px;box-shadow:0 4px 14px rgba(219,39,119,0.4);">
                                 ⬇️ Descargar ${fileName}
                             </a>
                             <span style="font-size:12px;color:#94a3b8;text-align:center;">
-                                O haz clic derecho sobre el archivo y elige <b>"Guardar ${isVideo ? 'video' : 'imagen'} como..."</b>
+                                O haz clic derecho sobre la imagen y elige <b>"Guardar imagen como..."</b>
                             </span>
                         </div>
                     </body>
@@ -6741,27 +6444,18 @@ ${defaultLayersCode}
                 alert("Tu navegador bloqueó la pestaña emergente. Por favor permite popups para este sitio o haz clic derecho sobre la vista previa para guardar.");
             }
         }
-        window.openGifInNewTab = openAnimationInNewTab;
+        window.openAnimationInNewTab = openGifInNewTab;
 
-        async function copyAnimationToClipboard() {
-            const blob = studio.currentAnimBlob || studio.currentGifBlob;
+        async function copyGifToClipboard() {
+            const blob = studio.currentGifBlob;
             if (!blob) return;
-            const format = studio.currentAnimFormat || 'gif';
 
             try {
-                if (format === 'apng') {
-                    await navigator.clipboard.write([
-                        new ClipboardItem({ 'image/png': blob })
-                    ]);
-                    alert("¡Animación APNG copiada al portapapeles con éxito!");
-                    return;
-                } else if (format === 'gif') {
-                    await navigator.clipboard.write([
-                        new ClipboardItem({ 'image/gif': blob })
-                    ]);
-                    alert("¡GIF copiado al portapapeles con éxito!");
-                    return;
-                }
+                await navigator.clipboard.write([
+                    new ClipboardItem({ 'image/gif': blob })
+                ]);
+                alert("¡GIF copiado al portapapeles con éxito!");
+                return;
             } catch (err) {}
 
             try {
@@ -6773,23 +6467,24 @@ ${defaultLayersCode}
                 c.drawImage(img, 0, 0);
                 cvs.toBlob(async (pngBlob) => {
                     if (!pngBlob) {
-                        downloadCurrentAnimation();
+                        downloadCurrentGif();
                         return;
                     }
                     try {
                         await navigator.clipboard.write([
                             new ClipboardItem({ 'image/png': pngBlob })
                         ]);
-                        alert("¡Imagen copiada al portapapeles! Para el archivo completo usa 'Descargar' o 'Abrir en Pestaña'.");
+                        alert("¡Fotograma copiado al portapapeles! Para guardar el GIF animado completo usa 'Descargar' o 'Abrir en Pestaña'.");
                     } catch (e2) {
-                        downloadCurrentAnimation();
+                        downloadCurrentGif();
                     }
                 }, 'image/png');
             } catch (e3) {
-                downloadCurrentAnimation();
+                downloadCurrentGif();
             }
         }
-        window.copyGifToClipboard = copyAnimationToClipboard;
+        window.copyAnimationToClipboard = copyGifToClipboard;
+        window.copyGifToClipboard = copyGifToClipboard;
 
         function getMcpStudioStateSummary() {
             return {
