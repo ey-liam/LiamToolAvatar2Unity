@@ -1502,13 +1502,14 @@
                         <div class="flex flex-col gap-1">
                             <label class="text-[11px] font-semibold text-slate-300">Resolución (Altura)</label>
                             <select id="selGifHeight" class="bg-[#121622] border border-[#28324d] rounded px-2 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-pink-500 font-medium">
-                                <option value="1080" selected>1080 px (1080p Full HD)</option>
-                                <option value="1440">1440 px (2K QHD - Alta Definición)</option>
-                                <option value="2160">2160 px (4K Ultra HD - Máxima Nitidez)</option>
-                                <option value="native">2752 px (Resolución Nativa 100% 1:1)</option>
+                                <option value="1080" selected>1080 px (1080p Full HD - Rápido y Fluido)</option>
+                                <option value="1440">1440 px (2K QHD - Aceleración GPU)</option>
+                                <option value="2160">2160 px (4K Ultra HD - Límite Máximo GPU)</option>
+                                <option value="native">2752 px (Nativa 1:1 - Muy Pesado / Sin GPU)</option>
                                 <option value="720">720 px (720p HD)</option>
                                 <option value="480">480 px (480p SD)</option>
                             </select>
+                            <span class="text-[10px] text-sky-300/80 leading-tight">⚡ <b>Tip de fluidez:</b> <b>1080p</b> y <b>2160p (4K)</b> usan aceleración por GPU y van a 60 FPS sin trabarse. 2752px supera el estándar de tarjetas gráficas; si deseas 2752px 100% fluido, usa <b>APNG</b>.</span>
                         </div>
                     </div>
 
@@ -6563,10 +6564,10 @@ ${defaultLayersCode}
                 if (selHeight) {
                     const currentH = selHeight.value;
                     selHeight.innerHTML = `
-                        <option value="1080" selected>1080 px (1080p Full HD)</option>
-                        <option value="1440">1440 px (2K QHD - Alta Definición)</option>
-                        <option value="2160">2160 px (4K Ultra HD - Máxima Nitidez)</option>
-                        <option value="native">2752 px (Resolución Nativa 100% 1:1)</option>
+                        <option value="1080" selected>1080 px (1080p Full HD - Rápido y Fluido)</option>
+                        <option value="1440">1440 px (2K QHD - Aceleración GPU)</option>
+                        <option value="2160">2160 px (4K Ultra HD - Límite Máximo GPU)</option>
+                        <option value="native">2752 px (Nativa 1:1 - Muy Pesado / Sin GPU)</option>
                         <option value="720">720 px (720p HD)</option>
                         <option value="480">480 px (480p SD Ligero)</option>
                     `;
@@ -7239,18 +7240,18 @@ ${defaultLayersCode}
                     }
                     if (!chosenMime) chosenMime = 'video/webm';
 
-                    // Bitrate scaled for ultra-high sharpness and clarity
+                    // Bitrate scaled for optimal balance between crystal clarity and smooth hardware decoding
                     let chosenBitrate = 18000000;
                     if (targetH >= 2160) {
-                        chosenBitrate = 60000000; // 60 Mbps for 4K / 2752p Ultra HD
+                        chosenBitrate = 36000000; // 36 Mbps for 4K / 2752p (ultra-sharp VP9 without decoding lag)
                     } else if (targetH >= 1440) {
-                        chosenBitrate = 42000000; // 42 Mbps for 1440p 2K
+                        chosenBitrate = 28000000; // 28 Mbps for 1440p 2K
                     } else if (targetH >= 1080) {
-                        chosenBitrate = 32000000; // 32 Mbps for 1080p Full HD
+                        chosenBitrate = 22000000; // 22 Mbps for 1080p Full HD
                     } else if (targetH >= 720) {
-                        chosenBitrate = 18000000; // 18 Mbps for 720p HD
+                        chosenBitrate = 14000000; // 14 Mbps for 720p HD
                     } else {
-                        chosenBitrate = 8000000;  // 8 Mbps for 480p SD
+                        chosenBitrate = 6000000;  // 6 Mbps for 480p SD
                     }
 
                     progressText.textContent = "Iniciando codificador de video WebM " + targetH + "p (" + (isAlpha ? 'Alpha' : 'Chroma Key') + ")...";
@@ -7294,7 +7295,11 @@ ${defaultLayersCode}
                     if (videoTrack && typeof videoTrack.requestFrame === 'function') {
                         videoTrack.requestFrame();
                     }
-                    await new Promise(r => setTimeout(r, 60));
+                    await new Promise(r => setTimeout(r, 30));
+
+                    // Synchronized wall-clock pacing: avoids frame drift and ensures exact playback speed
+                    const frameIntervalMs = (dur * 1000) / totalFrames;
+                    const loopStartTime = performance.now();
 
                     for (let f = 0; f < totalFrames; f++) {
                         if (studio.gifCancel) {
@@ -7309,7 +7314,12 @@ ${defaultLayersCode}
                             videoTrack.requestFrame();
                         }
 
-                        await new Promise(r => setTimeout(r, frameDelayMs));
+                        // Compensate for render time: sleep ONLY the remaining time of the frame slot
+                        const nextTargetTime = loopStartTime + (f + 1) * frameIntervalMs;
+                        const sleepMs = nextTargetTime - performance.now();
+                        if (sleepMs > 1) {
+                            await new Promise(r => setTimeout(r, sleepMs));
+                        }
 
                         const pct = Math.round(((f + 1) / totalFrames) * 90);
                         progressBar.style.width = pct + '%';
@@ -7317,8 +7327,8 @@ ${defaultLayersCode}
                         progressText.textContent = "Grabando video WebM (" + (f + 1) + " de " + totalFrames + " fotogramas)...";
                     }
 
-                    // Buffer final frame to seal container without glitch
-                    await new Promise(r => setTimeout(r, frameDelayMs * 2));
+                    // Seal stream cleanly
+                    await new Promise(r => setTimeout(r, 40));
                     if (typeof recorder.requestData === 'function') {
                         try { recorder.requestData(); } catch(e){}
                     }
@@ -7326,13 +7336,16 @@ ${defaultLayersCode}
                     progressText.textContent = "Finalizando y optimizando video WebM...";
                     const rawWebmBlob = await stopPromise;
 
-                    // Fix WebM duration and timecode headers using fix-webm-duration
+                    // Match container duration header with real recorded duration
+                    const actualRecordedMs = Math.round(performance.now() - loopStartTime);
+                    const expectedMs = Math.round(dur * 1000);
+                    const finalDurMs = (Math.abs(actualRecordedMs - expectedMs) < 250) ? expectedMs : actualRecordedMs;
+
                     let webmBlob = rawWebmBlob;
                     if (typeof ysFixWebmDuration === 'function') {
                         try {
-                            const durMs = Math.round(dur * 1000);
                             webmBlob = await new Promise(res => {
-                                ysFixWebmDuration(rawWebmBlob, durMs, fixed => res(fixed));
+                                ysFixWebmDuration(rawWebmBlob, finalDurMs, fixed => res(fixed));
                             });
                         } catch (fixErr) {
                             console.warn("Could not patch WebM duration header:", fixErr);
