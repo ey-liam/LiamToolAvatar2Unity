@@ -5,523 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LiamToolAvatar2Unity V3</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-/* fix-webm-duration v1.0.6 (bundled inline for 100% offline & zero-latency duration patching) */
-(function (name, definition) {
-    if (typeof define === 'function' && define.amd) { // RequireJS / AMD
-        define(definition);
-    } else if (typeof module !== 'undefined' && module.exports) { // CommonJS / Node.js
-        module.exports = definition();
-    } else { // Direct include
-        window.ysFixWebmDuration = definition();
-    }
-})('fix-webm-duration', function () {
-    /*
-     * This is the list of possible WEBM file sections by their IDs.
-     * Possible types: Container, Binary, Uint, Int, String, Float, Date
-     */
-    var sections = {
-        0xa45dfa3: { name: 'EBML', type: 'Container' },
-        0x286: { name: 'EBMLVersion', type: 'Uint' },
-        0x2f7: { name: 'EBMLReadVersion', type: 'Uint' },
-        0x2f2: { name: 'EBMLMaxIDLength', type: 'Uint' },
-        0x2f3: { name: 'EBMLMaxSizeLength', type: 'Uint' },
-        0x282: { name: 'DocType', type: 'String' },
-        0x287: { name: 'DocTypeVersion', type: 'Uint' },
-        0x285: { name: 'DocTypeReadVersion', type: 'Uint' },
-        0x6c: { name: 'Void', type: 'Binary' },
-        0x3f: { name: 'CRC-32', type: 'Binary' },
-        0xb538667: { name: 'SignatureSlot', type: 'Container' },
-        0x3e8a: { name: 'SignatureAlgo', type: 'Uint' },
-        0x3e9a: { name: 'SignatureHash', type: 'Uint' },
-        0x3ea5: { name: 'SignaturePublicKey', type: 'Binary' },
-        0x3eb5: { name: 'Signature', type: 'Binary' },
-        0x3e5b: { name: 'SignatureElements', type: 'Container' },
-        0x3e7b: { name: 'SignatureElementList', type: 'Container' },
-        0x2532: { name: 'SignedElement', type: 'Binary' },
-        0x8538067: { name: 'Segment', type: 'Container' },
-        0x14d9b74: { name: 'SeekHead', type: 'Container' },
-        0xdbb: { name: 'Seek', type: 'Container' },
-        0x13ab: { name: 'SeekID', type: 'Binary' },
-        0x13ac: { name: 'SeekPosition', type: 'Uint' },
-        0x549a966: { name: 'Info', type: 'Container' },
-        0x33a4: { name: 'SegmentUID', type: 'Binary' },
-        0x3384: { name: 'SegmentFilename', type: 'String' },
-        0x1cb923: { name: 'PrevUID', type: 'Binary' },
-        0x1c83ab: { name: 'PrevFilename', type: 'String' },
-        0x1eb923: { name: 'NextUID', type: 'Binary' },
-        0x1e83bb: { name: 'NextFilename', type: 'String' },
-        0x444: { name: 'SegmentFamily', type: 'Binary' },
-        0x2924: { name: 'ChapterTranslate', type: 'Container' },
-        0x29fc: { name: 'ChapterTranslateEditionUID', type: 'Uint' },
-        0x29bf: { name: 'ChapterTranslateCodec', type: 'Uint' },
-        0x29a5: { name: 'ChapterTranslateID', type: 'Binary' },
-        0xad7b1: { name: 'TimecodeScale', type: 'Uint' },
-        0x489: { name: 'Duration', type: 'Float' },
-        0x461: { name: 'DateUTC', type: 'Date' },
-        0x3ba9: { name: 'Title', type: 'String' },
-        0xd80: { name: 'MuxingApp', type: 'String' },
-        0x1741: { name: 'WritingApp', type: 'String' },
-        // 0xf43b675: { name: 'Cluster', type: 'Container' },
-        0x67: { name: 'Timecode', type: 'Uint' },
-        0x1854: { name: 'SilentTracks', type: 'Container' },
-        0x18d7: { name: 'SilentTrackNumber', type: 'Uint' },
-        0x27: { name: 'Position', type: 'Uint' },
-        0x2b: { name: 'PrevSize', type: 'Uint' },
-        0x23: { name: 'SimpleBlock', type: 'Binary' },
-        0x20: { name: 'BlockGroup', type: 'Container' },
-        0x21: { name: 'Block', type: 'Binary' },
-        0x22: { name: 'BlockVirtual', type: 'Binary' },
-        0x35a1: { name: 'BlockAdditions', type: 'Container' },
-        0x26: { name: 'BlockMore', type: 'Container' },
-        0x6e: { name: 'BlockAddID', type: 'Uint' },
-        0x25: { name: 'BlockAdditional', type: 'Binary' },
-        0x1b: { name: 'BlockDuration', type: 'Uint' },
-        0x7a: { name: 'ReferencePriority', type: 'Uint' },
-        0x7b: { name: 'ReferenceBlock', type: 'Int' },
-        0x7d: { name: 'ReferenceVirtual', type: 'Int' },
-        0x24: { name: 'CodecState', type: 'Binary' },
-        0x35a2: { name: 'DiscardPadding', type: 'Int' },
-        0xe: { name: 'Slices', type: 'Container' },
-        0x68: { name: 'TimeSlice', type: 'Container' },
-        0x4c: { name: 'LaceNumber', type: 'Uint' },
-        0x4d: { name: 'FrameNumber', type: 'Uint' },
-        0x4b: { name: 'BlockAdditionID', type: 'Uint' },
-        0x4e: { name: 'Delay', type: 'Uint' },
-        0x4f: { name: 'SliceDuration', type: 'Uint' },
-        0x48: { name: 'ReferenceFrame', type: 'Container' },
-        0x49: { name: 'ReferenceOffset', type: 'Uint' },
-        0x4a: { name: 'ReferenceTimeCode', type: 'Uint' },
-        0x2f: { name: 'EncryptedBlock', type: 'Binary' },
-        0x654ae6b: { name: 'Tracks', type: 'Container' },
-        0x2e: { name: 'TrackEntry', type: 'Container' },
-        0x57: { name: 'TrackNumber', type: 'Uint' },
-        0x33c5: { name: 'TrackUID', type: 'Uint' },
-        0x3: { name: 'TrackType', type: 'Uint' },
-        0x39: { name: 'FlagEnabled', type: 'Uint' },
-        0x8: { name: 'FlagDefault', type: 'Uint' },
-        0x15aa: { name: 'FlagForced', type: 'Uint' },
-        0x1c: { name: 'FlagLacing', type: 'Uint' },
-        0x2de7: { name: 'MinCache', type: 'Uint' },
-        0x2df8: { name: 'MaxCache', type: 'Uint' },
-        0x3e383: { name: 'DefaultDuration', type: 'Uint' },
-        0x34e7a: { name: 'DefaultDecodedFieldDuration', type: 'Uint' },
-        0x3314f: { name: 'TrackTimecodeScale', type: 'Float' },
-        0x137f: { name: 'TrackOffset', type: 'Int' },
-        0x15ee: { name: 'MaxBlockAdditionID', type: 'Uint' },
-        0x136e: { name: 'Name', type: 'String' },
-        0x2b59c: { name: 'Language', type: 'String' },
-        0x6: { name: 'CodecID', type: 'String' },
-        0x23a2: { name: 'CodecPrivate', type: 'Binary' },
-        0x58688: { name: 'CodecName', type: 'String' },
-        0x3446: { name: 'AttachmentLink', type: 'Uint' },
-        0x1a9697: { name: 'CodecSettings', type: 'String' },
-        0x1b4040: { name: 'CodecInfoURL', type: 'String' },
-        0x6b240: { name: 'CodecDownloadURL', type: 'String' },
-        0x2a: { name: 'CodecDecodeAll', type: 'Uint' },
-        0x2fab: { name: 'TrackOverlay', type: 'Uint' },
-        0x16aa: { name: 'CodecDelay', type: 'Uint' },
-        0x16bb: { name: 'SeekPreRoll', type: 'Uint' },
-        0x2624: { name: 'TrackTranslate', type: 'Container' },
-        0x26fc: { name: 'TrackTranslateEditionUID', type: 'Uint' },
-        0x26bf: { name: 'TrackTranslateCodec', type: 'Uint' },
-        0x26a5: { name: 'TrackTranslateTrackID', type: 'Binary' },
-        0x60: { name: 'Video', type: 'Container' },
-        0x1a: { name: 'FlagInterlaced', type: 'Uint' },
-        0x13b8: { name: 'StereoMode', type: 'Uint' },
-        0x13c0: { name: 'AlphaMode', type: 'Uint' },
-        0x13b9: { name: 'OldStereoMode', type: 'Uint' },
-        0x30: { name: 'PixelWidth', type: 'Uint' },
-        0x3a: { name: 'PixelHeight', type: 'Uint' },
-        0x14aa: { name: 'PixelCropBottom', type: 'Uint' },
-        0x14bb: { name: 'PixelCropTop', type: 'Uint' },
-        0x14cc: { name: 'PixelCropLeft', type: 'Uint' },
-        0x14dd: { name: 'PixelCropRight', type: 'Uint' },
-        0x14b0: { name: 'DisplayWidth', type: 'Uint' },
-        0x14ba: { name: 'DisplayHeight', type: 'Uint' },
-        0x14b2: { name: 'DisplayUnit', type: 'Uint' },
-        0x14b3: { name: 'AspectRatioType', type: 'Uint' },
-        0xeb524: { name: 'ColourSpace', type: 'Binary' },
-        0xfb523: { name: 'GammaValue', type: 'Float' },
-        0x383e3: { name: 'FrameRate', type: 'Float' },
-        0x61: { name: 'Audio', type: 'Container' },
-        0x35: { name: 'SamplingFrequency', type: 'Float' },
-        0x38b5: { name: 'OutputSamplingFrequency', type: 'Float' },
-        0x1f: { name: 'Channels', type: 'Uint' },
-        0x3d7b: { name: 'ChannelPositions', type: 'Binary' },
-        0x2264: { name: 'BitDepth', type: 'Uint' },
-        0x62: { name: 'TrackOperation', type: 'Container' },
-        0x63: { name: 'TrackCombinePlanes', type: 'Container' },
-        0x64: { name: 'TrackPlane', type: 'Container' },
-        0x65: { name: 'TrackPlaneUID', type: 'Uint' },
-        0x66: { name: 'TrackPlaneType', type: 'Uint' },
-        0x69: { name: 'TrackJoinBlocks', type: 'Container' },
-        0x6d: { name: 'TrackJoinUID', type: 'Uint' },
-        0x40: { name: 'TrickTrackUID', type: 'Uint' },
-        0x41: { name: 'TrickTrackSegmentUID', type: 'Binary' },
-        0x46: { name: 'TrickTrackFlag', type: 'Uint' },
-        0x47: { name: 'TrickMasterTrackUID', type: 'Uint' },
-        0x44: { name: 'TrickMasterTrackSegmentUID', type: 'Binary' },
-        0x2d80: { name: 'ContentEncodings', type: 'Container' },
-        0x2240: { name: 'ContentEncoding', type: 'Container' },
-        0x1031: { name: 'ContentEncodingOrder', type: 'Uint' },
-        0x1032: { name: 'ContentEncodingScope', type: 'Uint' },
-        0x1033: { name: 'ContentEncodingType', type: 'Uint' },
-        0x1034: { name: 'ContentCompression', type: 'Container' },
-        0x254: { name: 'ContentCompAlgo', type: 'Uint' },
-        0x255: { name: 'ContentCompSettings', type: 'Binary' },
-        0x1035: { name: 'ContentEncryption', type: 'Container' },
-        0x7e1: { name: 'ContentEncAlgo', type: 'Uint' },
-        0x7e2: { name: 'ContentEncKeyID', type: 'Binary' },
-        0x7e3: { name: 'ContentSignature', type: 'Binary' },
-        0x7e4: { name: 'ContentSigKeyID', type: 'Binary' },
-        0x7e5: { name: 'ContentSigAlgo', type: 'Uint' },
-        0x7e6: { name: 'ContentSigHashAlgo', type: 'Uint' },
-        0xc53bb6b: { name: 'Cues', type: 'Container' },
-        0x3b: { name: 'CuePoint', type: 'Container' },
-        0x33: { name: 'CueTime', type: 'Uint' },
-        0x37: { name: 'CueTrackPositions', type: 'Container' },
-        0x77: { name: 'CueTrack', type: 'Uint' },
-        0x71: { name: 'CueClusterPosition', type: 'Uint' },
-        0x70: { name: 'CueRelativePosition', type: 'Uint' },
-        0x32: { name: 'CueDuration', type: 'Uint' },
-        0x1378: { name: 'CueBlockNumber', type: 'Uint' },
-        0x6a: { name: 'CueCodecState', type: 'Uint' },
-        0x5b: { name: 'CueReference', type: 'Container' },
-        0x16: { name: 'CueRefTime', type: 'Uint' },
-        0x17: { name: 'CueRefCluster', type: 'Uint' },
-        0x135f: { name: 'CueRefNumber', type: 'Uint' },
-        0x6b: { name: 'CueRefCodecState', type: 'Uint' },
-        0x941a469: { name: 'Attachments', type: 'Container' },
-        0x21a7: { name: 'AttachedFile', type: 'Container' },
-        0x67e: { name: 'FileDescription', type: 'String' },
-        0x66e: { name: 'FileName', type: 'String' },
-        0x660: { name: 'FileMimeType', type: 'String' },
-        0x65c: { name: 'FileData', type: 'Binary' },
-        0x6ae: { name: 'FileUID', type: 'Uint' },
-        0x675: { name: 'FileReferral', type: 'Binary' },
-        0x661: { name: 'FileUsedStartTime', type: 'Uint' },
-        0x662: { name: 'FileUsedEndTime', type: 'Uint' },
-        0x43a770: { name: 'Chapters', type: 'Container' },
-        0x5b9: { name: 'EditionEntry', type: 'Container' },
-        0x5bc: { name: 'EditionUID', type: 'Uint' },
-        0x5bd: { name: 'EditionFlagHidden', type: 'Uint' },
-        0x5db: { name: 'EditionFlagDefault', type: 'Uint' },
-        0x5dd: { name: 'EditionFlagOrdered', type: 'Uint' },
-        0x36: { name: 'ChapterAtom', type: 'Container' },
-        0x33c4: { name: 'ChapterUID', type: 'Uint' },
-        0x1654: { name: 'ChapterStringUID', type: 'String' },
-        0x11: { name: 'ChapterTimeStart', type: 'Uint' },
-        0x12: { name: 'ChapterTimeEnd', type: 'Uint' },
-        0x18: { name: 'ChapterFlagHidden', type: 'Uint' },
-        0x598: { name: 'ChapterFlagEnabled', type: 'Uint' },
-        0x2e67: { name: 'ChapterSegmentUID', type: 'Binary' },
-        0x2ebc: { name: 'ChapterSegmentEditionUID', type: 'Uint' },
-        0x23c3: { name: 'ChapterPhysicalEquiv', type: 'Uint' },
-        0xf: { name: 'ChapterTrack', type: 'Container' },
-        0x9: { name: 'ChapterTrackNumber', type: 'Uint' },
-        0x0: { name: 'ChapterDisplay', type: 'Container' },
-        0x5: { name: 'ChapString', type: 'String' },
-        0x37c: { name: 'ChapLanguage', type: 'String' },
-        0x37e: { name: 'ChapCountry', type: 'String' },
-        0x2944: { name: 'ChapProcess', type: 'Container' },
-        0x2955: { name: 'ChapProcessCodecID', type: 'Uint' },
-        0x50d: { name: 'ChapProcessPrivate', type: 'Binary' },
-        0x2911: { name: 'ChapProcessCommand', type: 'Container' },
-        0x2922: { name: 'ChapProcessTime', type: 'Uint' },
-        0x2933: { name: 'ChapProcessData', type: 'Binary' },
-        0x254c367: { name: 'Tags', type: 'Container' },
-        0x3373: { name: 'Tag', type: 'Container' },
-        0x23c0: { name: 'Targets', type: 'Container' },
-        0x28ca: { name: 'TargetTypeValue', type: 'Uint' },
-        0x23ca: { name: 'TargetType', type: 'String' },
-        0x23c5: { name: 'TagTrackUID', type: 'Uint' },
-        0x23c9: { name: 'TagEditionUID', type: 'Uint' },
-        0x23c4: { name: 'TagChapterUID', type: 'Uint' },
-        0x23c6: { name: 'TagAttachmentUID', type: 'Uint' },
-        0x27c8: { name: 'SimpleTag', type: 'Container' },
-        0x5a3: { name: 'TagName', type: 'String' },
-        0x47a: { name: 'TagLanguage', type: 'String' },
-        0x484: { name: 'TagDefault', type: 'Uint' },
-        0x487: { name: 'TagString', type: 'String' },
-        0x485: { name: 'TagBinary', type: 'Binary' }
-    };
-
-    function doInherit(newClass, baseClass) {
-        newClass.prototype = Object.create(baseClass.prototype);
-        newClass.prototype.constructor = newClass;
-    }
-
-    function WebmBase(name, type) {
-        this.name = name || 'Unknown';
-        this.type = type || 'Unknown';
-    }
-    WebmBase.prototype.updateBySource = function() { };
-    WebmBase.prototype.setSource = function(source) {
-        this.source = source;
-        this.updateBySource();
-    };
-    WebmBase.prototype.updateByData = function() { };
-    WebmBase.prototype.setData = function(data) {
-        this.data = data;
-        this.updateByData();
-    };
-
-    function WebmUint(name, type) {
-        WebmBase.call(this, name, type || 'Uint');
-    }
-    doInherit(WebmUint, WebmBase);
-    function padHex(hex) {
-        return hex.length % 2 === 1 ? '0' + hex : hex;
-    }
-    WebmUint.prototype.updateBySource = function() {
-        // use hex representation of a number instead of number value
-        this.data = '';
-        for (var i = 0; i < this.source.length; i++) {
-            var hex = this.source[i].toString(16);
-            this.data += padHex(hex);
-        }
-    };
-    WebmUint.prototype.updateByData = function() {
-        var length = this.data.length / 2;
-        this.source = new Uint8Array(length);
-        for (var i = 0; i < length; i++) {
-            var hex = this.data.substr(i * 2, 2);
-            this.source[i] = parseInt(hex, 16);
-        }
-    };
-    WebmUint.prototype.getValue = function() {
-        return parseInt(this.data, 16);
-    };
-    WebmUint.prototype.setValue = function(value) {
-        this.setData(padHex(value.toString(16)));
-    };
-
-    function WebmFloat(name, type) {
-        WebmBase.call(this, name, type || 'Float');
-    }
-    doInherit(WebmFloat, WebmBase);
-    WebmFloat.prototype.getFloatArrayType = function() {
-        return this.source && this.source.length === 4 ? Float32Array : Float64Array;
-    };
-    WebmFloat.prototype.updateBySource = function() {
-        var byteArray = this.source.reverse();
-        var floatArrayType = this.getFloatArrayType();
-        var floatArray = new floatArrayType(byteArray.buffer);
-        this.data = floatArray[0];
-    };
-    WebmFloat.prototype.updateByData = function() {
-        var floatArrayType = this.getFloatArrayType();
-        var floatArray = new floatArrayType([ this.data ]);
-        var byteArray = new Uint8Array(floatArray.buffer);
-        this.source = byteArray.reverse();
-    };
-    WebmFloat.prototype.getValue = function() {
-        return this.data;
-    };
-    WebmFloat.prototype.setValue = function(value) {
-        this.setData(value);
-    };
-
-    function WebmContainer(name, type) {
-        WebmBase.call(this, name, type || 'Container');
-    }
-    doInherit(WebmContainer, WebmBase);
-    WebmContainer.prototype.readByte = function() {
-        return this.source[this.offset++];
-    };
-    WebmContainer.prototype.readUint = function() {
-        var firstByte = this.readByte();
-        var bytes = 8 - firstByte.toString(2).length;
-        var value = firstByte - (1 << (7 - bytes));
-        for (var i = 0; i < bytes; i++) {
-            // don't use bit operators to support x86
-            value *= 256;
-            value += this.readByte();
-        }
-        return value;
-    };
-    WebmContainer.prototype.updateBySource = function() {
-        this.data = [];
-        for (this.offset = 0; this.offset < this.source.length; this.offset = end) {
-            var id = this.readUint();
-            var len = this.readUint();
-            var end = Math.min(this.offset + len, this.source.length);
-            var data = this.source.slice(this.offset, end);
-
-            var info = sections[id] || { name: 'Unknown', type: 'Unknown' };
-            var ctr = WebmBase;
-            switch (info.type) {
-                case 'Container':
-                    ctr = WebmContainer;
-                    break;
-                case 'Uint':
-                    ctr = WebmUint;
-                    break;
-                case 'Float':
-                    ctr = WebmFloat;
-                    break;
-            }
-            var section = new ctr(info.name, info.type);
-            section.setSource(data);
-            this.data.push({
-                id: id,
-                idHex: id.toString(16),
-                data: section
-            });
-        }
-    };
-    WebmContainer.prototype.writeUint = function(x, draft) {
-        for (var bytes = 1, flag = 0x80; x >= flag && bytes < 8; bytes++, flag *= 0x80) { }
-
-        if (!draft) {
-            var value = flag + x;
-            for (var i = bytes - 1; i >= 0; i--) {
-                // don't use bit operators to support x86
-                var c = value % 256;
-                this.source[this.offset + i] = c;
-                value = (value - c) / 256;
-            }
-        }
-
-        this.offset += bytes;
-    };
-    WebmContainer.prototype.writeSections = function(draft) {
-        this.offset = 0;
-        for (var i = 0; i < this.data.length; i++) {
-            var section = this.data[i],
-                content = section.data.source,
-                contentLength = content.length;
-            this.writeUint(section.id, draft);
-            this.writeUint(contentLength, draft);
-            if (!draft) {
-                this.source.set(content, this.offset);
-            }
-            this.offset += contentLength;
-        }
-        return this.offset;
-    };
-    WebmContainer.prototype.updateByData = function() {
-        // run without accessing this.source to determine total length - need to know it to create Uint8Array
-        var length = this.writeSections('draft');
-        this.source = new Uint8Array(length);
-        // now really write data
-        this.writeSections();
-    };
-    WebmContainer.prototype.getSectionById = function(id) {
-        for (var i = 0; i < this.data.length; i++) {
-            var section = this.data[i];
-            if (section.id === id) {
-                return section.data;
-            }
-        }
-        return null;
-    };
-
-    function WebmFile(source) {
-        WebmContainer.call(this, 'File', 'File');
-        this.setSource(source);
-    }
-    doInherit(WebmFile, WebmContainer);
-    WebmFile.prototype.fixDuration = function(duration, options) {
-        var logger = options && options.logger;
-        if (logger === undefined) {
-            logger = function(message) {
-                console.log(message);
-            };
-        } else if (!logger) {
-            logger = function() { };
-        }
-
-        var segmentSection = this.getSectionById(0x8538067);
-        if (!segmentSection) {
-            logger('[fix-webm-duration] Segment section is missing');
-            return false;
-        }
-
-        var infoSection = segmentSection.getSectionById(0x549a966);
-        if (!infoSection) {
-            logger('[fix-webm-duration] Info section is missing');
-            return false;
-        }
-
-        var timeScaleSection = infoSection.getSectionById(0xad7b1);
-        if (!timeScaleSection) {
-            logger('[fix-webm-duration] TimecodeScale section is missing');
-            return false;
-        }
-
-        var durationSection = infoSection.getSectionById(0x489);
-        if (durationSection) {
-            if (durationSection.getValue() <= 0) {
-                logger(`[fix-webm-duration] Duration section is present, but the value is ${durationSection.getValue()}`);
-                durationSection.setValue(duration);
-            } else {
-                logger(`[fix-webm-duration] Duration section is present, and the value is ${durationSection.getValue()}`);
-                return false;
-            }
-        } else {
-            logger('[fix-webm-duration] Duration section is missing');
-            // append Duration section
-            durationSection = new WebmFloat('Duration', 'Float');
-            durationSection.setValue(duration);
-            infoSection.data.push({
-                id: 0x489,
-                data: durationSection
-            });
-        }
-
-        // set default time scale to 1 millisecond (1000000 nanoseconds)
-        timeScaleSection.setValue(1000000);
-        infoSection.updateByData();
-        segmentSection.updateByData();
-        this.updateByData();
-
-        return true;
-    };
-    WebmFile.prototype.toBlob = function(mimeType) {
-        return new Blob([ this.source.buffer ], { type: mimeType || 'video/webm' });
-    };
-
-    function fixWebmDuration(blob, duration, callback, options) {
-        // The callback may be omitted - then the third argument is options
-        if (typeof callback === "object") {
-            options = callback;
-            callback = undefined;
-        }
-
-        if (!callback) {
-            return new Promise(function(resolve) {
-                fixWebmDuration(blob, duration, resolve, options);
-            });
-        }
-
-        try {
-            var reader = new FileReader();
-            reader.onloadend = function() {
-                try {
-                    var file = new WebmFile(new Uint8Array(reader.result));
-                    if (file.fixDuration(duration, options)) {
-                        blob = file.toBlob(blob.type);
-                    }
-                } catch (ex) {
-                    // ignore
-                }
-                callback(blob);
-            };
-            reader.readAsArrayBuffer(blob);
-        } catch (ex) {
-            callback(blob);
-        }
-    }
-
-    // Support AMD import default
-    fixWebmDuration.default = fixWebmDuration;
-
-    return fixWebmDuration;
-});
-
-</script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -754,7 +237,7 @@
                 <span>Exportar Unity</span>
             </button>
 
-            <button onclick="openGifModal()" class="px-3 py-1.5 rounded bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 hover:from-purple-500 hover:via-pink-500 hover:to-rose-500 text-white text-[11px] font-semibold flex items-center gap-1.5 shadow transition" title="Exportar animación (APNG / WebM / GIF)">
+            <button onclick="openGifModal()" class="px-3 py-1.5 rounded bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 hover:from-purple-500 hover:via-pink-500 hover:to-rose-500 text-white text-[11px] font-semibold flex items-center gap-1.5 shadow transition" title="Exportar animación (APNG / GIF)">
                 <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
                     <rect x="2" y="2" width="20" height="20" rx="4"/>
                     <polygon points="10 8 16 12 10 16 10 8"/>
@@ -1462,7 +945,7 @@
                         <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="2" width="20" height="20" rx="4"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
                         ANIMATION EXPORTER V3
                     </span>
-                    <span class="text-sm font-bold text-white">Exportador de Animación (APNG • WebM • GIF)</span>
+                    <span class="text-sm font-bold text-white">Exportador de Animación (APNG • GIF)</span>
                 </div>
                 <button onclick="closeGifModal()" class="w-7 h-7 rounded bg-[#1e2538] text-slate-300 hover:text-white flex items-center justify-center font-bold text-xs">X</button>
             </div>
@@ -1475,9 +958,8 @@
                             <span id="lblFormatBadge" class="text-[10px] text-pink-400 font-bold">✨ APNG 32-bit</span>
                         </label>
                         <select id="selExportFormat" onchange="onExportFormatChanged()" class="bg-[#121622] border border-pink-500/60 rounded px-2.5 py-1.5 text-xs text-pink-200 font-bold focus:outline-none focus:border-pink-400">
-                            <option value="apng" selected>APNG (.png) • Calidad Perfecta (32-bit, sin pérdida ni parpadeo)</option>
-                            <option value="webm">WebM (.webm) • Video HD (480p, 720p, 1080p • Transparente o Chroma Key)</option>
-                            <option value="gif">GIF (.gif) • Clásico Universal (256 colores)</option>
+                            <option value="apng" selected>✨ APNG (.png) • Calidad Perfecta 32-bit (Sin pérdida ni parpadeo)</option>
+                            <option value="gif">🖼️ GIF (.gif) • Clásico Universal (256 colores)</option>
                         </select>
                     </div>
 
@@ -1509,7 +991,7 @@
                                 <option value="720">720 px (720p HD)</option>
                                 <option value="480">480 px (480p SD)</option>
                             </select>
-                            <span class="text-[10px] text-sky-300/80 leading-tight">⚡ <b>Tip de fluidez:</b> <b>1080p</b> y <b>2160p (4K)</b> usan aceleración por GPU y van a 60 FPS sin trabarse. 2752px supera el estándar de tarjetas gráficas; si deseas 2752px 100% fluido, usa <b>APNG</b>.</span>
+                            <span class="text-[10px] text-sky-300/80 leading-tight">⚡ <b>Calidad Máxima:</b> <b>APNG</b> genera animación en 32-bit real con canal alfa sin pérdida a 60 FPS, 100% fluido y nítido.</span>
                         </div>
                     </div>
 
@@ -1533,42 +1015,23 @@
                         </div>
                     </div>
 
-                    <!-- Selector de Fondo / Chroma Key para WebM -->
-                    <div id="rowWebmBg" class="hidden flex flex-col gap-1 p-2.5 bg-[#121622] border border-emerald-500/40 rounded-lg">
-                        <label class="text-[11px] font-semibold text-emerald-300 flex items-center justify-between">
-                            <span>Fondo de Video / Chroma Key</span>
-                            <span class="text-[10px] text-emerald-400 font-bold">🎬 Para Editores de Video</span>
+                    <!-- Selector de Fondo / Chroma Key -->
+                    <div id="rowAnimBg" class="flex flex-col gap-1 p-2.5 bg-[#121622] border border-pink-500/30 rounded-lg">
+                        <label class="text-[11px] font-semibold text-pink-300 flex items-center justify-between">
+                            <span>Fondo de Animación / Chroma Key</span>
+                            <span class="text-[10px] text-pink-400 font-bold">🎬 Transparencia o Pantalla</span>
                         </label>
-                        <select id="selWebmBg" onchange="onWebmBgChanged()" class="bg-[#0b0e16] border border-emerald-500/50 rounded px-2 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-emerald-400 font-medium">
-                            <option value="green" selected>🟩 Chroma Key Verde (#00FF00) • Ultra Fluido (Recomendado)</option>
-                            <option value="transparent">✨ Transparente (Canal Alpha WebM VP9/VP8)</option>
+                        <select id="selAnimBg" class="bg-[#0b0e16] border border-[#28324d] rounded px-2 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-pink-400 font-medium">
+                            <option value="transparent" selected>✨ Transparente (Canal Alpha 32-bit sin fondo)</option>
+                            <option value="green">🟩 Chroma Key Verde (#00FF00) • Pantalla Verde</option>
                             <option value="blue">🟦 Chroma Key Azul (#0000FF) • Pantalla Azul</option>
                             <option value="red">🟥 Chroma Key Rojo (#FF0000) • Pantalla Roja</option>
                             <option value="dark">⬛ Fondo Oscuro Estudio (#090b10)</option>
                         </select>
-                        <span class="text-[10px] text-slate-400 leading-tight">Usa <b>Chroma Key</b> para máxima fluidez y para incrustar fácilmente en Premiere, CapCut, DaVinci, OBS, etc.</span>
-                    </div>
-
-                    <!-- Selector de Códec WebM -->
-                    <div id="rowWebmCodec" class="hidden flex flex-col gap-1 p-2.5 bg-[#121622] border border-cyan-500/40 rounded-lg">
-                        <label class="text-[11px] font-semibold text-cyan-300 flex items-center justify-between">
-                            <span>Códec de Video WebM</span>
-                            <span class="text-[10px] text-cyan-400 font-bold">⚡ Fluidez y Rendimiento</span>
-                        </label>
-                        <select id="selWebmCodec" class="bg-[#0b0e16] border border-cyan-500/50 rounded px-2 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-cyan-400 font-medium">
-                            <option value="vp8" selected>VP8 • Ultra Fluido (Recomendado, 0 tirones, decodificación rápida)</option>
-                            <option value="vp9">VP9 • Máxima Compresión (Más pesado para CPU)</option>
-                        </select>
-                        <span class="text-[10px] text-slate-400 leading-tight"><b>VP8</b> evita los tirones de reproducción y se reproduce suave a 60 FPS en cualquier dispositivo.</span>
+                        <span class="text-[10px] text-slate-400 leading-tight">Ideal para exportar con <b>transparencia limpia</b> o pantalla <b>Chroma Key</b> para Premiere, CapCut, DaVinci, OBS, etc.</span>
                     </div>
 
                     <div class="flex flex-col gap-2 pt-1 border-t border-[#1e2538]">
-                        <div id="rowTransparentCheck">
-                            <label class="flex items-center gap-2 cursor-pointer">
-                                <input type="checkbox" id="chkGifTransparent" checked class="rounded bg-[#121622] border-[#28324d] text-pink-500 focus:ring-0">
-                                <span class="text-xs text-slate-200 font-medium">Fondo Transparente (Sin fondo)</span>
-                            </label>
-                        </div>
                         <div id="rowGifStabilize" class="hidden">
                             <label class="flex items-center gap-2 cursor-pointer" title="Fusiona micro-variaciones de tonos oscuros y ropa para que los colores no parpadeen">
                                 <input type="checkbox" id="chkGifStabilizeColors" checked class="rounded bg-[#121622] border-[#28324d] text-pink-500 focus:ring-0">
@@ -1607,10 +1070,9 @@
                                 <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="4"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
                             </div>
                             <span class="text-xs font-medium text-slate-400">Vista previa de la animación</span>
-                            <span class="text-[10px] text-slate-500 max-w-xs text-center">Selecciona el formato deseado (APNG, WebM o GIF) y presiona "Generar Animación" para procesarla.</span>
+                            <span class="text-[10px] text-slate-500 max-w-xs text-center">Selecciona el formato deseado (APNG o GIF) y presiona "Generar Animación" para procesarla.</span>
                         </div>
                         <img id="gifResultImg" class="hidden max-h-[340px] max-w-full object-contain filter drop-shadow-xl" alt="Preview Animation">
-                        <video id="animResultVideo" class="hidden max-h-[340px] max-w-full object-contain filter drop-shadow-xl" autoplay loop muted playsinline controls></video>
                     </div>
 
                     <div id="gifResultActions" class="hidden p-3 bg-[#0d101a] border border-[#22293d] rounded-xl flex items-center justify-between gap-3 flex-wrap">
@@ -6553,70 +6015,18 @@ ${defaultLayersCode}
             const fmt = selFmt ? selFmt.value : 'apng';
             const selHeight = document.getElementById('selGifHeight');
             const selFps = document.getElementById('selGifFps');
-            const rowWebmBg = document.getElementById('rowWebmBg');
-            const rowTransCheck = document.getElementById('rowTransparentCheck');
             const rowStab = document.getElementById('rowGifStabilize');
             const extLabel = document.getElementById('lblAnimExt');
             const fmtBadge = document.getElementById('lblFormatBadge');
             const btnGenText = document.getElementById('lblBtnGenerateText');
             const btnDownText = document.getElementById('lblBtnDownloadText');
 
-            const rowWebmCodec = document.getElementById('rowWebmCodec');
-            if (fmt === 'webm') {
-                if (extLabel) extLabel.textContent = '.webm';
-                if (fmtBadge) {
-                    fmtBadge.textContent = "🎥 Video HD WebM";
-                    fmtBadge.className = "text-[10px] text-emerald-400 font-bold";
-                }
-                if (rowWebmBg) rowWebmBg.classList.remove('hidden');
-                if (rowWebmCodec) rowWebmCodec.classList.remove('hidden');
-                if (rowTransCheck) rowTransCheck.classList.add('hidden');
-                if (rowStab) rowStab.classList.add('hidden');
-                if (btnGenText) btnGenText.textContent = "✨ Generar Video (WebM HD)";
-                if (btnDownText) btnDownText.textContent = "Descargar .WebM";
-
-                // WebM resolutions: 480p, 720p, 1080p, 1440p (2K), 2160p (4K), native (2752)
-                if (selHeight) {
-                    const currentH = selHeight.value;
-                    selHeight.innerHTML = `
-                        <option value="1080" selected>1080 px (1080p Full HD - Rápido y Fluido)</option>
-                        <option value="1440">1440 px (2K QHD - Aceleración GPU)</option>
-                        <option value="2160">2160 px (4K Ultra HD - Límite Máximo GPU)</option>
-                        <option value="native">2752 px (Nativa 1:1 - Muy Pesado / Sin GPU)</option>
-                        <option value="720">720 px (720p HD)</option>
-                        <option value="480">480 px (480p SD Ligero)</option>
-                    `;
-                    if (['480', '720', '1080', '1440', '2160', 'native'].includes(currentH)) {
-                        selHeight.value = currentH;
-                    } else {
-                        selHeight.value = '1080';
-                    }
-                }
-
-                // WebM FPS: 24, 30, 60
-                if (selFps) {
-                    const currentFps = selFps.value;
-                    selFps.innerHTML = `
-                        <option value="24">24 FPS (Cinemático)</option>
-                        <option value="30" selected>30 FPS (Fluido Estándar)</option>
-                        <option value="60">60 FPS (Máxima Suavidad 60 FPS)</option>
-                    `;
-                    if (['24', '30', '60'].includes(currentFps)) {
-                        selFps.value = currentFps;
-                    } else {
-                        selFps.value = '30';
-                    }
-                }
-
-            } else if (fmt === 'apng') {
+            if (fmt === 'apng') {
                 if (extLabel) extLabel.textContent = '.png';
                 if (fmtBadge) {
                     fmtBadge.textContent = "✨ APNG 32-bit";
                     fmtBadge.className = "text-[10px] text-pink-400 font-bold";
                 }
-                if (rowWebmBg) rowWebmBg.classList.add('hidden');
-                if (rowWebmCodec) rowWebmCodec.classList.add('hidden');
-                if (rowTransCheck) rowTransCheck.classList.remove('hidden');
                 if (rowStab) rowStab.classList.add('hidden');
                 if (btnGenText) btnGenText.textContent = "✨ Generar Animación (APNG)";
                 if (btnDownText) btnDownText.textContent = "Descargar .PNG (APNG)";
@@ -6625,14 +6035,14 @@ ${defaultLayersCode}
                 if (selHeight) {
                     const currentH = selHeight.value;
                     selHeight.innerHTML = `
-                        <option value="1080" selected>1080 px (1080p Full HD)</option>
+                        <option value="1080" selected>1080 px (1080p Full HD - Rápido y Fluido)</option>
                         <option value="1440">1440 px (2K QHD - Alta Definición)</option>
                         <option value="2160">2160 px (4K Ultra HD - Máxima Nitidez)</option>
                         <option value="native">2752 px (Resolución Nativa 100% 1:1)</option>
                         <option value="720">720 px (720p HD)</option>
-                        <option value="480">480 px (Equilibrado)</option>
-                        <option value="360">360 px (Ligero / Redes)</option>
-                        <option value="240">240 px (Mini / Sticker)</option>
+                        <option value="480">480 px (480p Equilibrado)</option>
+                        <option value="360">360 px (360p Ligero / Redes)</option>
+                        <option value="240">240 px (240p Mini / Sticker)</option>
                     `;
                     if (['240', '360', '480', '720', '1080', '1440', '2160', 'native'].includes(currentH)) {
                         selHeight.value = currentH;
@@ -6664,9 +6074,6 @@ ${defaultLayersCode}
                     fmtBadge.textContent = "🖼️ GIF Universal";
                     fmtBadge.className = "text-[10px] text-amber-400 font-bold";
                 }
-                if (rowWebmBg) rowWebmBg.classList.add('hidden');
-                if (rowWebmCodec) rowWebmCodec.classList.add('hidden');
-                if (rowTransCheck) rowTransCheck.classList.remove('hidden');
                 if (rowStab) rowStab.classList.remove('hidden');
                 if (btnGenText) btnGenText.textContent = "✨ Generar GIF Animado";
                 if (btnDownText) btnDownText.textContent = "Descargar .GIF";
@@ -7026,7 +6433,6 @@ ${defaultLayersCode}
             studio.currentGifDataUrl = null;
 
             const resultImg = document.getElementById('gifResultImg');
-            const resultVideo = document.getElementById('animResultVideo');
             const placeholder = document.getElementById('gifPlaceholder');
             const resultActions = document.getElementById('gifResultActions');
             const sandboxNotice = document.getElementById('gifSandboxNotice');
@@ -7035,20 +6441,9 @@ ${defaultLayersCode}
             if (resultActions) resultActions.classList.remove('hidden');
             if (sandboxNotice) sandboxNotice.classList.remove('hidden');
 
-            if (format === 'webm') {
-                if (resultImg) resultImg.classList.add('hidden');
-                if (resultVideo) {
-                    resultVideo.src = url;
-                    resultVideo.classList.remove('hidden');
-                    resultVideo.load();
-                    resultVideo.play().catch(() => {});
-                }
-            } else {
-                if (resultVideo) resultVideo.classList.add('hidden');
-                if (resultImg) {
-                    resultImg.src = url;
-                    resultImg.classList.remove('hidden');
-                }
+            if (resultImg) {
+                resultImg.src = url;
+                resultImg.classList.remove('hidden');
             }
 
             const sizeKb = (blob.size / 1024).toFixed(1);
@@ -7057,14 +6452,12 @@ ${defaultLayersCode}
             const infoSize = document.getElementById('gifInfoSize');
             const infoDetails = document.getElementById('gifInfoDetails');
             if (infoSize) infoSize.textContent = sizeStr;
-            const formatName = (format === 'apng') ? 'APNG 32-bit' : (format === 'webm' ? 'WebM HD' : 'GIF');
+            const formatName = (format === 'apng') ? 'APNG 32-bit' : 'GIF';
             if (infoDetails) infoDetails.textContent = formatName + ' • ' + targetW + 'x' + targetH + ' px • ' + totalFrames + ' frames @ ' + fps + ' FPS (' + dur.toFixed(2) + 's)';
 
             const btnDownText = document.getElementById('lblBtnDownloadText');
             if (btnDownText) {
-                if (format === 'webm') btnDownText.textContent = "Descargar .WebM";
-                else if (format === 'apng') btnDownText.textContent = "Descargar .PNG (APNG)";
-                else btnDownText.textContent = "Descargar .GIF";
+                btnDownText.textContent = (format === 'apng') ? "Descargar .PNG (APNG)" : "Descargar .GIF";
             }
         }
 
@@ -7093,17 +6486,6 @@ ${defaultLayersCode}
             return result;
         }
 
-        function onWebmBgChanged() {
-            const selWebmBg = document.getElementById('selWebmBg');
-            const selWebmCodec = document.getElementById('selWebmCodec');
-            if (!selWebmBg || !selWebmCodec) return;
-            if (selWebmBg.value === 'transparent') {
-                selWebmCodec.value = 'vp9';
-            } else {
-                selWebmCodec.value = 'vp8';
-            }
-        }
-
         async function generateAnimation() {
             if (!studio.parts || studio.parts.length === 0) {
                 alert("Por favor carga o crea un avatar primero.");
@@ -7117,14 +6499,8 @@ ${defaultLayersCode}
             const isLoop = document.getElementById('chkGifLoopForever').checked;
             const shouldStabilize = document.getElementById('chkGifStabilizeColors') ? document.getElementById('chkGifStabilizeColors').checked : true;
 
-            let bgMode = 'transparent';
-            if (format === 'webm') {
-                const selWebmBg = document.getElementById('selWebmBg');
-                bgMode = selWebmBg ? selWebmBg.value : 'transparent';
-            } else {
-                const isTransparent = document.getElementById('chkGifTransparent').checked;
-                bgMode = isTransparent ? 'transparent' : 'dark';
-            }
+            const selBg = document.getElementById('selAnimBg');
+            const bgMode = selBg ? selBg.value : 'transparent';
 
             studio.gifCancel = false;
 
@@ -7134,7 +6510,6 @@ ${defaultLayersCode}
             const progressText = document.getElementById('gifProgressText');
             const btnGen = document.getElementById('btnGenerateGif');
             const resultImg = document.getElementById('gifResultImg');
-            const resultVideo = document.getElementById('animResultVideo');
             const placeholder = document.getElementById('gifPlaceholder');
             const resultActions = document.getElementById('gifResultActions');
 
@@ -7142,7 +6517,6 @@ ${defaultLayersCode}
             btnGen.disabled = true;
             btnGen.classList.add('opacity-50', 'cursor-not-allowed');
             if (resultImg) resultImg.classList.add('hidden');
-            if (resultVideo) resultVideo.classList.add('hidden');
             if (resultActions) resultActions.classList.add('hidden');
             if (placeholder) placeholder.classList.remove('hidden');
 
@@ -7177,13 +6551,7 @@ ${defaultLayersCode}
                 targetW = Math.round(targetH * aspect);
             }
 
-            if (format === 'webm') {
-                targetW = Math.max(16, Math.round(targetW / 2) * 2);
-                if (targetW % 4 !== 0) targetW += (4 - (targetW % 4));
-                if (targetH % 2 !== 0) targetH++;
-            } else {
-                if (targetW % 2 !== 0) targetW++;
-            }
+            if (targetW % 2 !== 0) targetW++;
 
             const offCanvas = document.createElement('canvas');
             offCanvas.width = targetW;
@@ -7191,7 +6559,7 @@ ${defaultLayersCode}
             const offCtx = offCanvas.getContext('2d', {
                 alpha: true,
                 desynchronized: false,
-                willReadFrequently: (format !== 'webm')
+                willReadFrequently: true
             });
             if (offCtx) {
                 offCtx.imageSmoothingEnabled = true;
@@ -7247,165 +6615,6 @@ ${defaultLayersCode}
                     const apngBlob = new Blob([apngBytes], { type: 'image/png' });
 
                     finalizeAnimationOutput(apngBlob, 'apng', targetW, targetH, totalFrames, fps, dur);
-
-                } else if (format === 'webm') {
-                    // WebM Video (VP8 / VP9 with Alpha or Chroma Key)
-                    if (typeof MediaRecorder === 'undefined') {
-                        throw new Error("Tu navegador no soporta MediaRecorder para video WebM.");
-                    }
-
-                    const isAlpha = (bgMode === 'transparent');
-                    const codecChoice = (document.getElementById('selWebmCodec') ? document.getElementById('selWebmCodec').value : 'vp8');
-
-                    // Candidate codecs strictly WITHOUT audio (no opus) to prevent audio-sync stalling in video players
-                    let candidateMimes = [];
-                    if (codecChoice === 'vp8') {
-                        candidateMimes = [
-                            'video/webm;codecs=vp8',
-                            'video/webm;codecs=vp9',
-                            'video/webm'
-                        ];
-                    } else {
-                        candidateMimes = [
-                            'video/webm;codecs=vp9',
-                            'video/webm;codecs=vp8',
-                            'video/webm'
-                        ];
-                    }
-
-                    let chosenMime = '';
-                    for (const cand of candidateMimes) {
-                        if (MediaRecorder.isTypeSupported(cand)) {
-                            chosenMime = cand;
-                            break;
-                        }
-                    }
-                    if (!chosenMime) chosenMime = 'video/webm';
-
-                    // Bitrate scaled for 2D animation: avoids decoder buffer starvation and micro-stutter
-                    let chosenBitrate = 9000000;
-                    if (targetH >= 2160) {
-                        chosenBitrate = 22000000; // 22 Mbps for 4K / 2752p (ultra-sharp 2D with silky playback)
-                    } else if (targetH >= 1440) {
-                        chosenBitrate = 14000000; // 14 Mbps for 1440p 2K
-                    } else if (targetH >= 1080) {
-                        chosenBitrate = 9000000;  // 9 Mbps for 1080p Full HD (broadcast quality)
-                    } else if (targetH >= 720) {
-                        chosenBitrate = 5000000;  // 5 Mbps for 720p HD
-                    } else {
-                        chosenBitrate = 2500000;  // 2.5 Mbps for 480p SD
-                    }
-
-                    const codecName = chosenMime.replace('video/webm;codecs=', '').replace('video/webm', 'VP8').toUpperCase();
-                    progressText.textContent = "Iniciando codificador WebM " + targetH + "p (" + codecName + ")...";
-                    progressPct.textContent = "0%";
-                    progressBar.style.width = "0%";
-                    await new Promise(r => setTimeout(r, 0));
-
-                    // Mount canvas in active viewport tree with near-zero opacity
-                    // This forces Chromium GPU compositor to render at 100% native resolution without throttling or downsampling
-                    offCanvas.style.position = 'fixed';
-                    offCanvas.style.left = '0px';
-                    offCanvas.style.top = '0px';
-                    offCanvas.style.width = targetW + 'px';
-                    offCanvas.style.height = targetH + 'px';
-                    offCanvas.style.opacity = '0.001';
-                    offCanvas.style.pointerEvents = 'none';
-                    offCanvas.style.zIndex = '-9999';
-                    document.body.appendChild(offCanvas);
-
-                    // Use captureStream(0) for deterministic 1:1 frame delivery without background timer collisions
-                    let stream;
-                    let isManualStream = false;
-                    try {
-                        stream = offCanvas.captureStream(0);
-                        isManualStream = true;
-                    } catch (e) {
-                        stream = offCanvas.captureStream(fps);
-                    }
-                    const [videoTrack] = stream.getVideoTracks();
-
-                    const recorder = new MediaRecorder(stream, {
-                        mimeType: chosenMime,
-                        videoBitsPerSecond: chosenBitrate
-                    });
-
-                    const chunks = [];
-                    recorder.ondataavailable = e => {
-                        if (e.data && e.data.size > 0) chunks.push(e.data);
-                    };
-
-                    const stopPromise = new Promise((resolve, reject) => {
-                        recorder.onstop = () => resolve(new Blob(chunks, { type: chosenMime }));
-                        recorder.onerror = reject;
-                    });
-
-                    // Start recorder WITHOUT timeslice to avoid 100ms cluster fragmentation
-                    recorder.start();
-
-                    // Initial frame setup
-                    renderAnimationSnapshot(offCtx, targetW, targetH, cropBox, bgMode, 0);
-                    if (isManualStream && videoTrack && typeof videoTrack.requestFrame === 'function') {
-                        videoTrack.requestFrame();
-                    }
-                    await new Promise(r => setTimeout(r, 30));
-
-                    // Precise wall-clock synchronization
-                    const frameIntervalMs = (dur * 1000) / totalFrames;
-                    const loopStartTime = performance.now();
-
-                    for (let f = 0; f < totalFrames; f++) {
-                        if (studio.gifCancel) {
-                            try { recorder.stop(); } catch(e){}
-                            return;
-                        }
-
-                        const t = (f / totalFrames) * dur;
-                        renderAnimationSnapshot(offCtx, targetW, targetH, cropBox, bgMode, t);
-
-                        if (isManualStream && videoTrack && typeof videoTrack.requestFrame === 'function') {
-                            videoTrack.requestFrame();
-                        }
-
-                        // Compensate for render time: sleep ONLY the remaining time of the frame slot
-                        const nextTargetTime = loopStartTime + (f + 1) * frameIntervalMs;
-                        const sleepMs = nextTargetTime - performance.now();
-                        if (sleepMs > 1) {
-                            await new Promise(r => setTimeout(r, sleepMs));
-                        }
-
-                        const pct = Math.round(((f + 1) / totalFrames) * 90);
-                        progressBar.style.width = pct + '%';
-                        progressPct.textContent = pct + '%';
-                        progressText.textContent = "Grabando video WebM (" + (f + 1) + " de " + totalFrames + " fotogramas)...";
-                    }
-
-                    // Seal stream cleanly
-                    await new Promise(r => setTimeout(r, 40));
-                    if (typeof recorder.requestData === 'function') {
-                        try { recorder.requestData(); } catch(e){}
-                    }
-                    recorder.stop();
-                    progressText.textContent = "Finalizando y optimizando video WebM...";
-                    const rawWebmBlob = await stopPromise;
-
-                    // Match container duration header with real recorded duration
-                    const actualRecordedMs = Math.round(performance.now() - loopStartTime);
-                    const expectedMs = Math.round(dur * 1000);
-                    const finalDurMs = (Math.abs(actualRecordedMs - expectedMs) < 250) ? expectedMs : actualRecordedMs;
-
-                    let webmBlob = rawWebmBlob;
-                    if (typeof ysFixWebmDuration === 'function') {
-                        try {
-                            webmBlob = await new Promise(res => {
-                                ysFixWebmDuration(rawWebmBlob, finalDurMs, fixed => res(fixed));
-                            });
-                        } catch (fixErr) {
-                            console.warn("Could not patch WebM duration header:", fixErr);
-                        }
-                    }
-
-                    finalizeAnimationOutput(webmBlob, 'webm', targetW, targetH, totalFrames, fps, dur);
 
                 } else {
                     // GIF - 256 colors with perceptual stabilization
@@ -7531,9 +6740,6 @@ ${defaultLayersCode}
                 console.error("Error generating animation:", err);
                 alert("Ocurrió un error al generar la animación: " + (err.message || err));
             } finally {
-                if (offCanvas.parentNode) {
-                    offCanvas.parentNode.removeChild(offCanvas);
-                }
                 studio.anim.time = savedTime;
                 studio.anim.gust = savedGust;
                 studio.anim.gustVel = savedGustVel;
@@ -7554,7 +6760,7 @@ ${defaultLayersCode}
             }
             const blob = studio.currentAnimBlob || studio.currentGifBlob;
             const format = studio.currentAnimFormat || 'apng';
-            const ext = (format === 'apng') ? 'png' : (format === 'webm' ? 'webm' : 'gif');
+            const ext = (format === 'apng') ? 'png' : 'gif';
             const avatarName = getSanitizedAvatarName();
             const fileName = avatarName + '_anim.' + ext;
 
@@ -7590,16 +6796,11 @@ ${defaultLayersCode}
             const blob = studio.currentAnimBlob || studio.currentGifBlob;
             const targetUrl = studio.currentAnimUrl || studio.currentGifUrl || URL.createObjectURL(blob);
             const format = studio.currentAnimFormat || 'apng';
-            const ext = (format === 'apng') ? 'png' : (format === 'webm' ? 'webm' : 'gif');
-            const isVideo = (format === 'webm');
+            const ext = (format === 'apng') ? 'png' : 'gif';
             const avatarName = getSanitizedAvatarName();
             const fileName = avatarName + '_anim.' + ext;
             const win = window.open();
             if (win) {
-                const mediaTag = isVideo
-                    ? '<video src="' + targetUrl + '" autoplay loop muted playsinline controls style="max-height:75vh;max-width:90vw;object-fit:contain;border-radius:8px;box-shadow:0 10px 25px rgba(0,0,0,0.6);"></video>'
-                    : '<img src="' + targetUrl + '" style="max-height:75vh;max-width:90vw;object-fit:contain;border-radius:8px;filter:drop-shadow(0 10px 25px rgba(0,0,0,0.6));" alt="' + avatarName + '">';
-
                 win.document.write(`
                     <!DOCTYPE html>
                     <html lang="es">
@@ -7609,13 +6810,13 @@ ${defaultLayersCode}
                         <meta name="viewport" content="width=device-width, initial-scale=1">
                     </head>
                     <body style="margin:0;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#0c0f18;background-image:linear-gradient(45deg,#151b29 25%,transparent 25%),linear-gradient(-45deg,#151b29 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#151b29 75%),linear-gradient(-45deg,transparent 75%,#151b29 75%);background-size:20px 20px;font-family:sans-serif;color:#e2e8f0;padding:20px;box-sizing:border-box;">
-                        ${mediaTag}
+                        <img src="${targetUrl}" style="max-height:75vh;max-width:90vw;object-fit:contain;border-radius:8px;filter:drop-shadow(0 10px 25px rgba(0,0,0,0.6));" alt="${avatarName}">
                         <div style="margin-top:20px;display:flex;flex-direction:column;align-items:center;gap:10px;">
                             <a href="${targetUrl}" download="${fileName}" style="display:inline-block;padding:10px 22px;background:linear-gradient(135deg,#db2777,#9333ea);color:white;text-decoration:none;border-radius:8px;font-weight:bold;font-size:14px;box-shadow:0 4px 14px rgba(219,39,119,0.4);">
                                 ⬇️ Descargar ${fileName}
                             </a>
                             <span style="font-size:12px;color:#94a3b8;text-align:center;">
-                                O haz clic derecho sobre el archivo y elige <b>"Guardar ${isVideo ? 'video' : 'imagen'} como..."</b>
+                                O haz clic derecho sobre la animación y elige <b>"Guardar imagen como..."</b>
                             </span>
                         </div>
                     </body>
@@ -7632,11 +6833,6 @@ ${defaultLayersCode}
             const blob = studio.currentAnimBlob || studio.currentGifBlob;
             if (!blob) return;
             const format = studio.currentAnimFormat || 'apng';
-
-            if (format === 'webm') {
-                downloadCurrentAnimation();
-                return;
-            }
 
             try {
                 if (format === 'apng') {
