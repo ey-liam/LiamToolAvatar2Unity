@@ -1491,21 +1491,23 @@
 
                     <div class="grid grid-cols-2 gap-2">
                         <div class="flex flex-col gap-1">
-                            <label class="text-[11px] font-semibold text-slate-300">Encuadre</label>
-                            <select id="selGifCropMode" class="bg-[#121622] border border-[#28324d] rounded px-2 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-pink-500">
-                                <option value="autocrop" selected>Ajustar al Avatar (Auto-crop)</option>
-                                <option value="full">Lienzo Completo</option>
+                            <label class="text-[11px] font-semibold text-slate-300">Encuadre / Cámara</label>
+                            <select id="selGifCropMode" class="bg-[#121622] border border-[#28324d] rounded px-2 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-pink-500 font-medium">
+                                <option value="camera" selected>🎥 Vista de Cámara (Lo que ves en pantalla)</option>
+                                <option value="bust">👤 Primer Plano / Busto (Cara y Pecho)</option>
+                                <option value="autocrop">🧍 Ajustar al Avatar (Cuerpo Completo)</option>
+                                <option value="full">🖼️ Lienzo Completo Original (1536x2752)</option>
                             </select>
                         </div>
                         <div class="flex flex-col gap-1">
                             <label class="text-[11px] font-semibold text-slate-300">Resolución (Altura)</label>
-                            <select id="selGifHeight" class="bg-[#121622] border border-[#28324d] rounded px-2 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-pink-500">
-                                <option value="240">240 px (Mini / Sticker)</option>
-                                <option value="360">360 px (Ligero / Redes)</option>
-                                <option value="480" selected>480 px (Recomendado)</option>
-                                <option value="640">640 px (Alta Calidad)</option>
+                            <select id="selGifHeight" class="bg-[#121622] border border-[#28324d] rounded px-2 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-pink-500 font-medium">
+                                <option value="1080" selected>1080 px (1080p Full HD)</option>
+                                <option value="1440">1440 px (2K QHD - Alta Definición)</option>
+                                <option value="2160">2160 px (4K Ultra HD - Máxima Nitidez)</option>
+                                <option value="native">2752 px (Resolución Nativa 100% 1:1)</option>
                                 <option value="720">720 px (720p HD)</option>
-                                <option value="1080">1080 px (1080p Full HD)</option>
+                                <option value="480">480 px (480p SD)</option>
                             </select>
                         </div>
                     </div>
@@ -3797,6 +3799,8 @@
             const dy = (u0 * (v2 * y1 - v1 * y2) + v0 * (u1 * y2 - u2 * y1) + (u2 * v1 - u1 * v2) * y0) / denom;
 
             c.transform(m11, m12, m21, m22, dx, dy);
+            c.imageSmoothingEnabled = true;
+            c.imageSmoothingQuality = 'high';
             c.drawImage(img, 0, 0);
             c.restore();
         }
@@ -6555,18 +6559,21 @@ ${defaultLayersCode}
                 if (btnGenText) btnGenText.textContent = "✨ Generar Video (WebM HD)";
                 if (btnDownText) btnDownText.textContent = "Descargar .WebM";
 
-                // WebM resolutions: 480p, 720p, 1080p
+                // WebM resolutions: 480p, 720p, 1080p, 1440p (2K), 2160p (4K), native (2752)
                 if (selHeight) {
                     const currentH = selHeight.value;
                     selHeight.innerHTML = `
-                        <option value="480">480 px (480p SD)</option>
-                        <option value="720" selected>720 px (720p HD)</option>
-                        <option value="1080">1080 px (1080p Full HD)</option>
+                        <option value="1080" selected>1080 px (1080p Full HD)</option>
+                        <option value="1440">1440 px (2K QHD - Alta Definición)</option>
+                        <option value="2160">2160 px (4K Ultra HD - Máxima Nitidez)</option>
+                        <option value="native">2752 px (Resolución Nativa 100% 1:1)</option>
+                        <option value="720">720 px (720p HD)</option>
+                        <option value="480">480 px (480p SD Ligero)</option>
                     `;
-                    if (['480', '720', '1080'].includes(currentH)) {
+                    if (['480', '720', '1080', '1440', '2160', 'native'].includes(currentH)) {
                         selHeight.value = currentH;
                     } else {
-                        selHeight.value = '720';
+                        selHeight.value = '1080';
                     }
                 }
 
@@ -6597,21 +6604,23 @@ ${defaultLayersCode}
                 if (btnGenText) btnGenText.textContent = "✨ Generar Animación (APNG)";
                 if (btnDownText) btnDownText.textContent = "Descargar .PNG (APNG)";
 
-                // APNG resolutions: 240, 360, 480, 640, 720, 1080
+                // APNG resolutions: 480, 720, 1080, 1440, 2160, native (2752), 360, 240
                 if (selHeight) {
                     const currentH = selHeight.value;
                     selHeight.innerHTML = `
-                        <option value="240">240 px (Mini / Sticker)</option>
-                        <option value="360">360 px (Ligero / Redes)</option>
-                        <option value="480" selected>480 px (Recomendado)</option>
-                        <option value="640">640 px (Alta Calidad)</option>
+                        <option value="1080" selected>1080 px (1080p Full HD)</option>
+                        <option value="1440">1440 px (2K QHD - Alta Definición)</option>
+                        <option value="2160">2160 px (4K Ultra HD - Máxima Nitidez)</option>
+                        <option value="native">2752 px (Resolución Nativa 100% 1:1)</option>
                         <option value="720">720 px (720p HD)</option>
-                        <option value="1080">1080 px (1080p Full HD)</option>
+                        <option value="480">480 px (Equilibrado)</option>
+                        <option value="360">360 px (Ligero / Redes)</option>
+                        <option value="240">240 px (Mini / Sticker)</option>
                     `;
-                    if (['240', '360', '480', '640', '720', '1080'].includes(currentH)) {
+                    if (['240', '360', '480', '720', '1080', '1440', '2160', 'native'].includes(currentH)) {
                         selHeight.value = currentH;
                     } else {
-                        selHeight.value = '480';
+                        selHeight.value = '1080';
                     }
                 }
 
@@ -6902,6 +6911,36 @@ ${defaultLayersCode}
             return { x: cropX, y: cropY, width: cropW, height: cropH };
         }
 
+        function computeCameraCropBox() {
+            const z = studio.camera.zoom || 1;
+            const dpr = window.devicePixelRatio || 1;
+            const cw = (typeof viewportCanvas !== 'undefined' && viewportCanvas.width) ? (viewportCanvas.width / dpr) : 1000;
+            const ch = (typeof viewportCanvas !== 'undefined' && viewportCanvas.height) ? (viewportCanvas.height / dpr) : 700;
+            const camX = studio.camera.x || 0;
+            const camY = studio.camera.y || 0;
+
+            const cX = Math.round(-camX / z);
+            const cY = Math.round(-camY / z);
+            const cW = Math.max(40, Math.round(cw / z));
+            const cH = Math.max(40, Math.round(ch / z));
+
+            return { x: cX, y: cY, width: cW, height: cH };
+        }
+
+        function computeBustCropBox() {
+            const fullBox = computeAnimationBoundingBox(12);
+            const bustH = Math.max(120, Math.round(fullBox.height * 0.46));
+            const bustW = Math.max(120, Math.round(bustH * 0.90));
+            const bustX = Math.round(fullBox.x + (fullBox.width - bustW) * 0.5);
+            const bustY = fullBox.y;
+            return {
+                x: Math.max(0, bustX),
+                y: Math.max(0, bustY),
+                width: Math.min(RefWidth - Math.max(0, bustX), bustW),
+                height: Math.min(RefHeight - Math.max(0, bustY), bustH)
+            };
+        }
+
         function renderAnimationSnapshot(ctx, targetW, targetH, cropBox, bgMode, t) {
             studio.anim.time = t;
             studio.anim.gust = 0;
@@ -7044,7 +7083,7 @@ ${defaultLayersCode}
 
             const format = document.getElementById('selExportFormat') ? document.getElementById('selExportFormat').value : 'apng';
             const cropMode = document.getElementById('selGifCropMode').value;
-            const targetH = parseInt(document.getElementById('selGifHeight').value, 10) || 480;
+            const rawTargetH = document.getElementById('selGifHeight').value;
             const fps = parseInt(document.getElementById('selGifFps').value, 10) || 24;
             const isLoop = document.getElementById('chkGifLoopForever').checked;
             const shouldStabilize = document.getElementById('chkGifStabilizeColors') ? document.getElementById('chkGifStabilizeColors').checked : true;
@@ -7079,14 +7118,36 @@ ${defaultLayersCode}
             if (placeholder) placeholder.classList.remove('hidden');
 
             let cropBox;
-            if (cropMode === 'autocrop') {
+            if (cropMode === 'camera') {
+                cropBox = computeCameraCropBox();
+            } else if (cropMode === 'bust') {
+                cropBox = computeBustCropBox();
+            } else if (cropMode === 'autocrop') {
                 cropBox = computeAnimationBoundingBox(24);
             } else {
                 cropBox = { x: 0, y: 0, width: RefWidth, height: RefHeight };
             }
 
+            let targetH = 1080;
+            if (rawTargetH === 'native') {
+                targetH = Math.min(2752, Math.max(100, Math.round(cropBox.height)));
+            } else {
+                targetH = parseInt(rawTargetH, 10) || 1080;
+            }
+
             const aspect = cropBox.width / cropBox.height;
             let targetW = Math.round(targetH * aspect);
+
+            // Cap dimensions to 4096px (GPU texture and codec safety boundary)
+            if (targetW > 4096) {
+                targetW = 4096;
+                targetH = Math.round(targetW / aspect);
+            }
+            if (targetH > 4096) {
+                targetH = 4096;
+                targetW = Math.round(targetH * aspect);
+            }
+
             if (format === 'webm') {
                 targetW = Math.max(16, Math.round(targetW / 2) * 2);
                 if (targetW % 4 !== 0) targetW += (4 - (targetW % 4));
@@ -7178,9 +7239,13 @@ ${defaultLayersCode}
                     }
                     if (!chosenMime) chosenMime = 'video/webm';
 
-                    // Bitrate scaled for maximum sharpness and clarity
-                    let chosenBitrate = 16000000;
-                    if (targetH >= 1080) {
+                    // Bitrate scaled for ultra-high sharpness and clarity
+                    let chosenBitrate = 18000000;
+                    if (targetH >= 2160) {
+                        chosenBitrate = 60000000; // 60 Mbps for 4K / 2752p Ultra HD
+                    } else if (targetH >= 1440) {
+                        chosenBitrate = 42000000; // 42 Mbps for 1440p 2K
+                    } else if (targetH >= 1080) {
                         chosenBitrate = 32000000; // 32 Mbps for 1080p Full HD
                     } else if (targetH >= 720) {
                         chosenBitrate = 18000000; // 18 Mbps for 720p HD
