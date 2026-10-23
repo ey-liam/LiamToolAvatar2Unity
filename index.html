@@ -512,10 +512,6 @@
                         <button onclick="triggerPhysicsImpulse()" class="px-2 py-1 rounded bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 text-[10px] font-semibold">
                             Impulso Fisica
                         </button>
-                        <button onclick="openGifModal()" class="px-2.5 py-1 rounded bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/40 text-purple-300 text-[10px] font-semibold flex items-center gap-1" title="Vista previa y exportación de GIF animado">
-                            <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="2" width="20" height="20" rx="4"/><path d="M7 9h2a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1H8v2h2"/><path d="M12 9v6"/><path d="M15 9h3v2h-2v1h2v2"/></svg>
-                            <span>GIF Preview</span>
-                        </button>
                     </div>
                 </div>
 
@@ -928,10 +924,6 @@
                     <button onclick="downloadSelectedPartPNG()" class="px-2.5 py-1.5 rounded bg-[#182032] hover:bg-[#222d47] border border-[#2d3a5c] text-sky-300 text-xs font-semibold">
                         Descargar PNG Parte
                     </button>
-                    <button onclick="openGifModal()" class="px-3 py-1.5 rounded bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white text-xs font-semibold shadow flex items-center gap-1.5">
-                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="4"/><path d="M7 9h2a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1H8v2h2"/><path d="M12 9v6"/><path d="M15 9h3v2h-2v1h2v2"/></svg>
-                        <span>Exportar GIF Sin Fondo</span>
-                    </button>
                     <button id="btnCopyExport" onclick="copyExportBuffer()" class="px-3 py-1.5 rounded bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold">
                         Copiar Texto
                     </button>
@@ -1049,21 +1041,29 @@
                         <img id="gifResultImg" class="hidden max-h-[340px] max-w-full object-contain filter drop-shadow-xl" alt="Preview GIF">
                     </div>
 
-                    <div id="gifResultActions" class="hidden p-3 bg-[#0d101a] border border-[#22293d] rounded-xl flex items-center justify-between gap-3">
+                    <div id="gifResultActions" class="hidden p-3 bg-[#0d101a] border border-[#22293d] rounded-xl flex items-center justify-between gap-3 flex-wrap">
                         <div class="flex flex-col">
                             <span id="gifInfoSize" class="text-xs font-bold text-pink-300 mono">0 KB</span>
                             <span id="gifInfoDetails" class="text-[10px] text-slate-400 mono">0x0 px • 0 frames</span>
                         </div>
-                        <div class="flex items-center gap-2">
-                            <button id="btnDownloadGif" onclick="downloadGeneratedGif()" class="px-4 py-2 rounded-lg bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-bold text-xs flex items-center gap-1.5 shadow transition">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <button id="btnDownloadGif" onclick="downloadCurrentGif()" class="px-3.5 py-2 rounded-lg bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-bold text-xs flex items-center gap-1.5 shadow transition">
                                 <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                                 <span>Descargar .GIF</span>
+                            </button>
+                            <button onclick="openGifInNewTab()" class="px-3 py-2 rounded-lg bg-sky-600/30 hover:bg-sky-600/40 border border-sky-500/40 text-sky-200 text-xs font-semibold flex items-center gap-1.5 transition" title="Abrir GIF en una pestaña nueva para guardar">
+                                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                <span>Abrir en Pestaña</span>
                             </button>
                             <button id="btnCopyGif" onclick="copyGifToClipboard()" class="px-3 py-2 rounded-lg bg-[#182032] hover:bg-[#232c45] border border-[#2b3754] text-slate-200 text-xs font-semibold flex items-center gap-1.5 transition">
                                 <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
                                 <span>Copiar</span>
                             </button>
                         </div>
+                    </div>
+
+                    <div id="gifSandboxNotice" class="hidden text-center p-2 bg-pink-500/10 border border-pink-500/20 rounded-lg text-[11px] text-pink-200 leading-relaxed">
+                        <span>💡 <b>¿En Google Sites o iframe?</b> Si la descarga directa es bloqueada por el navegador, usa el botón <b>"Abrir en Pestaña"</b> o haz clic derecho sobre el GIF y selecciona <b>"Guardar imagen como..."</b>.</span>
                     </div>
                 </div>
             </div>
@@ -1164,6 +1164,7 @@
             gifCancel: false,
             currentGifBlob: null,
             currentGifUrl: null,
+            currentGifDataUrl: null,
 
             undoStack: [],
             redoStack: [],
@@ -6102,8 +6103,6 @@ ${defaultLayersCode}
             const totalFrames = Math.max(2, Math.round(dur * fps));
             const frameDelayMs = Math.round(1000 / fps);
 
-            const gif = window.gifenc.GIFEncoder();
-
             const savedTime = studio.anim.time;
             const savedGust = studio.anim.gust;
             const savedGustVel = studio.anim.gustVel;
@@ -6113,86 +6112,167 @@ ${defaultLayersCode}
             studio.anim.gust = 0;
             studio.anim.gustVel = 0;
 
+            const renderFrameAt = (t) => {
+                studio.anim.time = t;
+                studio.anim.gust = 0;
+                studio.anim.gustVel = 0;
+                solveSkeletonAndDeformParts(0);
+
+                offCtx.clearRect(0, 0, targetW, targetH);
+                if (!isTransparent) {
+                    offCtx.fillStyle = '#090b10';
+                    offCtx.fillRect(0, 0, targetW, targetH);
+                }
+
+                offCtx.save();
+                const scale = targetH / cropBox.height;
+                const scaledW = cropBox.width * scale;
+                const offX = (targetW - scaledW) * 0.5;
+                offCtx.translate(offX, 0);
+                offCtx.scale(scale, scale);
+                offCtx.translate(-cropBox.x, -cropBox.y);
+
+                for (let pIdx = studio.parts.length - 1; pIdx >= 0; pIdx--) {
+                    const part = studio.parts[pIdx];
+                    if (!part.visible) continue;
+                    const md = part.mesh;
+                    const tex = part.bakedCanvas;
+                    if (!tex) continue;
+
+                    for (let i = 0; i < md.triangles.length; i++) {
+                        const [i0, i1, i2] = md.triangles[i];
+                        const v0 = md.vertices[i0], v1 = md.vertices[i1], v2 = md.vertices[i2];
+                        drawTexturedTriangleAffine(
+                            offCtx, tex,
+                            v0.u, v0.v, v1.u, v1.v, v2.u, v2.v,
+                            v0.dx, v0.dy, v1.dx, v1.dy, v2.dx, v2.dy
+                        );
+                    }
+                }
+                offCtx.restore();
+            };
+
             try {
+                progressText.textContent = "Analizando paleta de colores de alta fidelidad...";
+                progressPct.textContent = "5%";
+                progressBar.style.width = "5%";
+                await new Promise(r => setTimeout(r, 0));
+
+                const sampleCount = Math.min(10, totalFrames);
+                const sampleStep = Math.max(1, Math.floor(totalFrames / sampleCount));
+                const samplePixels = [];
+
+                for (let s = 0; s < totalFrames; s += sampleStep) {
+                    renderFrameAt((s / totalFrames) * dur);
+                    const imgData = offCtx.getImageData(0, 0, targetW, targetH);
+                    const data = imgData.data;
+                    const pixelStep = (data.length / 4 > 60000) ? 8 : 4;
+                    for (let p = 0; p < data.length; p += pixelStep * 4) {
+                        const a = data[p + 3];
+                        if (!isTransparent || a >= 64) {
+                            samplePixels.push(data[p], data[p + 1], data[p + 2], 255);
+                        }
+                    }
+                }
+
+                let masterPalette, opaquePalette;
+                if (samplePixels.length === 0) {
+                    opaquePalette = [[200, 200, 200], [40, 40, 40]];
+                } else {
+                    const sampleBuffer = new Uint8Array(samplePixels);
+                    const maxColors = isTransparent ? 255 : 256;
+                    opaquePalette = window.gifenc.quantize(sampleBuffer, maxColors, { format: 'rgb565' });
+                }
+
+                if (isTransparent) {
+                    masterPalette = [[0, 0, 0], ...opaquePalette];
+                } else {
+                    masterPalette = opaquePalette;
+                }
+
+                const gif = window.gifenc.GIFEncoder();
+
                 for (let f = 0; f < totalFrames; f++) {
                     if (studio.gifCancel) break;
 
                     const t = (f / totalFrames) * dur;
-                    studio.anim.time = t;
-                    studio.anim.gust = 0;
-                    studio.anim.gustVel = 0;
-                    solveSkeletonAndDeformParts(0);
-
-                    offCtx.clearRect(0, 0, targetW, targetH);
-                    if (!isTransparent) {
-                        offCtx.fillStyle = '#090b10';
-                        offCtx.fillRect(0, 0, targetW, targetH);
-                    }
-
-                    offCtx.save();
-                    const scale = targetH / cropBox.height;
-                    const scaledW = cropBox.width * scale;
-                    const offX = (targetW - scaledW) * 0.5;
-                    offCtx.translate(offX, 0);
-                    offCtx.scale(scale, scale);
-                    offCtx.translate(-cropBox.x, -cropBox.y);
-
-                    for (let pIdx = studio.parts.length - 1; pIdx >= 0; pIdx--) {
-                        const part = studio.parts[pIdx];
-                        if (!part.visible) continue;
-                        const md = part.mesh;
-                        const tex = part.bakedCanvas;
-                        if (!tex) continue;
-
-                        for (let i = 0; i < md.triangles.length; i++) {
-                            const [i0, i1, i2] = md.triangles[i];
-                            const v0 = md.vertices[i0], v1 = md.vertices[i1], v2 = md.vertices[i2];
-                            drawTexturedTriangleAffine(
-                                offCtx, tex,
-                                v0.u, v0.v, v1.u, v1.v, v2.u, v2.v,
-                                v0.dx, v0.dy, v1.dx, v1.dy, v2.dx, v2.dy
-                            );
-                        }
-                    }
-                    offCtx.restore();
+                    renderFrameAt(t);
 
                     const imgData = offCtx.getImageData(0, 0, targetW, targetH);
                     const rgba = imgData.data;
 
-                    let palette, index, transparentIndex = -1;
+                    let index;
                     if (isTransparent) {
-                        for (let i = 0; i < rgba.length; i += 4) {
-                            if (rgba[i + 3] < 36) {
-                                rgba[i] = 0;
-                                rgba[i + 1] = 0;
-                                rgba[i + 2] = 0;
-                                rgba[i + 3] = 0;
+                        const mappedOpaque = window.gifenc.applyPalette(rgba, opaquePalette, 'rgb565');
+                        index = new Uint8Array(targetW * targetH);
+                        for (let i = 0; i < targetW * targetH; i++) {
+                            if (rgba[i * 4 + 3] < 64) {
+                                index[i] = 0;
+                            } else {
+                                index[i] = mappedOpaque[i] + 1;
                             }
                         }
-                        palette = window.gifenc.quantize(rgba, 256, { format: 'rgba4444', oneBitAlpha: 64, clearAlpha: true });
-                        index = window.gifenc.applyPalette(rgba, palette, 'rgba4444');
-                        transparentIndex = palette.findIndex(p => p.length >= 4 && p[3] === 0);
                     } else {
-                        palette = window.gifenc.quantize(rgba, 256, { format: 'rgb565' });
-                        index = window.gifenc.applyPalette(rgba, palette, 'rgb565');
+                        index = window.gifenc.applyPalette(rgba, masterPalette, 'rgb565');
                     }
 
                     gif.writeFrame(index, targetW, targetH, {
-                        palette,
+                        palette: (f === 0) ? masterPalette : null,
                         delay: frameDelayMs,
-                        transparent: isTransparent && (transparentIndex !== -1),
-                        transparentIndex: Math.max(0, transparentIndex),
+                        transparent: isTransparent,
+                        transparentIndex: 0,
                         dispose: isTransparent ? 2 : 1,
                         repeat: isLoop ? 0 : -1
                     });
 
-                    const pct = Math.round(((f + 1) / totalFrames) * 100);
+                    const pct = Math.round(10 + ((f + 1) / totalFrames) * 90);
                     progressBar.style.width = pct + '%';
                     progressPct.textContent = pct + '%';
                     progressText.textContent = `Renderizando fotograma ${f + 1} de ${totalFrames} (${pct}%)...`;
 
                     await new Promise(r => setTimeout(r, 0));
                 }
+
+                if (studio.gifCancel) return;
+
+                progressText.textContent = "Finalizando compresión GIF...";
+                await new Promise(r => setTimeout(r, 0));
+
+                gif.finish();
+                const bytes = gif.bytes();
+                const blob = new Blob([bytes], { type: 'image/gif' });
+                studio.currentGifBlob = blob;
+
+                if (studio.currentGifUrl) {
+                    URL.revokeObjectURL(studio.currentGifUrl);
+                }
+                studio.currentGifUrl = URL.createObjectURL(blob);
+
+                let binary = '';
+                const len = bytes.byteLength;
+                const chunkSize = 16384;
+                for (let i = 0; i < len; i += chunkSize) {
+                    const sub = bytes.subarray(i, Math.min(i + chunkSize, len));
+                    binary += String.fromCharCode.apply(null, sub);
+                }
+                studio.currentGifDataUrl = 'data:image/gif;base64,' + btoa(binary);
+
+                resultImg.src = studio.currentGifUrl;
+                resultImg.classList.remove('hidden');
+                placeholder.classList.add('hidden');
+
+                const sizeKb = (blob.size / 1024).toFixed(1);
+                const sizeMb = (blob.size / (1024 * 1024)).toFixed(2);
+                const sizeStr = blob.size > 1024 * 1024 ? `${sizeMb} MB` : `${sizeKb} KB`;
+                document.getElementById('gifInfoSize').textContent = sizeStr;
+                document.getElementById('gifInfoDetails').textContent = `${targetW}x${targetH} px • ${totalFrames} frames @ ${fps} FPS (${dur.toFixed(2)}s)`;
+                resultActions.classList.remove('hidden');
+                const sandboxNotice = document.getElementById('gifSandboxNotice');
+                if (sandboxNotice) sandboxNotice.classList.remove('hidden');
+
+            } catch (err) {
+                console.error("Error generating GIF:", err);
+                alert("Ocurrió un error al generar el GIF: " + (err.message || err));
             } finally {
                 studio.anim.time = savedTime;
                 studio.anim.gust = savedGust;
@@ -6204,38 +6284,70 @@ ${defaultLayersCode}
                 btnGen.disabled = false;
                 btnGen.classList.remove('opacity-50', 'cursor-not-allowed');
             }
-
-            if (studio.gifCancel) return;
-
-            gif.finish();
-            const bytes = gif.bytes();
-            const blob = new Blob([bytes], { type: 'image/gif' });
-            studio.currentGifBlob = blob;
-
-            if (studio.currentGifUrl) {
-                URL.revokeObjectURL(studio.currentGifUrl);
-            }
-            studio.currentGifUrl = URL.createObjectURL(blob);
-
-            resultImg.src = studio.currentGifUrl;
-            resultImg.classList.remove('hidden');
-            placeholder.classList.add('hidden');
-
-            const sizeKb = (blob.size / 1024).toFixed(1);
-            const sizeMb = (blob.size / (1024 * 1024)).toFixed(2);
-            const sizeStr = blob.size > 1024 * 1024 ? `${sizeMb} MB` : `${sizeKb} KB`;
-            document.getElementById('gifInfoSize').textContent = sizeStr;
-            document.getElementById('gifInfoDetails').textContent = `${targetW}x${targetH} px • ${totalFrames} frames @ ${fps} FPS (${dur.toFixed(2)}s)`;
-            resultActions.classList.remove('hidden');
         }
 
         function downloadCurrentGif() {
-            if (!studio.currentGifBlob || !studio.currentGifUrl) return;
+            if (!studio.currentGifBlob) {
+                alert("Primero genera el GIF para poder descargarlo.");
+                return;
+            }
             const avatarName = getSanitizedAvatarName();
-            const a = document.createElement('a');
-            a.href = studio.currentGifUrl;
-            a.download = `${avatarName}_anim.gif`;
-            a.click();
+            const fileName = `${avatarName}_anim.gif`;
+            const targetUrl = studio.currentGifDataUrl || studio.currentGifUrl;
+
+            try {
+                const a = document.createElement('a');
+                a.href = targetUrl;
+                a.download = fileName;
+                a.rel = 'noopener';
+                a.style.display = 'none';
+                document.body.appendChild(a);
+                a.click();
+                setTimeout(() => {
+                    if (a.parentNode) a.parentNode.removeChild(a);
+                }, 400);
+            } catch (e) {
+                console.warn("Automated a.click() download failed:", e);
+            }
+
+            const notice = document.getElementById('gifSandboxNotice');
+            if (notice) notice.classList.remove('hidden');
+        }
+
+        function openGifInNewTab() {
+            if (!studio.currentGifBlob) {
+                alert("Primero genera el GIF para poder abrirlo.");
+                return;
+            }
+            const targetUrl = studio.currentGifDataUrl || studio.currentGifUrl;
+            const avatarName = getSanitizedAvatarName();
+            const win = window.open();
+            if (win) {
+                win.document.write(`
+                    <!DOCTYPE html>
+                    <html lang="es">
+                    <head>
+                        <meta charset="UTF-8">
+                        <title>${avatarName} - Preview GIF</title>
+                        <meta name="viewport" content="width=device-width, initial-scale=1">
+                    </head>
+                    <body style="margin:0;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#0c0f18;background-image:linear-gradient(45deg,#151b29 25%,transparent 25%),linear-gradient(-45deg,#151b29 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#151b29 75%),linear-gradient(-45deg,transparent 75%,#151b29 75%);background-size:20px 20px;font-family:sans-serif;color:#e2e8f0;padding:20px;box-sizing:border-box;">
+                        <img src="${targetUrl}" style="max-height:75vh;max-width:90vw;object-fit:contain;filter:drop-shadow(0 10px 25px rgba(0,0,0,0.6));border-radius:8px;" alt="${avatarName}">
+                        <div style="margin-top:20px;display:flex;flex-direction:column;align-items:center;gap:10px;">
+                            <a href="${targetUrl}" download="${avatarName}_anim.gif" style="display:inline-block;padding:10px 22px;background:linear-gradient(135deg,#db2777,#9333ea);color:white;text-decoration:none;border-radius:8px;font-weight:bold;font-size:14px;box-shadow:0 4px 14px rgba(219,39,119,0.4);">
+                                ⬇️ Descargar ${avatarName}_anim.gif
+                            </a>
+                            <span style="font-size:12px;color:#94a3b8;text-align:center;">
+                                O haz clic derecho sobre la imagen y elige <b>"Guardar imagen como..."</b>
+                            </span>
+                        </div>
+                    </body>
+                    </html>
+                `);
+                win.document.close();
+            } else {
+                alert("Tu navegador bloqueó la pestaña emergente. Por favor permite popups para este sitio o haz clic derecho sobre el GIF y selecciona 'Guardar imagen como...'.");
+            }
         }
 
         async function copyGifToClipboard() {
@@ -6262,7 +6374,7 @@ ${defaultLayersCode}
                             await navigator.clipboard.write([
                                 new ClipboardItem({ 'image/png': pngBlob })
                             ]);
-                            alert("¡Imagen copiada al portapapeles! (Para el GIF animado completo usa 'Descargar .GIF').");
+                            alert("¡Imagen copiada al portapapeles! (Para el archivo animado usa 'Descargar .GIF' o 'Abrir en Pestaña').");
                         } catch (e2) {
                             downloadCurrentGif();
                         }
