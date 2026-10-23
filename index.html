@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LiamToolAvatar2Unity V2</title>
+    <title>LiamToolAvatar2Unity V3</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
@@ -133,7 +133,7 @@
                 </div>
                 <div class="flex items-center gap-1.5">
                     <span class="font-bold tracking-tight text-white text-xs sm:text-sm">LiamToolAvatar2Unity</span>
-                    <span class="mono text-[10px] font-semibold px-1.5 py-0.5 rounded bg-sky-500/15 text-sky-300 border border-sky-500/30">V2 HD</span>
+                    <span class="mono text-[10px] font-semibold px-1.5 py-0.5 rounded bg-sky-500/15 text-sky-300 border border-sky-500/30">V3</span>
                 </div>
             </div>
 
@@ -237,14 +237,12 @@
                 <span>Exportar Unity</span>
             </button>
 
-            <button onclick="openGifModal()" class="px-3 py-1.5 rounded bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 hover:from-purple-500 hover:via-pink-500 hover:to-rose-500 text-white text-[11px] font-semibold flex items-center gap-1.5 shadow transition" title="Exportar animación como GIF transparente sin fondo">
+            <button onclick="openGifModal()" class="px-3 py-1.5 rounded bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 hover:from-purple-500 hover:via-pink-500 hover:to-rose-500 text-white text-[11px] font-semibold flex items-center gap-1.5 shadow transition" title="Exportar animación (APNG / WebM / GIF)">
                 <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
                     <rect x="2" y="2" width="20" height="20" rx="4"/>
-                    <path d="M7 9h2a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1H8v2h2"/>
-                    <path d="M12 9v6"/>
-                    <path d="M15 9h3v2h-2v1h2v2"/>
+                    <polygon points="10 8 16 12 10 16 10 8"/>
                 </svg>
-                <span>Exportar GIF</span>
+                <span>Exportar Animación</span>
             </button>
         </div>
     </header>
@@ -945,9 +943,9 @@
                 <div class="flex items-center gap-3">
                     <span class="px-2 py-0.5 rounded bg-gradient-to-r from-pink-500/20 to-purple-500/20 border border-pink-500/40 text-pink-300 mono text-xs font-bold flex items-center gap-1.5">
                         <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="2" width="20" height="20" rx="4"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
-                        GIF PREVIEW EXPORTER
+                        ANIMATION EXPORTER V3
                     </span>
-                    <span class="text-sm font-bold text-white">Exportador de Animación GIF Transparente (Sin Fondo)</span>
+                    <span class="text-sm font-bold text-white">Exportador de Animación (APNG • WebM • GIF)</span>
                 </div>
                 <button onclick="closeGifModal()" class="w-7 h-7 rounded bg-[#1e2538] text-slate-300 hover:text-white flex items-center justify-center font-bold text-xs">X</button>
             </div>
@@ -955,10 +953,22 @@
             <div class="p-5 flex-1 overflow-y-auto grid grid-cols-1 md:grid-cols-12 gap-5">
                 <div class="md:col-span-5 flex flex-col gap-3.5 bg-[#0b0e16] p-4 rounded-xl border border-[#20273a]">
                     <div class="flex flex-col gap-1">
+                        <label class="text-[11px] font-semibold text-slate-300 flex items-center justify-between">
+                            <span>Formato de Exportación</span>
+                            <span id="lblFormatBadge" class="text-[10px] text-pink-400 font-bold">✨ APNG 32-bit</span>
+                        </label>
+                        <select id="selExportFormat" onchange="onExportFormatChanged()" class="bg-[#121622] border border-pink-500/60 rounded px-2.5 py-1.5 text-xs text-pink-200 font-bold focus:outline-none focus:border-pink-400">
+                            <option value="apng" selected>APNG (.png) • Calidad Perfecta (32-bit, sin pérdida ni parpadeo)</option>
+                            <option value="webm">WebM (.webm) • Video HD (480p, 720p, 1080p • Transparente o Chroma Key)</option>
+                            <option value="gif">GIF (.gif) • Clásico Universal (256 colores)</option>
+                        </select>
+                    </div>
+
+                    <div class="flex flex-col gap-1">
                         <label class="text-[11px] font-semibold text-slate-300">Nombre del Avatar / Archivo</label>
                         <div class="flex items-center gap-1 bg-[#121622] border border-[#28324d] rounded px-2.5 py-1.5">
                             <input id="inpGifAvatarName" type="text" value="LiamAvatar" oninput="onAvatarNameChanged(this.value)" class="bg-transparent text-emerald-300 mono text-xs font-bold w-full focus:outline-none" placeholder="Nombre">
-                            <span id="lblAnimExt" class="text-[11px] text-pink-400 mono font-bold">.gif</span>
+                            <span id="lblAnimExt" class="text-[11px] text-pink-400 mono font-bold">.png</span>
                         </div>
                     </div>
 
@@ -976,7 +986,9 @@
                                 <option value="240">240 px (Mini / Sticker)</option>
                                 <option value="360">360 px (Ligero / Redes)</option>
                                 <option value="480" selected>480 px (Recomendado)</option>
-                                <option value="640">640 px (Alta Calidad HD)</option>
+                                <option value="640">640 px (Alta Calidad)</option>
+                                <option value="720">720 px (720p HD)</option>
+                                <option value="1080">1080 px (1080p Full HD)</option>
                             </select>
                         </div>
                     </div>
@@ -988,6 +1000,8 @@
                                 <option value="15">15 FPS (Ligero)</option>
                                 <option value="20">20 FPS (Estándar)</option>
                                 <option value="24" selected>24 FPS (Cinemático)</option>
+                                <option value="30">30 FPS (Fluido)</option>
+                                <option value="60">60 FPS (Máxima Suavidad)</option>
                             </select>
                         </div>
                         <div class="flex flex-col gap-1">
@@ -999,15 +1013,35 @@
                         </div>
                     </div>
 
+                    <!-- Selector de Fondo / Chroma Key para WebM -->
+                    <div id="rowWebmBg" class="hidden flex flex-col gap-1 p-2.5 bg-[#121622] border border-emerald-500/40 rounded-lg">
+                        <label class="text-[11px] font-semibold text-emerald-300 flex items-center justify-between">
+                            <span>Fondo de Video / Chroma Key</span>
+                            <span class="text-[10px] text-emerald-400 font-bold">🎬 Para Editores de Video</span>
+                        </label>
+                        <select id="selWebmBg" class="bg-[#0b0e16] border border-emerald-500/50 rounded px-2 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-emerald-400 font-medium">
+                            <option value="transparent" selected>✨ Transparente (Canal Alpha VP9)</option>
+                            <option value="green">🟩 Chroma Key Verde (#00FF00) • Pantalla Verde</option>
+                            <option value="blue">🟦 Chroma Key Azul (#0000FF) • Pantalla Azul</option>
+                            <option value="red">🟥 Chroma Key Rojo (#FF0000) • Pantalla Roja</option>
+                            <option value="dark">⬛ Fondo Oscuro Estudio (#090b10)</option>
+                        </select>
+                        <span class="text-[10px] text-slate-400 leading-tight">Usa <b>Chroma Key</b> para incrustar fácilmente en Premiere, CapCut, DaVinci, OBS, etc.</span>
+                    </div>
+
                     <div class="flex flex-col gap-2 pt-1 border-t border-[#1e2538]">
-                        <label class="flex items-center gap-2 cursor-pointer">
-                            <input type="checkbox" id="chkGifTransparent" checked class="rounded bg-[#121622] border-[#28324d] text-pink-500 focus:ring-0">
-                            <span class="text-xs text-slate-200 font-medium">Fondo Transparente (Sin fondo)</span>
-                        </label>
-                        <label class="flex items-center gap-2 cursor-pointer" title="Fusiona micro-variaciones de tonos oscuros y ropa para que los colores no parpadeen">
-                            <input type="checkbox" id="chkGifStabilizeColors" checked class="rounded bg-[#121622] border-[#28324d] text-pink-500 focus:ring-0">
-                            <span class="text-xs text-slate-200 font-medium">Estabilizar Colores (Anti-parpadeo)</span>
-                        </label>
+                        <div id="rowTransparentCheck">
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" id="chkGifTransparent" checked class="rounded bg-[#121622] border-[#28324d] text-pink-500 focus:ring-0">
+                                <span class="text-xs text-slate-200 font-medium">Fondo Transparente (Sin fondo)</span>
+                            </label>
+                        </div>
+                        <div id="rowGifStabilize" class="hidden">
+                            <label class="flex items-center gap-2 cursor-pointer" title="Fusiona micro-variaciones de tonos oscuros y ropa para que los colores no parpadeen">
+                                <input type="checkbox" id="chkGifStabilizeColors" checked class="rounded bg-[#121622] border-[#28324d] text-pink-500 focus:ring-0">
+                                <span class="text-xs text-slate-200 font-medium">Estabilizar Colores (Anti-parpadeo)</span>
+                            </label>
+                        </div>
                         <label class="flex items-center gap-2 cursor-pointer">
                             <input type="checkbox" id="chkGifLoopForever" checked class="rounded bg-[#121622] border-[#28324d] text-pink-500 focus:ring-0">
                             <span class="text-xs text-slate-200 font-medium">Bucle Infinito (Loop continuo)</span>
@@ -1017,7 +1051,7 @@
                     <div class="mt-2 flex flex-col gap-2">
                         <button id="btnGenerateGif" onclick="generateAnimation()" class="w-full py-2.5 rounded-lg bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 hover:from-purple-500 hover:via-pink-500 hover:to-rose-500 text-white font-bold text-xs shadow-lg transition flex items-center justify-center gap-2">
                             <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
-                            <span id="lblBtnGenerateText">✨ Generar GIF Animado</span>
+                            <span id="lblBtnGenerateText">✨ Generar Animación (APNG)</span>
                         </button>
                     </div>
 
@@ -1039,10 +1073,11 @@
                             <div class="w-12 h-12 rounded-full bg-[#141926] border border-[#232b42] flex items-center justify-center text-pink-400/60">
                                 <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="4"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
                             </div>
-                            <span class="text-xs font-medium text-slate-400">Vista previa del GIF transparente</span>
-                            <span class="text-[10px] text-slate-500 max-w-xs text-center">Presiona "Generar GIF Animado" para procesar la animación sin fondo lista para compartir.</span>
+                            <span class="text-xs font-medium text-slate-400">Vista previa de la animación</span>
+                            <span class="text-[10px] text-slate-500 max-w-xs text-center">Selecciona el formato deseado (APNG, WebM o GIF) y presiona "Generar Animación" para procesarla.</span>
                         </div>
-                        <img id="gifResultImg" class="hidden max-h-[340px] max-w-full object-contain filter drop-shadow-xl" alt="Preview GIF">
+                        <img id="gifResultImg" class="hidden max-h-[340px] max-w-full object-contain filter drop-shadow-xl" alt="Preview Animation">
+                        <video id="animResultVideo" class="hidden max-h-[340px] max-w-full object-contain filter drop-shadow-xl" autoplay loop muted playsinline controls></video>
                     </div>
 
                     <div id="gifResultActions" class="hidden p-3 bg-[#0d101a] border border-[#22293d] rounded-xl flex items-center justify-between gap-3 flex-wrap">
@@ -1053,21 +1088,21 @@
                         <div class="flex items-center gap-2 flex-wrap">
                             <button id="btnDownloadGif" onclick="downloadCurrentAnimation()" class="px-3.5 py-2 rounded-lg bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-bold text-xs flex items-center gap-1.5 shadow transition">
                                 <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                                <span id="lblBtnDownloadText">Descargar .GIF</span>
+                                <span id="lblBtnDownloadText">Descargar .PNG (APNG)</span>
                             </button>
-                            <button onclick="openAnimationInNewTab()" class="px-3 py-2 rounded-lg bg-sky-600/30 hover:bg-sky-600/40 border border-sky-500/40 text-sky-200 text-xs font-semibold flex items-center gap-1.5 transition" title="Abrir GIF en una pestaña nueva para guardar">
+                            <button onclick="openAnimationInNewTab()" class="px-3 py-2 rounded-lg bg-sky-600/30 hover:bg-sky-600/40 border border-sky-500/40 text-sky-200 text-xs font-semibold flex items-center gap-1.5 transition" title="Abrir animación en una pestaña nueva para guardar">
                                 <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
                                 <span>Abrir en Pestaña</span>
                             </button>
                             <button id="btnCopyGif" onclick="copyAnimationToClipboard()" class="px-3 py-2 rounded-lg bg-[#182032] hover:bg-[#232c45] border border-[#2b3754] text-slate-200 text-xs font-semibold flex items-center gap-1.5 transition">
                                 <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                                <span>Copiar GIF</span>
+                                <span>Copiar</span>
                             </button>
                         </div>
                     </div>
 
                     <div id="gifSandboxNotice" class="hidden text-center p-2 bg-pink-500/10 border border-pink-500/20 rounded-lg text-[11px] text-pink-200 leading-relaxed">
-                        <span>💡 <b>¿En Google Sites o iframe?</b> Si la descarga directa es bloqueada por el navegador, usa el botón <b>"Abrir en Pestaña"</b> o haz clic derecho sobre el GIF y selecciona <b>"Guardar imagen como..."</b>.</span>
+                        <span>💡 <b>¿En Google Sites o iframe?</b> Si la descarga directa es bloqueada por el navegador, usa el botón <b>"Abrir en Pestaña"</b> o haz clic derecho sobre la vista previa y selecciona <b>"Guardar como..."</b>.</span>
                     </div>
                 </div>
             </div>
@@ -4510,7 +4545,7 @@
 
             const exportData = {
                 avatarName: avatarName,
-                exporter: 'LiamToolAvatar2Unity V2',
+                exporter: 'LiamToolAvatar2Unity V3',
                 preset: studio.activeLayerPreset,
                 skeleton: {
                     width: w,
@@ -5978,7 +6013,279 @@ ${defaultLayersCode}
             a.click();
         }
 
-        function onExportFormatChanged() {} // Compatibilidad retroactiva
+        function onExportFormatChanged() {
+            const selFmt = document.getElementById('selExportFormat');
+            const fmt = selFmt ? selFmt.value : 'apng';
+            const selHeight = document.getElementById('selGifHeight');
+            const selFps = document.getElementById('selGifFps');
+            const rowWebmBg = document.getElementById('rowWebmBg');
+            const rowTransCheck = document.getElementById('rowTransparentCheck');
+            const rowStab = document.getElementById('rowGifStabilize');
+            const extLabel = document.getElementById('lblAnimExt');
+            const fmtBadge = document.getElementById('lblFormatBadge');
+            const btnGenText = document.getElementById('lblBtnGenerateText');
+            const btnDownText = document.getElementById('lblBtnDownloadText');
+
+            if (fmt === 'webm') {
+                if (extLabel) extLabel.textContent = '.webm';
+                if (fmtBadge) {
+                    fmtBadge.textContent = "🎥 Video HD WebM";
+                    fmtBadge.className = "text-[10px] text-emerald-400 font-bold";
+                }
+                if (rowWebmBg) rowWebmBg.classList.remove('hidden');
+                if (rowTransCheck) rowTransCheck.classList.add('hidden');
+                if (rowStab) rowStab.classList.add('hidden');
+                if (btnGenText) btnGenText.textContent = "✨ Generar Video (WebM HD)";
+                if (btnDownText) btnDownText.textContent = "Descargar .WebM";
+
+                // WebM resolutions: 480p, 720p, 1080p
+                if (selHeight) {
+                    const currentH = selHeight.value;
+                    selHeight.innerHTML = `
+                        <option value="480">480 px (480p SD)</option>
+                        <option value="720" selected>720 px (720p HD)</option>
+                        <option value="1080">1080 px (1080p Full HD)</option>
+                    `;
+                    if (['480', '720', '1080'].includes(currentH)) {
+                        selHeight.value = currentH;
+                    } else {
+                        selHeight.value = '720';
+                    }
+                }
+
+                // WebM FPS: 24, 30, 60
+                if (selFps) {
+                    const currentFps = selFps.value;
+                    selFps.innerHTML = `
+                        <option value="24">24 FPS (Cinemático)</option>
+                        <option value="30" selected>30 FPS (Fluido Estándar)</option>
+                        <option value="60">60 FPS (Máxima Suavidad 60 FPS)</option>
+                    `;
+                    if (['24', '30', '60'].includes(currentFps)) {
+                        selFps.value = currentFps;
+                    } else {
+                        selFps.value = '30';
+                    }
+                }
+
+            } else if (fmt === 'apng') {
+                if (extLabel) extLabel.textContent = '.png';
+                if (fmtBadge) {
+                    fmtBadge.textContent = "✨ APNG 32-bit";
+                    fmtBadge.className = "text-[10px] text-pink-400 font-bold";
+                }
+                if (rowWebmBg) rowWebmBg.classList.add('hidden');
+                if (rowTransCheck) rowTransCheck.classList.remove('hidden');
+                if (rowStab) rowStab.classList.add('hidden');
+                if (btnGenText) btnGenText.textContent = "✨ Generar Animación (APNG)";
+                if (btnDownText) btnDownText.textContent = "Descargar .PNG (APNG)";
+
+                // APNG resolutions: 240, 360, 480, 640, 720, 1080
+                if (selHeight) {
+                    const currentH = selHeight.value;
+                    selHeight.innerHTML = `
+                        <option value="240">240 px (Mini / Sticker)</option>
+                        <option value="360">360 px (Ligero / Redes)</option>
+                        <option value="480" selected>480 px (Recomendado)</option>
+                        <option value="640">640 px (Alta Calidad)</option>
+                        <option value="720">720 px (720p HD)</option>
+                        <option value="1080">1080 px (1080p Full HD)</option>
+                    `;
+                    if (['240', '360', '480', '640', '720', '1080'].includes(currentH)) {
+                        selHeight.value = currentH;
+                    } else {
+                        selHeight.value = '480';
+                    }
+                }
+
+                // APNG FPS: 15, 20, 24, 30, 60
+                if (selFps) {
+                    const currentFps = selFps.value;
+                    selFps.innerHTML = `
+                        <option value="15">15 FPS (Ligero)</option>
+                        <option value="20">20 FPS (Estándar)</option>
+                        <option value="24" selected>24 FPS (Cinemático)</option>
+                        <option value="30">30 FPS (Fluido)</option>
+                        <option value="60">60 FPS (Máxima Suavidad 60 FPS)</option>
+                    `;
+                    if (['15', '20', '24', '30', '60'].includes(currentFps)) {
+                        selFps.value = currentFps;
+                    } else {
+                        selFps.value = '24';
+                    }
+                }
+
+            } else { // gif
+                if (extLabel) extLabel.textContent = '.gif';
+                if (fmtBadge) {
+                    fmtBadge.textContent = "🖼️ GIF Universal";
+                    fmtBadge.className = "text-[10px] text-amber-400 font-bold";
+                }
+                if (rowWebmBg) rowWebmBg.classList.add('hidden');
+                if (rowTransCheck) rowTransCheck.classList.remove('hidden');
+                if (rowStab) rowStab.classList.remove('hidden');
+                if (btnGenText) btnGenText.textContent = "✨ Generar GIF Animado";
+                if (btnDownText) btnDownText.textContent = "Descargar .GIF";
+
+                // GIF resolutions: 240, 360, 480, 640
+                if (selHeight) {
+                    const currentH = selHeight.value;
+                    selHeight.innerHTML = `
+                        <option value="240">240 px (Mini / Sticker)</option>
+                        <option value="360">360 px (Ligero / Redes)</option>
+                        <option value="480" selected>480 px (Recomendado)</option>
+                        <option value="640">640 px (Alta Calidad HD)</option>
+                    `;
+                    if (['240', '360', '480', '640'].includes(currentH)) {
+                        selHeight.value = currentH;
+                    } else {
+                        selHeight.value = '480';
+                    }
+                }
+
+                // GIF FPS: 15, 20, 24
+                if (selFps) {
+                    const currentFps = selFps.value;
+                    selFps.innerHTML = `
+                        <option value="15">15 FPS (Ligero)</option>
+                        <option value="20">20 FPS (Estándar)</option>
+                        <option value="24" selected>24 FPS (Cinemático)</option>
+                    `;
+                    if (['15', '20', '24'].includes(currentFps)) {
+                        selFps.value = currentFps;
+                    } else {
+                        selFps.value = '24';
+                    }
+                }
+            }
+        }
+
+        // APNG (Animated PNG) Encoding Engine
+        const apngCrcTable = new Uint32Array(256);
+        for (let n = 0; n < 256; n++) {
+            let c = n;
+            for (let k = 0; k < 8; k++) {
+                if (c & 1) c = 0xedb88320 ^ (c >>> 1);
+                else c = c >>> 1;
+            }
+            apngCrcTable[n] = c;
+        }
+
+        function apngCrc32(buf, start = 0, len = buf.length) {
+            let c = 0xffffffff;
+            const end = start + len;
+            for (let i = start; i < end; i++) {
+                c = apngCrcTable[(c ^ buf[i]) & 0xff] ^ (c >>> 8);
+            }
+            return (c ^ 0xffffffff) >>> 0;
+        }
+
+        function makeApngChunk(typeStr, data) {
+            const len = data.length;
+            const chunk = new Uint8Array(12 + len);
+            const view = new DataView(chunk.buffer);
+            view.setUint32(0, len);
+            for (let i = 0; i < 4; i++) {
+                chunk[4 + i] = typeStr.charCodeAt(i);
+            }
+            chunk.set(data, 8);
+            const crc = apngCrc32(chunk, 4, 4 + len);
+            view.setUint32(8 + len, crc);
+            return chunk;
+        }
+
+        function parsePngChunks(pngBytes) {
+            const view = new DataView(pngBytes.buffer, pngBytes.byteOffset, pngBytes.byteLength);
+            let offset = 8;
+            let ihdrChunk = null;
+            const idatParts = [];
+
+            while (offset < pngBytes.length) {
+                const length = view.getUint32(offset);
+                const typeStr = String.fromCharCode(
+                    pngBytes[offset + 4],
+                    pngBytes[offset + 5],
+                    pngBytes[offset + 6],
+                    pngBytes[offset + 7]
+                );
+                const data = pngBytes.subarray(offset + 8, offset + 8 + length);
+                if (typeStr === 'IHDR') {
+                    ihdrChunk = pngBytes.subarray(offset, offset + 12 + length);
+                } else if (typeStr === 'IDAT') {
+                    idatParts.push(data);
+                } else if (typeStr === 'IEND') {
+                    break;
+                }
+                offset += 12 + length;
+            }
+
+            let totalIdatLen = 0;
+            for (let i = 0; i < idatParts.length; i++) totalIdatLen += idatParts[i].length;
+            const mergedIdat = new Uint8Array(totalIdatLen);
+            let cur = 0;
+            for (let i = 0; i < idatParts.length; i++) {
+                mergedIdat.set(idatParts[i], cur);
+                cur += idatParts[i].length;
+            }
+            return { ihdrChunk, idatData: mergedIdat };
+        }
+
+        function buildApng(framePngBytesList, width, height, fps = 20, loop = true) {
+            const chunks = [];
+            chunks.push(new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10]));
+
+            const firstParsed = parsePngChunks(framePngBytesList[0]);
+            chunks.push(firstParsed.ihdrChunk);
+
+            const acTLData = new Uint8Array(8);
+            const acTLView = new DataView(acTLData.buffer);
+            acTLView.setUint32(0, framePngBytesList.length);
+            acTLView.setUint32(4, loop ? 0 : 1);
+            chunks.push(makeApngChunk('acTL', acTLData));
+
+            let seq = 0;
+            const delayNum = Math.round(1000 / fps);
+            const delayDen = 1000;
+
+            for (let f = 0; f < framePngBytesList.length; f++) {
+                const parsed = (f === 0) ? firstParsed : parsePngChunks(framePngBytesList[f]);
+
+                const fcTLData = new Uint8Array(26);
+                const fcTLView = new DataView(fcTLData.buffer);
+                fcTLView.setUint32(0, seq++);
+                fcTLView.setUint32(4, width);
+                fcTLView.setUint32(8, height);
+                fcTLView.setUint32(12, 0);
+                fcTLView.setUint32(16, 0);
+                fcTLView.setUint16(20, delayNum);
+                fcTLView.setUint16(22, delayDen);
+                fcTLView.setUint8(24, 1);
+                fcTLView.setUint8(25, 0);
+                chunks.push(makeApngChunk('fcTL', fcTLData));
+
+                if (f === 0) {
+                    chunks.push(makeApngChunk('IDAT', parsed.idatData));
+                } else {
+                    const fdATData = new Uint8Array(4 + parsed.idatData.length);
+                    const fdATView = new DataView(fdATData.buffer);
+                    fdATView.setUint32(0, seq++);
+                    fdATData.set(parsed.idatData, 4);
+                    chunks.push(makeApngChunk('fdAT', fdATData));
+                }
+            }
+
+            chunks.push(makeApngChunk('IEND', new Uint8Array(0)));
+
+            let totalLen = 0;
+            for (let i = 0; i < chunks.length; i++) totalLen += chunks[i].length;
+            const result = new Uint8Array(totalLen);
+            let cur = 0;
+            for (let i = 0; i < chunks.length; i++) {
+                result.set(chunks[i], cur);
+                cur += chunks[i].length;
+            }
+            return result;
+        }
 
         function openGifModal() {
             if (!studio.parts || studio.parts.length === 0) {
@@ -5997,6 +6304,8 @@ ${defaultLayersCode}
 
             const lblDur = document.getElementById('lblGifDuration');
             if (lblDur) lblDur.textContent = (studio.anim.duration || 2.0).toFixed(2) + 's';
+
+            onExportFormatChanged();
 
             modal.classList.remove('hidden');
             modal.classList.add('flex');
@@ -6076,14 +6385,23 @@ ${defaultLayersCode}
             return { x: cropX, y: cropY, width: cropW, height: cropH };
         }
 
-        function renderAnimationSnapshot(ctx, targetW, targetH, cropBox, isTransparent, t) {
+        function renderAnimationSnapshot(ctx, targetW, targetH, cropBox, bgMode, t) {
             studio.anim.time = t;
             studio.anim.gust = 0;
             studio.anim.gustVel = 0;
             solveSkeletonAndDeformParts(0);
 
             ctx.clearRect(0, 0, targetW, targetH);
-            if (!isTransparent) {
+            if (bgMode === 'green') {
+                ctx.fillStyle = '#00FF00';
+                ctx.fillRect(0, 0, targetW, targetH);
+            } else if (bgMode === 'blue') {
+                ctx.fillStyle = '#0000FF';
+                ctx.fillRect(0, 0, targetW, targetH);
+            } else if (bgMode === 'red') {
+                ctx.fillStyle = '#FF0000';
+                ctx.fillRect(0, 0, targetW, targetH);
+            } else if (bgMode === 'dark') {
                 ctx.fillStyle = '#090b10';
                 ctx.fillRect(0, 0, targetW, targetH);
             }
@@ -6116,26 +6434,27 @@ ${defaultLayersCode}
             ctx.restore();
         }
 
-        function finalizeGifOutput(blob, targetW, targetH, totalFrames, fps, dur) {
-            studio.currentGifBlob = blob;
+        function finalizeAnimationOutput(blob, format, targetW, targetH, totalFrames, fps, dur) {
             studio.currentAnimBlob = blob;
-            studio.currentAnimFormat = 'gif';
+            studio.currentGifBlob = blob;
+            studio.currentAnimFormat = format;
 
-            if (studio.currentGifUrl) {
-                URL.revokeObjectURL(studio.currentGifUrl);
+            if (studio.currentAnimUrl) {
+                URL.revokeObjectURL(studio.currentAnimUrl);
             }
             const url = URL.createObjectURL(blob);
-            studio.currentGifUrl = url;
             studio.currentAnimUrl = url;
+            studio.currentGifUrl = url;
 
             const reader = new FileReader();
             reader.onloadend = () => {
-                studio.currentGifDataUrl = reader.result;
                 studio.currentAnimDataUrl = reader.result;
+                studio.currentGifDataUrl = reader.result;
             };
             reader.readAsDataURL(blob);
 
             const resultImg = document.getElementById('gifResultImg');
+            const resultVideo = document.getElementById('animResultVideo');
             const placeholder = document.getElementById('gifPlaceholder');
             const resultActions = document.getElementById('gifResultActions');
             const sandboxNotice = document.getElementById('gifSandboxNotice');
@@ -6144,9 +6463,20 @@ ${defaultLayersCode}
             if (resultActions) resultActions.classList.remove('hidden');
             if (sandboxNotice) sandboxNotice.classList.remove('hidden');
 
-            if (resultImg) {
-                resultImg.src = url;
-                resultImg.classList.remove('hidden');
+            if (format === 'webm') {
+                if (resultImg) resultImg.classList.add('hidden');
+                if (resultVideo) {
+                    resultVideo.src = url;
+                    resultVideo.classList.remove('hidden');
+                    resultVideo.load();
+                    resultVideo.play().catch(() => {});
+                }
+            } else {
+                if (resultVideo) resultVideo.classList.add('hidden');
+                if (resultImg) {
+                    resultImg.src = url;
+                    resultImg.classList.remove('hidden');
+                }
             }
 
             const sizeKb = (blob.size / 1024).toFixed(1);
@@ -6155,7 +6485,8 @@ ${defaultLayersCode}
             const infoSize = document.getElementById('gifInfoSize');
             const infoDetails = document.getElementById('gifInfoDetails');
             if (infoSize) infoSize.textContent = sizeStr;
-            if (infoDetails) infoDetails.textContent = targetW + 'x' + targetH + ' px • ' + totalFrames + ' frames @ ' + fps + ' FPS (' + dur.toFixed(2) + 's)';
+            const formatName = (format === 'apng') ? 'APNG' : (format === 'webm' ? 'WebM HD' : 'GIF');
+            if (infoDetails) infoDetails.textContent = formatName + ' • ' + targetW + 'x' + targetH + ' px • ' + totalFrames + ' frames @ ' + fps + ' FPS (' + dur.toFixed(2) + 's)';
         }
 
         function colorDistSq(c1, c2) {
@@ -6189,12 +6520,21 @@ ${defaultLayersCode}
                 return;
             }
 
+            const format = document.getElementById('selExportFormat') ? document.getElementById('selExportFormat').value : 'apng';
             const cropMode = document.getElementById('selGifCropMode').value;
             const targetH = parseInt(document.getElementById('selGifHeight').value, 10) || 480;
             const fps = parseInt(document.getElementById('selGifFps').value, 10) || 24;
-            const isTransparent = document.getElementById('chkGifTransparent').checked;
             const isLoop = document.getElementById('chkGifLoopForever').checked;
             const shouldStabilize = document.getElementById('chkGifStabilizeColors') ? document.getElementById('chkGifStabilizeColors').checked : true;
+
+            let bgMode = 'transparent';
+            if (format === 'webm') {
+                const selWebmBg = document.getElementById('selWebmBg');
+                bgMode = selWebmBg ? selWebmBg.value : 'transparent';
+            } else {
+                const isTransparent = document.getElementById('chkGifTransparent').checked;
+                bgMode = isTransparent ? 'transparent' : 'dark';
+            }
 
             studio.gifCancel = false;
 
@@ -6204,6 +6544,7 @@ ${defaultLayersCode}
             const progressText = document.getElementById('gifProgressText');
             const btnGen = document.getElementById('btnGenerateGif');
             const resultImg = document.getElementById('gifResultImg');
+            const resultVideo = document.getElementById('animResultVideo');
             const placeholder = document.getElementById('gifPlaceholder');
             const resultActions = document.getElementById('gifResultActions');
 
@@ -6211,6 +6552,7 @@ ${defaultLayersCode}
             btnGen.disabled = true;
             btnGen.classList.add('opacity-50', 'cursor-not-allowed');
             if (resultImg) resultImg.classList.add('hidden');
+            if (resultVideo) resultVideo.classList.add('hidden');
             if (resultActions) resultActions.classList.add('hidden');
             if (placeholder) placeholder.classList.remove('hidden');
 
@@ -6223,7 +6565,7 @@ ${defaultLayersCode}
 
             const aspect = cropBox.width / cropBox.height;
             let targetW = Math.round(targetH * aspect);
-            if (targetW % 2 !== 0) targetW++;
+            if (targetW % 2 !== 0) targetW++; // Even width required for video codecs
 
             const offCanvas = document.createElement('canvas');
             offCanvas.width = targetW;
@@ -6244,128 +6586,259 @@ ${defaultLayersCode}
             studio.anim.gustVel = 0;
 
             try {
-                if (!window.gifenc || !window.gifenc.GIFEncoder) {
-                    throw new Error("El codificador de GIF no está disponible.");
-                }
+                if (format === 'apng') {
+                    // APNG (Animated PNG) - 32-bit TrueColor + 8-bit Alpha
+                    progressText.textContent = "Preparando renderizado APNG en 32-bit...";
+                    progressPct.textContent = "0%";
+                    progressBar.style.width = "0%";
+                    await new Promise(r => setTimeout(r, 0));
 
-                progressText.textContent = "Analizando paleta de colores del avatar...";
-                progressPct.textContent = "5%";
-                progressBar.style.width = "5%";
-                await new Promise(r => setTimeout(r, 0));
+                    const frameBytesList = [];
+                    for (let f = 0; f < totalFrames; f++) {
+                        if (studio.gifCancel) break;
 
-                const samplePixels = [];
+                        const t = (f / totalFrames) * dur;
+                        renderAnimationSnapshot(offCtx, targetW, targetH, cropBox, bgMode, t);
 
-                // Muestrear texturas horneadas de las partes
-                for (let pIdx = 0; pIdx < studio.parts.length; pIdx++) {
-                    const part = studio.parts[pIdx];
-                    if (!part.visible || !part.bakedCanvas) continue;
-                    try {
-                        const pctx = part.bakedCanvas.getContext('2d');
-                        const pData = pctx.getImageData(0, 0, part.bakedCanvas.width, part.bakedCanvas.height).data;
-                        const step = (pData.length / 4 > 60000) ? 8 : 4;
-                        for (let p = 0; p < pData.length; p += step * 4) {
-                            if (!isTransparent || pData[p + 3] >= 64) {
-                                samplePixels.push(pData[p], pData[p + 1], pData[p + 2], 255);
-                            }
-                        }
-                    } catch (e) {}
-                }
+                        const blob = await new Promise(res => offCanvas.toBlob(res, 'image/png'));
+                        const ab = await blob.arrayBuffer();
+                        frameBytesList.push(new Uint8Array(ab));
 
-                // Muestrear fotogramas representativos de la animación
-                const sampleCount = Math.min(8, totalFrames);
-                const sampleStep = Math.max(1, Math.floor(totalFrames / sampleCount));
+                        const pct = Math.round(((f + 1) / totalFrames) * 90);
+                        progressBar.style.width = pct + '%';
+                        progressPct.textContent = pct + '%';
+                        progressText.textContent = "Renderizando fotograma APNG " + (f + 1) + " de " + totalFrames + " (" + pct + "%)...";
 
-                for (let s = 0; s < totalFrames; s += sampleStep) {
-                    renderAnimationSnapshot(offCtx, targetW, targetH, cropBox, isTransparent, (s / totalFrames) * dur);
-                    const imgData = offCtx.getImageData(0, 0, targetW, targetH);
-                    const data = imgData.data;
-                    const pixelStep = (data.length / 4 > 60000) ? 8 : 4;
-                    for (let p = 0; p < data.length; p += pixelStep * 4) {
-                        const a = data[p + 3];
-                        if (!isTransparent || a >= 64) {
-                            samplePixels.push(data[p], data[p + 1], data[p + 2], 255);
-                        }
-                    }
-                }
-
-                let masterPalette, opaquePalette;
-                if (samplePixels.length === 0) {
-                    opaquePalette = [[200, 200, 200], [40, 40, 40]];
-                } else {
-                    const sampleBuffer = new Uint8Array(samplePixels);
-                    const maxColors = isTransparent ? 255 : 256;
-                    const rawPalette = window.gifenc.quantize(sampleBuffer, maxColors, { format: 'rgb565' });
-                    if (shouldStabilize) {
-                        opaquePalette = prunePalettePerceptual(rawPalette, 8);
-                    } else {
-                        opaquePalette = rawPalette;
-                    }
-                }
-
-                if (isTransparent) {
-                    masterPalette = [[0, 0, 0], ...opaquePalette];
-                } else {
-                    masterPalette = opaquePalette;
-                }
-
-                const gif = window.gifenc.GIFEncoder();
-
-                for (let f = 0; f < totalFrames; f++) {
-                    if (studio.gifCancel) break;
-
-                    const t = (f / totalFrames) * dur;
-                    renderAnimationSnapshot(offCtx, targetW, targetH, cropBox, isTransparent, t);
-
-                    const imgData = offCtx.getImageData(0, 0, targetW, targetH);
-                    const rgba = imgData.data;
-
-                    let index;
-                    if (isTransparent) {
-                        const mappedOpaque = window.gifenc.applyPalette(rgba, opaquePalette, 'rgb565');
-                        index = new Uint8Array(targetW * targetH);
-                        for (let i = 0; i < targetW * targetH; i++) {
-                            if (rgba[i * 4 + 3] < 64) {
-                                index[i] = 0;
-                            } else {
-                                index[i] = mappedOpaque[i] + 1;
-                            }
-                        }
-                    } else {
-                        index = window.gifenc.applyPalette(rgba, masterPalette, 'rgb565');
+                        await new Promise(r => setTimeout(r, 0));
                     }
 
-                    gif.writeFrame(index, targetW, targetH, {
-                        palette: (f === 0) ? masterPalette : null,
-                        delay: frameDelayMs,
-                        transparent: isTransparent,
-                        transparentIndex: 0,
-                        dispose: isTransparent ? 2 : 1,
-                        repeat: isLoop ? 0 : -1
+                    if (studio.gifCancel) return;
+
+                    progressText.textContent = "Empaquetando APNG de 32-bit sin compresión con pérdida...";
+                    await new Promise(r => setTimeout(r, 0));
+
+                    const apngBytes = buildApng(frameBytesList, targetW, targetH, fps, isLoop);
+                    const apngBlob = new Blob([apngBytes], { type: 'image/png' });
+
+                    finalizeAnimationOutput(apngBlob, 'apng', targetW, targetH, totalFrames, fps, dur);
+
+                } else if (format === 'webm') {
+                    // WebM Video (VP9/VP8 with Alpha or Chroma Key)
+                    if (typeof MediaRecorder === 'undefined') {
+                        throw new Error("Tu navegador no soporta MediaRecorder para video WebM.");
+                    }
+
+                    const isAlpha = (bgMode === 'transparent');
+                    const candidateMimes = isAlpha
+                        ? ['video/webm;codecs=vp9,opus', 'video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm']
+                        : ['video/webm;codecs=vp8,opus', 'video/webm;codecs=vp8', 'video/webm;codecs=vp9,opus', 'video/webm;codecs=vp9', 'video/webm'];
+
+                    let chosenMime = '';
+                    for (const cand of candidateMimes) {
+                        if (MediaRecorder.isTypeSupported(cand)) {
+                            chosenMime = cand;
+                            break;
+                        }
+                    }
+                    if (!chosenMime) chosenMime = 'video/webm';
+
+                    progressText.textContent = "Iniciando codificador de video WebM " + targetH + "p (" + (isAlpha ? 'Alpha' : 'Chroma Key') + ")...";
+                    progressPct.textContent = "0%";
+                    progressBar.style.width = "0%";
+                    await new Promise(r => setTimeout(r, 0));
+
+                    // Attach canvas temporarily to ensure active compositor refresh in all engines
+                    offCanvas.style.position = 'fixed';
+                    offCanvas.style.top = '-9999px';
+                    offCanvas.style.left = '-9999px';
+                    offCanvas.style.visibility = 'hidden';
+                    document.body.appendChild(offCanvas);
+
+                    const stream = offCanvas.captureStream(fps);
+                    const [videoTrack] = stream.getVideoTracks();
+                    const recorder = new MediaRecorder(stream, {
+                        mimeType: chosenMime,
+                        videoBitsPerSecond: targetH >= 1080 ? 16000000 : (targetH >= 720 ? 10000000 : 5000000)
                     });
 
-                    const pct = Math.round(10 + ((f + 1) / totalFrames) * 90);
-                    progressBar.style.width = pct + '%';
-                    progressPct.textContent = pct + '%';
-                    progressText.textContent = "Renderizando fotograma " + (f + 1) + " de " + totalFrames + " (" + pct + "%)...";
+                    const chunks = [];
+                    recorder.ondataavailable = e => {
+                        if (e.data && e.data.size > 0) chunks.push(e.data);
+                    };
 
+                    const stopPromise = new Promise((resolve, reject) => {
+                        recorder.onstop = () => resolve(new Blob(chunks, { type: chosenMime }));
+                        recorder.onerror = reject;
+                    });
+
+                    recorder.start(100);
+
+                    // Initial frame setup
+                    renderAnimationSnapshot(offCtx, targetW, targetH, cropBox, bgMode, 0);
+                    if (videoTrack && typeof videoTrack.requestFrame === 'function') {
+                        videoTrack.requestFrame();
+                    }
+                    await new Promise(r => setTimeout(r, 60));
+
+                    for (let f = 0; f < totalFrames; f++) {
+                        if (studio.gifCancel) {
+                            try { recorder.stop(); } catch(e){}
+                            return;
+                        }
+
+                        const t = (f / totalFrames) * dur;
+                        renderAnimationSnapshot(offCtx, targetW, targetH, cropBox, bgMode, t);
+
+                        if (videoTrack && typeof videoTrack.requestFrame === 'function') {
+                            videoTrack.requestFrame();
+                        }
+
+                        await new Promise(r => setTimeout(r, frameDelayMs));
+
+                        const pct = Math.round(((f + 1) / totalFrames) * 90);
+                        progressBar.style.width = pct + '%';
+                        progressPct.textContent = pct + '%';
+                        progressText.textContent = "Grabando video WebM (" + (f + 1) + " de " + totalFrames + " fotogramas)...";
+                    }
+
+                    // Buffer final frame to seal container without glitch
+                    await new Promise(r => setTimeout(r, frameDelayMs * 2));
+                    if (typeof recorder.requestData === 'function') {
+                        try { recorder.requestData(); } catch(e){}
+                    }
+                    recorder.stop();
+                    progressText.textContent = "Finalizando codificación WebM...";
+                    const webmBlob = await stopPromise;
+
+                    finalizeAnimationOutput(webmBlob, 'webm', targetW, targetH, totalFrames, fps, dur);
+
+                } else {
+                    // GIF - 256 colors with perceptual stabilization
+                    if (!window.gifenc || !window.gifenc.GIFEncoder) {
+                        throw new Error("El codificador de GIF no está disponible.");
+                    }
+
+                    progressText.textContent = "Analizando paleta de colores del avatar...";
+                    progressPct.textContent = "5%";
+                    progressBar.style.width = "5%";
                     await new Promise(r => setTimeout(r, 0));
+
+                    const isTransparent = (bgMode === 'transparent');
+                    const samplePixels = [];
+
+                    for (let pIdx = 0; pIdx < studio.parts.length; pIdx++) {
+                        const part = studio.parts[pIdx];
+                        if (!part.visible || !part.bakedCanvas) continue;
+                        try {
+                            const pctx = part.bakedCanvas.getContext('2d');
+                            const pData = pctx.getImageData(0, 0, part.bakedCanvas.width, part.bakedCanvas.height).data;
+                            const step = (pData.length / 4 > 60000) ? 8 : 4;
+                            for (let p = 0; p < pData.length; p += step * 4) {
+                                if (!isTransparent || pData[p + 3] >= 64) {
+                                    samplePixels.push(pData[p], pData[p + 1], pData[p + 2], 255);
+                                }
+                            }
+                        } catch (e) {}
+                    }
+
+                    const sampleCount = Math.min(8, totalFrames);
+                    const sampleStep = Math.max(1, Math.floor(totalFrames / sampleCount));
+
+                    for (let s = 0; s < totalFrames; s += sampleStep) {
+                        renderAnimationSnapshot(offCtx, targetW, targetH, cropBox, bgMode, (s / totalFrames) * dur);
+                        const imgData = offCtx.getImageData(0, 0, targetW, targetH);
+                        const data = imgData.data;
+                        const pixelStep = (data.length / 4 > 60000) ? 8 : 4;
+                        for (let p = 0; p < data.length; p += pixelStep * 4) {
+                            const a = data[p + 3];
+                            if (!isTransparent || a >= 64) {
+                                samplePixels.push(data[p], data[p + 1], data[p + 2], 255);
+                            }
+                        }
+                    }
+
+                    let masterPalette, opaquePalette;
+                    if (samplePixels.length === 0) {
+                        opaquePalette = [[200, 200, 200], [40, 40, 40]];
+                    } else {
+                        const sampleBuffer = new Uint8Array(samplePixels);
+                        const maxColors = isTransparent ? 255 : 256;
+                        const rawPalette = window.gifenc.quantize(sampleBuffer, maxColors, { format: 'rgb565' });
+                        if (shouldStabilize) {
+                            opaquePalette = prunePalettePerceptual(rawPalette, 8);
+                        } else {
+                            opaquePalette = rawPalette;
+                        }
+                    }
+
+                    if (isTransparent) {
+                        masterPalette = [[0, 0, 0], ...opaquePalette];
+                    } else {
+                        masterPalette = opaquePalette;
+                    }
+
+                    const gif = window.gifenc.GIFEncoder();
+
+                    for (let f = 0; f < totalFrames; f++) {
+                        if (studio.gifCancel) break;
+
+                        const t = (f / totalFrames) * dur;
+                        renderAnimationSnapshot(offCtx, targetW, targetH, cropBox, bgMode, t);
+
+                        const imgData = offCtx.getImageData(0, 0, targetW, targetH);
+                        const rgba = imgData.data;
+
+                        let index;
+                        if (isTransparent) {
+                            const mappedOpaque = window.gifenc.applyPalette(rgba, opaquePalette, 'rgb565');
+                            index = new Uint8Array(targetW * targetH);
+                            for (let i = 0; i < targetW * targetH; i++) {
+                                if (rgba[i * 4 + 3] < 64) {
+                                    index[i] = 0;
+                                } else {
+                                    index[i] = mappedOpaque[i] + 1;
+                                }
+                            }
+                        } else {
+                            index = window.gifenc.applyPalette(rgba, masterPalette, 'rgb565');
+                        }
+
+                        gif.writeFrame(index, targetW, targetH, {
+                            palette: (f === 0) ? masterPalette : null,
+                            delay: frameDelayMs,
+                            transparent: isTransparent,
+                            transparentIndex: 0,
+                            dispose: isTransparent ? 2 : 1,
+                            repeat: isLoop ? 0 : -1
+                        });
+
+                        const pct = Math.round(10 + ((f + 1) / totalFrames) * 90);
+                        progressBar.style.width = pct + '%';
+                        progressPct.textContent = pct + '%';
+                        progressText.textContent = "Renderizando fotograma " + (f + 1) + " de " + totalFrames + " (" + pct + "%)...";
+
+                        await new Promise(r => setTimeout(r, 0));
+                    }
+
+                    if (studio.gifCancel) return;
+
+                    progressText.textContent = "Finalizando compresión GIF...";
+                    await new Promise(r => setTimeout(r, 0));
+
+                    gif.finish();
+                    const bytes = gif.bytes();
+                    const gifBlob = new Blob([bytes], { type: 'image/gif' });
+
+                    finalizeAnimationOutput(gifBlob, 'gif', targetW, targetH, totalFrames, fps, dur);
                 }
 
-                if (studio.gifCancel) return;
-
-                progressText.textContent = "Finalizando compresión GIF...";
-                await new Promise(r => setTimeout(r, 0));
-
-                gif.finish();
-                const bytes = gif.bytes();
-                const gifBlob = new Blob([bytes], { type: 'image/gif' });
-
-                finalizeGifOutput(gifBlob, targetW, targetH, totalFrames, fps, dur);
-
             } catch (err) {
-                console.error("Error generating GIF:", err);
-                alert("Ocurrió un error al generar el GIF: " + (err.message || err));
+                console.error("Error generating animation:", err);
+                alert("Ocurrió un error al generar la animación: " + (err.message || err));
             } finally {
+                if (offCanvas.parentNode) {
+                    offCanvas.parentNode.removeChild(offCanvas);
+                }
                 studio.anim.time = savedTime;
                 studio.anim.gust = savedGust;
                 studio.anim.gustVel = savedGustVel;
@@ -6379,14 +6852,17 @@ ${defaultLayersCode}
         }
         window.generateGifAnimation = generateAnimation;
 
-        function downloadCurrentGif() {
-            if (!studio.currentGifBlob) {
-                alert("Primero genera el GIF para poder descargarlo.");
+        function downloadCurrentAnimation() {
+            if (!studio.currentAnimBlob && !studio.currentGifBlob) {
+                alert("Primero genera la animación para poder descargarla.");
                 return;
             }
+            const blob = studio.currentAnimBlob || studio.currentGifBlob;
+            const format = studio.currentAnimFormat || 'apng';
+            const ext = (format === 'apng') ? 'png' : (format === 'webm' ? 'webm' : 'gif');
             const avatarName = getSanitizedAvatarName();
-            const fileName = avatarName + '_anim.gif';
-            const targetUrl = studio.currentGifDataUrl || studio.currentGifUrl;
+            const fileName = avatarName + '_anim.' + ext;
+            const targetUrl = studio.currentAnimDataUrl || studio.currentAnimUrl || studio.currentGifDataUrl || studio.currentGifUrl;
 
             try {
                 const a = document.createElement('a');
@@ -6406,34 +6882,41 @@ ${defaultLayersCode}
             const notice = document.getElementById('gifSandboxNotice');
             if (notice) notice.classList.remove('hidden');
         }
-        window.downloadCurrentAnimation = downloadCurrentGif;
+        window.downloadCurrentGif = downloadCurrentAnimation;
 
-        function openGifInNewTab() {
-            if (!studio.currentGifBlob) {
-                alert("Primero genera el GIF para poder abrirlo.");
+        function openAnimationInNewTab() {
+            if (!studio.currentAnimBlob && !studio.currentGifBlob) {
+                alert("Primero genera la animación para poder abrirla.");
                 return;
             }
-            const targetUrl = studio.currentGifDataUrl || studio.currentGifUrl;
+            const targetUrl = studio.currentAnimDataUrl || studio.currentAnimUrl || studio.currentGifDataUrl || studio.currentGifUrl;
+            const format = studio.currentAnimFormat || 'apng';
+            const ext = (format === 'apng') ? 'png' : (format === 'webm' ? 'webm' : 'gif');
+            const isVideo = (format === 'webm');
             const avatarName = getSanitizedAvatarName();
-            const fileName = avatarName + '_anim.gif';
+            const fileName = avatarName + '_anim.' + ext;
             const win = window.open();
             if (win) {
+                const mediaTag = isVideo
+                    ? '<video src="' + targetUrl + '" autoplay loop muted playsinline controls style="max-height:75vh;max-width:90vw;object-fit:contain;border-radius:8px;box-shadow:0 10px 25px rgba(0,0,0,0.6);"></video>'
+                    : '<img src="' + targetUrl + '" style="max-height:75vh;max-width:90vw;object-fit:contain;border-radius:8px;filter:drop-shadow(0 10px 25px rgba(0,0,0,0.6));" alt="' + avatarName + '">';
+
                 win.document.write(`
                     <!DOCTYPE html>
                     <html lang="es">
                     <head>
                         <meta charset="UTF-8">
-                        <title>${avatarName} - Preview GIF</title>
+                        <title>${avatarName} - Preview ${ext.toUpperCase()}</title>
                         <meta name="viewport" content="width=device-width, initial-scale=1">
                     </head>
                     <body style="margin:0;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#0c0f18;background-image:linear-gradient(45deg,#151b29 25%,transparent 25%),linear-gradient(-45deg,#151b29 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#151b29 75%),linear-gradient(-45deg,transparent 75%,#151b29 75%);background-size:20px 20px;font-family:sans-serif;color:#e2e8f0;padding:20px;box-sizing:border-box;">
-                        <img src="${targetUrl}" style="max-height:75vh;max-width:90vw;object-fit:contain;filter:drop-shadow(0 10px 25px rgba(0,0,0,0.6));border-radius:8px;" alt="${avatarName}">
+                        ${mediaTag}
                         <div style="margin-top:20px;display:flex;flex-direction:column;align-items:center;gap:10px;">
                             <a href="${targetUrl}" download="${fileName}" style="display:inline-block;padding:10px 22px;background:linear-gradient(135deg,#db2777,#9333ea);color:white;text-decoration:none;border-radius:8px;font-weight:bold;font-size:14px;box-shadow:0 4px 14px rgba(219,39,119,0.4);">
                                 ⬇️ Descargar ${fileName}
                             </a>
                             <span style="font-size:12px;color:#94a3b8;text-align:center;">
-                                O haz clic derecho sobre la imagen y elige <b>"Guardar imagen como..."</b>
+                                O haz clic derecho sobre el archivo y elige <b>"Guardar ${isVideo ? 'video' : 'imagen'} como..."</b>
                             </span>
                         </div>
                     </body>
@@ -6444,18 +6927,27 @@ ${defaultLayersCode}
                 alert("Tu navegador bloqueó la pestaña emergente. Por favor permite popups para este sitio o haz clic derecho sobre la vista previa para guardar.");
             }
         }
-        window.openAnimationInNewTab = openGifInNewTab;
+        window.openGifInNewTab = openAnimationInNewTab;
 
-        async function copyGifToClipboard() {
-            const blob = studio.currentGifBlob;
+        async function copyAnimationToClipboard() {
+            const blob = studio.currentAnimBlob || studio.currentGifBlob;
             if (!blob) return;
+            const format = studio.currentAnimFormat || 'apng';
 
             try {
-                await navigator.clipboard.write([
-                    new ClipboardItem({ 'image/gif': blob })
-                ]);
-                alert("¡GIF copiado al portapapeles con éxito!");
-                return;
+                if (format === 'apng') {
+                    await navigator.clipboard.write([
+                        new ClipboardItem({ 'image/png': blob })
+                    ]);
+                    alert("¡Animación APNG copiada al portapapeles con éxito!");
+                    return;
+                } else if (format === 'gif') {
+                    await navigator.clipboard.write([
+                        new ClipboardItem({ 'image/gif': blob })
+                    ]);
+                    alert("¡GIF copiado al portapapeles con éxito!");
+                    return;
+                }
             } catch (err) {}
 
             try {
@@ -6467,24 +6959,24 @@ ${defaultLayersCode}
                 c.drawImage(img, 0, 0);
                 cvs.toBlob(async (pngBlob) => {
                     if (!pngBlob) {
-                        downloadCurrentGif();
+                        downloadCurrentAnimation();
                         return;
                     }
                     try {
                         await navigator.clipboard.write([
                             new ClipboardItem({ 'image/png': pngBlob })
                         ]);
-                        alert("¡Fotograma copiado al portapapeles! Para guardar el GIF animado completo usa 'Descargar' o 'Abrir en Pestaña'.");
+                        alert("¡Imagen copiada al portapapeles! Para guardar el archivo completo usa 'Descargar' o 'Abrir en Pestaña'.");
                     } catch (e2) {
-                        downloadCurrentGif();
+                        downloadCurrentAnimation();
                     }
                 }, 'image/png');
             } catch (e3) {
-                downloadCurrentGif();
+                downloadCurrentAnimation();
             }
         }
-        window.copyAnimationToClipboard = copyGifToClipboard;
-        window.copyGifToClipboard = copyGifToClipboard;
+        window.copyAnimationToClipboard = copyAnimationToClipboard;
+        window.copyGifToClipboard = copyAnimationToClipboard;
 
         function getMcpStudioStateSummary() {
             return {
