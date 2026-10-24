@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LiamToolAvatar2Unity V4</title>
+    <title>LiamToolAvatar2Unity V5</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
@@ -119,139 +119,121 @@
 </head>
 <body class="flex flex-col select-none">
 
-    <header class="h-11 bg-[#0d1018] border-b border-[#22293c] px-2.5 flex items-center justify-between shrink-0 z-30 gap-2">
-        <div class="flex items-center gap-2">
-            <div class="flex items-center gap-2">
-                <div class="w-7 h-7 rounded bg-gradient-to-br from-sky-500 to-indigo-600 flex items-center justify-center shadow">
-                    <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                        <circle cx="6" cy="6" r="3"/>
-                        <circle cx="18" cy="18" r="3"/>
-                        <path d="M8.12 8.12L15.88 15.88"/>
-                        <circle cx="18" cy="6" r="2.5"/>
-                        <path d="M8.5 6H15.5"/>
-                    </svg>
+    <header class="h-12 bg-[#090d16]/95 backdrop-blur-md border-b border-[#1c2438] px-3 flex items-center justify-between shrink-0 z-30 gap-2.5 shadow-sm">
+        <div class="flex items-center gap-2.5 overflow-x-auto py-1">
+            
+            <div class="flex items-center gap-2 shrink-0">
+                <div class="relative w-7 h-7 rounded-lg bg-gradient-to-tr from-cyan-500 via-indigo-600 to-violet-600 p-[1.5px] shadow-md shadow-cyan-500/15 flex items-center justify-center">
+                    <div class="w-full h-full bg-[#080b12] rounded-[6px] flex items-center justify-center overflow-hidden">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none">
+                            <polygon points="12 2 21 8 21 16 12 22 3 16 3 8" stroke="url(#logoV5Grad)" stroke-width="1.8" stroke-linejoin="round"/>
+                            <path d="M12 2V12M12 12L21 8M12 12L3 8M12 12L12 22M12 12L21 16M12 12L3 16" stroke="#38bdf8" stroke-width="1.2" stroke-opacity="0.45"/>
+                            <circle cx="12" cy="12" r="2.2" fill="#00e5ff" stroke="#ffffff" stroke-width="1"/>
+                            <circle cx="12" cy="3" r="1.2" fill="#a855f7"/>
+                            <circle cx="20" cy="8.5" r="1.2" fill="#38bdf8"/>
+                            <circle cx="20" cy="15.5" r="1.2" fill="#38bdf8"/>
+                            <circle cx="12" cy="21" r="1.2" fill="#a855f7"/>
+                            <circle cx="4" cy="15.5" r="1.2" fill="#38bdf8"/>
+                            <circle cx="4" cy="8.5" r="1.2" fill="#38bdf8"/>
+                            <defs>
+                                <linearGradient id="logoV5Grad" x1="3" y1="2" x2="21" y2="22" gradientUnits="userSpaceOnUse">
+                                    <stop stop-color="#00e5ff"/>
+                                    <stop offset="0.5" stop-color="#6366f1"/>
+                                    <stop offset="1" stop-color="#a855f7"/>
+                                </linearGradient>
+                            </defs>
+                        </svg>
+                    </div>
                 </div>
                 <div class="flex items-center gap-1.5">
-                    <span class="font-bold tracking-tight text-white text-xs sm:text-sm">LiamToolAvatar2Unity</span>
-                    <span class="mono text-[10px] font-semibold px-1.5 py-0.5 rounded bg-sky-500/15 text-sky-300 border border-sky-500/30">V4</span>
+                    <span class="font-extrabold tracking-tight text-xs sm:text-sm bg-gradient-to-r from-white via-slate-100 to-slate-300 bg-clip-text text-transparent">LiamTool <span class="bg-gradient-to-r from-cyan-400 to-sky-300 bg-clip-text text-transparent font-bold">Avatar2Unity</span></span>
+                    <span class="mono text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/30">V5</span>
                 </div>
             </div>
 
-            <div class="h-5 w-px bg-[#22293c]"></div>
+            <div class="h-5 w-px bg-[#1c2438]"></div>
 
-            <div class="flex items-center gap-1 bg-[#141926] px-2 py-0.5 rounded border border-[#242c42]" title="Resolucion Nativa del Lienzo">
-                <span class="text-[10px] text-slate-400">Lienzo:</span>
-                <input type="number" id="inpCanvasW" value="1536" min="256" max="8192" onchange="changeCanvasResolution()" class="w-14 bg-[#0b0e16] border border-[#26304a] rounded px-1 py-0.5 text-[10px] mono text-sky-300 text-center">
-                <span class="text-[10px] text-slate-500">x</span>
-                <input type="number" id="inpCanvasH" value="2752" min="256" max="8192" onchange="changeCanvasResolution()" class="w-14 bg-[#0b0e16] border border-[#26304a] rounded px-1 py-0.5 text-[10px] mono text-sky-300 text-center">
+            <div class="flex items-center gap-1.5 shrink-0">
+                <div class="flex items-center gap-1.5 bg-[#101522] px-2 py-1 rounded-lg border border-[#212b42]" title="Nombre del Avatar">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                    <span class="text-[10px] text-slate-400 font-semibold">Avatar:</span>
+                    <input type="text" id="inpHeaderAvatarName" value="CustomAvatar" oninput="onAvatarNameChanged(this.value)" class="w-24 bg-[#080b12] border border-[#26314d] rounded px-1.5 py-0.5 text-[10px] mono text-emerald-300 font-bold focus:outline-none focus:border-emerald-500" placeholder="Nombre Avatar">
+                </div>
+
+                <div class="flex items-center gap-1 bg-[#101522] px-2 py-1 rounded-lg border border-[#212b42]" title="Resolucion Nativa del Lienzo">
+                    <span class="text-[10px] text-slate-400 font-medium">Lienzo:</span>
+                    <input type="number" id="inpCanvasW" value="1536" min="256" max="8192" onchange="changeCanvasResolution()" class="w-12 bg-[#080b12] border border-[#26314d] rounded px-1 py-0.5 text-[10px] mono text-sky-300 text-center">
+                    <span class="text-[10px] text-slate-500">x</span>
+                    <input type="number" id="inpCanvasH" value="2752" min="256" max="8192" onchange="changeCanvasResolution()" class="w-12 bg-[#080b12] border border-[#26314d] rounded px-1 py-0.5 text-[10px] mono text-sky-300 text-center">
+                </div>
             </div>
 
-            <div class="h-5 w-px bg-[#22293c]"></div>
+            <div class="h-5 w-px bg-[#1c2438]"></div>
 
-            <div class="flex items-center gap-1.5 bg-[#141926] px-2 py-0.5 rounded border border-[#242c42]" title="Nombre del Avatar para exportar .cs, .json y atlas">
-                <span class="text-[10px] text-slate-400 font-semibold">Avatar:</span>
-                <input type="text" id="inpHeaderAvatarName" value="CustomAvatar" oninput="onAvatarNameChanged(this.value)" class="w-28 bg-[#0b0e16] border border-[#26304a] rounded px-1.5 py-0.5 text-[10px] mono text-emerald-300 font-bold focus:outline-none focus:border-emerald-500" placeholder="Nombre Avatar">
-            </div>
-
-            <div class="h-5 w-px bg-[#22293c]"></div>
-
-            <div class="flex items-center gap-1">
-                <button id="btnUndo" onclick="performUndo()" disabled class="px-2 py-1 rounded bg-[#151a28] hover:bg-[#1e263a] disabled:opacity-35 border border-[#26304a] text-slate-200 text-[11px] font-medium flex items-center gap-1 transition" title="Ctrl+Z">
-                    <svg class="w-3.5 h-3.5 text-sky-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/>
-                    </svg>
+            <div class="flex items-center gap-1 shrink-0">
+                <button id="btnUndo" onclick="performUndo()" disabled class="px-2 py-1 rounded-lg bg-[#101522] hover:bg-[#1a2236] disabled:opacity-30 border border-[#212b42] text-slate-200 text-[11px] font-medium flex items-center gap-1 transition" title="Ctrl+Z">
+                    <svg class="w-3.5 h-3.5 text-sky-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg>
                     <span>Deshacer</span>
                 </button>
-                <button id="btnRedo" onclick="performRedo()" disabled class="px-2 py-1 rounded bg-[#151a28] hover:bg-[#1e263a] disabled:opacity-35 border border-[#26304a] text-slate-200 text-[11px] font-medium flex items-center gap-1 transition" title="Ctrl+Y">
-                    <svg class="w-3.5 h-3.5 text-sky-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 7v6h-6"/><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"/>
-                    </svg>
+                <button id="btnRedo" onclick="performRedo()" disabled class="px-2 py-1 rounded-lg bg-[#101522] hover:bg-[#1a2236] disabled:opacity-30 border border-[#212b42] text-slate-200 text-[11px] font-medium flex items-center gap-1 transition" title="Ctrl+Y">
+                    <svg class="w-3.5 h-3.5 text-sky-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"/></svg>
                     <span>Rehacer</span>
                 </button>
             </div>
 
-            <div class="h-5 w-px bg-[#22293c]"></div>
+            <div class="h-5 w-px bg-[#1c2438]"></div>
 
-            <div class="flex items-center gap-1">
-                <button onclick="saveProjectToFile()" class="px-2 py-1 rounded bg-[#151a28] hover:bg-[#1e263a] border border-emerald-500/40 text-emerald-300 text-[11px] font-semibold flex items-center gap-1 transition">
-                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
-                        <polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>
-                    </svg>
+            <div class="flex items-center gap-1 shrink-0">
+                <button onclick="saveProjectToFile()" class="px-2 py-1 rounded-lg bg-[#101522] hover:bg-[#1a2236] border border-emerald-500/40 text-emerald-300 text-[11px] font-semibold flex items-center gap-1 transition" title="Guardar proyecto completo en archivo .L2U">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
                     <span>Guardar (.L2U)</span>
                 </button>
 
-                <label class="cursor-pointer px-2 py-1 rounded bg-[#151a28] hover:bg-[#1e263a] border border-amber-500/40 text-amber-300 text-[11px] font-semibold flex items-center gap-1 transition">
-                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
-                    </svg>
+                <label class="cursor-pointer px-2 py-1 rounded-lg bg-[#101522] hover:bg-[#1a2236] border border-amber-500/40 text-amber-300 text-[11px] font-semibold flex items-center gap-1 transition" title="Cargar proyecto .L2U">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
                     <span>Cargar (.L2U)</span>
                     <input type="file" id="fileLoadProject" accept=".l2u,.json,application/json" class="hidden" onchange="loadProjectFromFile(event)">
                 </label>
-            </div>
 
-            <div class="h-5 w-px bg-[#22293c]"></div>
-
-            <div class="flex items-center gap-1">
-                <label class="cursor-pointer px-2 py-1 rounded bg-[#181f30] hover:bg-[#202940] border border-[#2c3654] text-slate-200 text-[11px] font-medium flex items-center gap-1 transition">
-                    <svg class="w-3.5 h-3.5 text-sky-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                        <polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
-                    </svg>
+                <label class="cursor-pointer px-2 py-1 rounded-lg bg-[#131928] hover:bg-[#1d263b] border border-[#27324c] text-slate-200 text-[11px] font-medium flex items-center gap-1 transition">
+                    <svg class="w-3.5 h-3.5 text-sky-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
                     <span>Subir Partes PNG</span>
                     <input type="file" id="fileImportPartsMulti" accept="image/png,image/jpeg,image/webp" multiple class="hidden" onchange="importMultiplePartFiles(event)">
-                </label>
-
-                <label class="cursor-pointer px-2 py-1 rounded bg-[#181f30] hover:bg-[#202940] border border-[#2c3654] text-slate-200 text-[11px] font-medium flex items-center gap-1 transition">
-                    <svg class="w-3.5 h-3.5 text-indigo-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="3" y="3" width="18" height="18" rx="2"/>
-                        <circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
-                    </svg>
-                    <span>Imagen Unica</span>
-                    <input type="file" id="fileImportSingleFull" accept="image/png,image/jpeg,image/webp" class="hidden" onchange="importSingleFullAvatar(event)">
                 </label>
             </div>
         </div>
 
-        <div class="flex items-center gap-2">
-            <div class="flex items-center bg-[#141926] p-0.5 rounded border border-[#242c42]">
-                <button id="btnStateSetup" onclick="setSystemState('setup')" class="px-3 py-1 rounded text-[11px] transition mode-setup-active flex items-center gap-1">
-                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                        <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
-                    </svg>
+        <div class="flex items-center gap-2 shrink-0">
+            
+            <div class="flex items-center bg-[#101522] p-0.5 rounded-lg border border-[#212b42]">
+                <button id="btnStateSetup" onclick="setSystemState('setup')" class="px-3 py-1 rounded-md text-[11px] font-bold transition mode-setup-active flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
                     <span>SETUP</span>
                 </button>
-                <button id="btnStateAnimate" onclick="setSystemState('animate')" class="px-3 py-1 rounded text-[11px] transition text-slate-400 hover:text-white flex items-center gap-1">
-                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                        <polygon points="5 3 19 12 5 21 5 3"/>
-                    </svg>
+                <button id="btnStateAnimate" onclick="setSystemState('animate')" class="px-3 py-1 rounded-md text-[11px] font-bold transition text-slate-400 hover:text-white flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
                     <span>ANIMATE</span>
                 </button>
             </div>
 
-            <button onclick="openExportModal()" class="px-3 py-1.5 rounded bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-[11px] font-semibold flex items-center gap-1.5 shadow transition">
-                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
-                    <polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>
-                </svg>
-                <span>Exportar Unity</span>
+            <button onclick="openSettingsModal()" class="px-2.5 py-1.5 rounded-lg bg-[#101522] hover:bg-[#1a2236] border border-[#212b42] hover:border-cyan-500/40 text-slate-300 hover:text-white text-[11px] font-medium flex items-center gap-1.5 transition shadow-sm" title="Configuracion del Estudio">
+                <svg class="w-3.5 h-3.5 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                <span class="hidden sm:inline">Configuracion</span>
             </button>
 
-            <button onclick="openStaticTexturesModal()" class="px-3 py-1.5 rounded bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 hover:from-amber-400 hover:via-orange-400 hover:to-rose-400 text-white text-[11px] font-bold flex items-center gap-1.5 shadow transition" title="Exportar las 7 texturas para CustomAvatars (Banner, Cursor, DancerCard, Full, Hud, Portrait, Square)">
-                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                    <circle cx="8.5" cy="8.5" r="1.5"/>
-                    <polyline points="21 15 16 10 5 21"/>
-                </svg>
+            <button onclick="openStaticTexturesModal()" class="px-3 py-1.5 rounded-lg bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 hover:from-amber-400 hover:via-orange-400 hover:to-rose-400 text-white text-[11px] font-bold flex items-center gap-1.5 shadow transition" title="Exportar las 7 texturas para CustomAvatars (Banner, Cursor, DancerCard, Full, Hud, Portrait, Square)">
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
                 <span>Texturas CustomAvatars</span>
             </button>
 
-            <button onclick="openGifModal()" class="px-3 py-1.5 rounded bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 hover:from-purple-500 hover:via-pink-500 hover:to-rose-500 text-white text-[11px] font-semibold flex items-center gap-1.5 shadow transition" title="Exportar animación (APNG / GIF)">
-                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                    <rect x="2" y="2" width="20" height="20" rx="4"/>
-                    <polygon points="10 8 16 12 10 16 10 8"/>
-                </svg>
-                <span>Exportar Animación</span>
+            <button onclick="openGifModal()" class="px-3 py-1.5 rounded-lg bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 hover:from-purple-500 hover:via-pink-500 hover:to-rose-500 text-white text-[11px] font-semibold flex items-center gap-1.5 shadow transition" title="Exportar animacion (APNG / GIF)">
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="2" width="20" height="20" rx="4"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+                <span>Exportar Animacion</span>
+            </button>
+
+            <button onclick="openExportModal()" class="px-3 py-1.5 rounded-lg bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-500 hover:via-teal-500 hover:to-cyan-500 text-white text-[11px] font-bold flex items-center gap-1.5 shadow transition" title="Exportar atlas PNG, esqueleto JSON y script C# Unity">
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                <span>Exportar Unity</span>
             </button>
         </div>
     </header>
@@ -891,6 +873,123 @@
         </aside>
     </div>
 
+    <div id="settingsModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden items-center justify-center p-4">
+        <div class="bg-[#0e121d] border border-[#242d44] rounded-2xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+            <div class="px-5 py-3.5 border-b border-[#1e263d] flex items-center justify-between bg-[#131929]">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-6 h-6 rounded bg-cyan-500/20 border border-cyan-500/40 text-cyan-300 flex items-center justify-center">
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-white leading-tight">Configuracion del Estudio</h3>
+                        <p class="text-[10px] text-slate-400">Preferencias de visualizacion, rigging, renderizado y exportacion</p>
+                    </div>
+                </div>
+                <button onclick="closeSettingsModal()" class="w-7 h-7 rounded-lg bg-[#1a2236] hover:bg-[#25314d] text-slate-300 hover:text-white flex items-center justify-center font-bold text-xs transition">X</button>
+            </div>
+
+            <div class="p-5 flex-1 overflow-y-auto flex flex-col gap-4">
+                <div class="flex flex-col gap-2.5 bg-[#0a0d15] p-3.5 rounded-xl border border-[#1b2338]">
+                    <span class="text-[11px] font-bold text-cyan-400 uppercase tracking-wider">Visualizacion y Fondo del Visor</span>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div class="flex flex-col gap-1">
+                            <label class="text-[11px] text-slate-300 font-medium">Estilo de Fondo:</label>
+                            <select id="cfgCanvasBg" onchange="updateStudioSetting('canvasBg', this.value)" class="bg-[#121624] border border-[#26314d] rounded-lg px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-cyan-500 font-medium">
+                                <option value="grid" selected>Estudio Oscuro con Rejilla</option>
+                                <option value="checker">Patron Transparente Checkerboard</option>
+                                <option value="black">Negro Profundo OLED (#000000)</option>
+                                <option value="green">Pantalla Verde Chroma (#00FF00)</option>
+                                <option value="blue">Pantalla Azul Chroma (#0000FF)</option>
+                            </select>
+                        </div>
+
+                        <div class="flex flex-col gap-1">
+                            <label class="text-[11px] text-slate-300 font-medium">Densidad de Rejilla:</label>
+                            <select id="cfgGridSize" onchange="updateStudioSetting('gridSize', parseInt(this.value, 10))" class="bg-[#121624] border border-[#26314d] rounded-lg px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-cyan-500 font-medium">
+                                <option value="40">Fina (40 px)</option>
+                                <option value="80" selected>Estandar (80 px)</option>
+                                <option value="120">Amplia (120 px)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-4 pt-1">
+                        <label class="flex items-center gap-2 cursor-pointer text-xs text-slate-300">
+                            <input type="checkbox" id="cfgShowGridLines" onchange="updateStudioSetting('showGridLines', this.checked)" checked class="rounded bg-[#121624] border-[#26314d] text-cyan-500 focus:ring-0">
+                            <span>Mostrar lineas de rejilla</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer text-xs text-slate-300">
+                            <input type="checkbox" id="cfgShowCanvasBounds" onchange="updateStudioSetting('showCanvasBounds', this.checked)" checked class="rounded bg-[#121624] border-[#26314d] text-cyan-500 focus:ring-0">
+                            <span>Marco del lienzo nativo (1536x2752)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-2.5 bg-[#0a0d15] p-3.5 rounded-xl border border-[#1b2338]">
+                    <span class="text-[11px] font-bold text-amber-400 uppercase tracking-wider">Huesos y Esqueleto (Rigging)</span>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div class="flex flex-col gap-1">
+                            <label class="text-[11px] text-slate-300 font-medium">Grosor de Huesos:</label>
+                            <select id="cfgBoneThickness" onchange="updateStudioSetting('boneThickness', parseFloat(this.value))" class="bg-[#121624] border border-[#26314d] rounded-lg px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-amber-500 font-medium">
+                                <option value="1.0">Fino (1.0x)</option>
+                                <option value="1.6" selected>Estandar (1.6x)</option>
+                                <option value="2.4">Grueso (2.4x)</option>
+                            </select>
+                        </div>
+
+                        <div class="flex flex-col gap-1">
+                            <label class="text-[11px] text-slate-300 font-medium">Opacidad de Huesos:</label>
+                            <select id="cfgBoneOpacity" onchange="updateStudioSetting('boneOpacity', parseFloat(this.value))" class="bg-[#121624] border border-[#26314d] rounded-lg px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-amber-500 font-medium">
+                                <option value="0.5">Media (50%)</option>
+                                <option value="0.8" selected>Alta (80%)</option>
+                                <option value="1.0">Solida (100%)</option>
+                            </select>
+                        </div>
+
+                        <div class="flex flex-col gap-1">
+                            <label class="text-[11px] text-slate-300 font-medium">Radio de Nodos:</label>
+                            <select id="cfgJointRadius" onchange="updateStudioSetting('jointRadius', parseFloat(this.value))" class="bg-[#121624] border border-[#26314d] rounded-lg px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-amber-500 font-medium">
+                                <option value="3.5">Pequeno (3.5 px)</option>
+                                <option value="5.0" selected>Normal (5.0 px)</option>
+                                <option value="7.0">Grande (7.0 px)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-4 pt-1">
+                        <label class="flex items-center gap-2 cursor-pointer text-xs text-slate-300">
+                            <input type="checkbox" id="cfgShowBoneLabels" onchange="updateStudioSetting('showBoneLabels', this.checked)" checked class="rounded bg-[#121624] border-[#26314d] text-amber-500 focus:ring-0">
+                            <span>Mostrar nombres flotantes de huesos</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-2.5 bg-[#0a0d15] p-3.5 rounded-xl border border-[#1b2338]">
+                    <span class="text-[11px] font-bold text-emerald-400 uppercase tracking-wider">Valores Predeterminados de Exportacion</span>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div class="flex flex-col gap-1">
+                            <label class="text-[11px] text-slate-300 font-medium">Nombre de Avatar Inicial:</label>
+                            <input type="text" id="cfgDefaultAvatarName" value="CustomAvatar" onchange="updateStudioSetting('defaultAvatarName', this.value)" class="bg-[#121624] border border-[#26314d] rounded-lg px-2.5 py-1.5 text-xs text-emerald-300 mono focus:outline-none focus:border-emerald-500 font-bold">
+                        </div>
+
+                        <div class="flex flex-col gap-1">
+                            <label class="text-[11px] text-slate-300 font-medium">Ruta Base de Destino:</label>
+                            <input type="text" id="cfgDefaultExportPath" value="C:\JDLiminal\Game\CustomAvatars\" onchange="updateStudioSetting('defaultExportPath', this.value)" class="bg-[#121624] border border-[#26314d] rounded-lg px-2.5 py-1.5 text-xs text-emerald-300 mono focus:outline-none focus:border-emerald-500 font-medium">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="px-5 py-3 border-t border-[#1e263d] flex items-center justify-between bg-[#111625]">
+                <button onclick="resetStudioSettingsToDefault()" class="text-xs text-rose-400 hover:text-rose-300 underline font-medium">Restablecer valores por defecto</button>
+                <button onclick="closeSettingsModal()" class="px-4 py-1.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs shadow transition">Guardar y Cerrar</button>
+            </div>
+        </div>
+    </div>
+
     <div id="exportModal" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
         <div class="bg-[#101420] border border-[#28324e] rounded-xl max-w-5xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
             <div class="px-4 py-3 border-b border-[#22293f] flex items-center justify-between bg-[#151a28]">
@@ -964,7 +1063,7 @@
                 <div class="flex items-center gap-3">
                     <span class="px-2 py-0.5 rounded bg-gradient-to-r from-pink-500/20 to-purple-500/20 border border-pink-500/40 text-pink-300 mono text-xs font-bold flex items-center gap-1.5">
                         <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="2" width="20" height="20" rx="4"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
-                        ANIMATION EXPORTER V4
+                        ANIMATION EXPORTER V5
                     </span>
                     <span class="text-sm font-bold text-white">Exportador de Animación (APNG • GIF)</span>
                 </div>
@@ -1449,6 +1548,7 @@
         let fpsTracker = 60;
 
         function initApplication() {
+            loadStudioSettings();
             applyPoseTemplate('dynamic', false);
             loadLayerPreset('preset1', false);
 
@@ -1469,6 +1569,83 @@
             updateUndoRedoButtons();
 
             requestAnimationFrame(mainStudioLoop);
+        }
+        const DEFAULT_STUDIO_SETTINGS = {
+            canvasBg: 'grid',
+            gridSize: 80,
+            showGridLines: true,
+            showCanvasBounds: true,
+            boneThickness: 1.6,
+            boneOpacity: 0.8,
+            jointRadius: 5.0,
+            showBoneLabels: true,
+            defaultAvatarName: 'CustomAvatar',
+            defaultExportPath: 'C:\\JDLiminal\\Game\\CustomAvatars\\'
+        };
+
+        function loadStudioSettings() {
+            try {
+                const raw = localStorage.getItem('LIAM_STUDIO_SETTINGS_V5');
+                studio.settings = raw ? { ...DEFAULT_STUDIO_SETTINGS, ...JSON.parse(raw) } : { ...DEFAULT_STUDIO_SETTINGS };
+            } catch(e) {
+                studio.settings = { ...DEFAULT_STUDIO_SETTINGS };
+            }
+            syncSettingsUI();
+        }
+
+        function saveStudioSettings() {
+            try {
+                localStorage.setItem('LIAM_STUDIO_SETTINGS_V5', JSON.stringify(studio.settings));
+            } catch(e) {}
+        }
+
+        function updateStudioSetting(key, val) {
+            if (!studio.settings) studio.settings = { ...DEFAULT_STUDIO_SETTINGS };
+            studio.settings[key] = val;
+            saveStudioSettings();
+        }
+
+        function resetStudioSettingsToDefault() {
+            studio.settings = { ...DEFAULT_STUDIO_SETTINGS };
+            saveStudioSettings();
+            syncSettingsUI();
+        }
+
+        function syncSettingsUI() {
+            const cfg = studio.settings || DEFAULT_STUDIO_SETTINGS;
+            const elBg = document.getElementById('cfgCanvasBg');
+            if (elBg) elBg.value = cfg.canvasBg || 'grid';
+            const elGSize = document.getElementById('cfgGridSize');
+            if (elGSize) elGSize.value = cfg.gridSize || 80;
+            const elGLines = document.getElementById('cfgShowGridLines');
+            if (elGLines) elGLines.checked = (cfg.showGridLines !== false);
+            const elBounds = document.getElementById('cfgShowCanvasBounds');
+            if (elBounds) elBounds.checked = (cfg.showCanvasBounds !== false);
+
+            const elBThick = document.getElementById('cfgBoneThickness');
+            if (elBThick) elBThick.value = cfg.boneThickness || 1.6;
+            const elBOpac = document.getElementById('cfgBoneOpacity');
+            if (elBOpac) elBOpac.value = cfg.boneOpacity || 0.8;
+            const elJRad = document.getElementById('cfgJointRadius');
+            if (elJRad) elJRad.value = cfg.jointRadius || 5.0;
+            const elBLab = document.getElementById('cfgShowBoneLabels');
+            if (elBLab) elBLab.checked = (cfg.showBoneLabels !== false);
+
+            const elDefAv = document.getElementById('cfgDefaultAvatarName');
+            if (elDefAv) elDefAv.value = cfg.defaultAvatarName || 'CustomAvatar';
+            const elDefPath = document.getElementById('cfgDefaultExportPath');
+            if (elDefPath) elDefPath.value = cfg.defaultExportPath || 'C:\\JDLiminal\\Game\\CustomAvatars\\';
+        }
+
+        function openSettingsModal() {
+            syncSettingsUI();
+            const m = document.getElementById('settingsModal');
+            if (m) m.classList.remove('hidden'), m.classList.add('flex');
+        }
+
+        function closeSettingsModal() {
+            const m = document.getElementById('settingsModal');
+            if (m) m.classList.add('hidden'), m.classList.remove('flex');
         }
 
         function changeCanvasResolution() {
@@ -3475,7 +3652,8 @@
                     ctx.strokeStyle = isSel ? '#ffffff' : pb.color;
                     ctx.lineWidth = 2 / z;
                     ctx.beginPath();
-                    ctx.arc(pb.ax1, pb.ay1, (isSel ? 6.2 : 4.6) / z, 0, Math.PI * 2);
+                    const jRad = cfg.jointRadius || 5.0;
+                    ctx.arc(pb.ax1, pb.ay1, (isSel ? jRad * 1.25 : jRad) / z, 0, Math.PI * 2);
                     ctx.fill();
                     ctx.stroke();
 
@@ -4573,7 +4751,7 @@
 
             const exportData = {
                 avatarName: avatarName,
-                exporter: 'LiamToolAvatar2Unity V4',
+                exporter: 'LiamToolAvatar2Unity V5',
                 preset: studio.activeLayerPreset,
                 skeleton: {
                     width: w,

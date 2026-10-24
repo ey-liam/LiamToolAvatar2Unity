@@ -1,18 +1,22 @@
-# LiamToolAvatar2Unity V4
+# LiamToolAvatar2Unity V5
 
-Herramienta web para crear, configurar rig, animar avatares 2D en alta resolución y exportarlos directamente a Unity.
+Herramienta web profesional para crear, configurar rig, animar avatares 2D en alta resolucion y exportarlos directamente a Unity y al juego.
 
 - Google Sites: https://sites.google.com/view/liamtoolavatar2unity/full-page-embed
 - GitHub Pages: https://ey-liam.github.io/LiamToolAvatar2Unity/
 
-## Novedades en V4
+## Novedades en V5
 
-- Exportacion directa a CustomAvatars: Guarda los archivos en C:\JDLiminal\Game\CustomAvatars\<AvatarName>\ creando automaticamente la subcarpeta con el nombre del avatar.
-- Exportacion completa de paquetes: Almacena en la carpeta del avatar el Atlas PNG, el script C#, el archivo JSON y las 7 texturas estaticas del juego.
-- Descarga individual conservada: Posibilidad de descargar cada recurso por separado (Atlas PNG, archivo JSON, script C#, texturas individuales o paquete ZIP).
-- Exportador de Texturas Estaticas: Genera las 7 texturas requeridas (Banner, Cursor, DancerCard, Full, Hud, Portrait, Square) con ajuste interactivo de zoom, posicion X y posicion Y en tiempo real.
-- Exportador de animaciones en APNG 32-bit (canal alfa real sin perdida) y formato GIF universal.
-- Interfaz y codigo limpios sin emojis ni comentarios redundantes.
+- Nueva interfaz moderna y estilizada: Barra superior redisenada con logotipo vectorial original, distribucion equilibrada de herramientas y jerarquia visual mejorada.
+- Apartado de Configuracion del Estudio: Panel dedicado para personalizar el entorno de trabajo:
+  - Fondos de lienzo: Estudio con rejilla, patron checkerboard para transparencia, negro profundo OLED (#000000), pantalla verde chroma (#00FF00) y azul chroma (#0000FF).
+  - Parametros de rigging: Ajuste de grosor de huesos (1.0x a 2.4x), nivel de opacidad, radio de nodos articulares y conmutador para mostrar u ocultar etiquetas de huesos sobre el visor.
+  - Valores predeterminados de exportacion: Configuracion de nombre inicial de avatar y ruta base del sistema.
+  - Persistencia local: Todas las preferencias se guardan automaticamente en el navegador.
+- Template de inicio optimizado: Maniqui generico limpio estilo Just Dance listo para posar y animar.
+- Exportacion directa a CustomAvatars (Atlas PNG, archivo JSON, script C# y 7 texturas estaticas del juego).
+- Exportador de animaciones en APNG 32-bit y formato GIF.
+- Sin emojis ni comentarios explicativos en el codigo fuente.
 
 ## Caracteristicas Principales
 
