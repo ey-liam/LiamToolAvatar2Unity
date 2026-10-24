@@ -1547,30 +1547,7 @@
         let lastFrameTimestamp = performance.now();
         let fpsTracker = 60;
 
-        function initApplication() {
-            loadStudioSettings();
-            applyPoseTemplate('dynamic', false);
-            loadLayerPreset('preset1', false);
-
-            resizeAllCanvases();
-            window.addEventListener('resize', resizeAllCanvases);
-
-            resetCameraView();
-            setupViewportInteractions();
-            setupTimelineInteractions();
-
-            renderPartTreeUI();
-            renderBoneTreeUI();
-            syncPartInspectorUI();
-            syncBoneInspectorUI();
-            syncWeightBrushSliders();
-            syncAnimSliders();
-            setSystemState('setup');
-            updateUndoRedoButtons();
-
-            requestAnimationFrame(mainStudioLoop);
-        }
-        const DEFAULT_STUDIO_SETTINGS = {
+                const DEFAULT_STUDIO_SETTINGS = {
             canvasBg: 'grid',
             gridSize: 80,
             showGridLines: true,
@@ -1612,7 +1589,7 @@
         }
 
         function syncSettingsUI() {
-            const cfg = studio.settings || DEFAULT_STUDIO_SETTINGS;
+            const cfg = (studio && studio.settings) || DEFAULT_STUDIO_SETTINGS;
             const elBg = document.getElementById('cfgCanvasBg');
             if (elBg) elBg.value = cfg.canvasBg || 'grid';
             const elGSize = document.getElementById('cfgGridSize');
@@ -1648,6 +1625,30 @@
             if (m) m.classList.add('hidden'), m.classList.remove('flex');
         }
 
+        function initApplication() {
+            loadStudioSettings();
+            applyPoseTemplate('dynamic', false);
+            loadLayerPreset('preset1', false);
+
+            resizeAllCanvases();
+            window.addEventListener('resize', resizeAllCanvases);
+
+            resetCameraView();
+            setupViewportInteractions();
+            setupTimelineInteractions();
+
+            renderPartTreeUI();
+            renderBoneTreeUI();
+            syncPartInspectorUI();
+            syncBoneInspectorUI();
+            syncWeightBrushSliders();
+            syncAnimSliders();
+            setSystemState('setup');
+            updateUndoRedoButtons();
+
+            requestAnimationFrame(mainStudioLoop);
+        }
+        
         function changeCanvasResolution() {
             const nw = Math.max(256, Math.min(8192, parseInt(document.getElementById('inpCanvasW').value, 10) || 1536));
             const nh = Math.max(256, Math.min(8192, parseInt(document.getElementById('inpCanvasH').value, 10) || 2752));
@@ -3491,6 +3492,7 @@
         }
 
         function renderViewport(frame) {
+            const cfg = (studio && studio.settings) || DEFAULT_STUDIO_SETTINGS;
             const dpr = window.devicePixelRatio || 1;
             const cw = viewportCanvas.width / dpr;
             const ch = viewportCanvas.height / dpr;
@@ -3652,7 +3654,7 @@
                     ctx.strokeStyle = isSel ? '#ffffff' : pb.color;
                     ctx.lineWidth = 2 / z;
                     ctx.beginPath();
-                    const jRad = cfg.jointRadius || 5.0;
+                    const jRad = (cfg && cfg.jointRadius) || 5.0;
                     ctx.arc(pb.ax1, pb.ay1, (isSel ? jRad * 1.25 : jRad) / z, 0, Math.PI * 2);
                     ctx.fill();
                     ctx.stroke();
