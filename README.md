@@ -2,7 +2,7 @@
 
 Herramienta web profesional para crear, configurar rig, animar avatares 2D en alta resolucion y exportarlos directamente a Unity y al juego.
 
-- Google Sites: https://sites.google.com/view/liamtoolavatar2unity/full-page-embed
+- Google Sites: https://sites.google.com/view/liamtoolavatar2unity/home
 - GitHub Pages: https://ey-liam.github.io/LiamToolAvatar2Unity/
 
 ## Novedades en V5.1
