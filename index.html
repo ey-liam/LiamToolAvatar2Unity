@@ -3,8 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LiamToolAvatar2Unity V5</title>
+    <meta name="description" content="Editor de avatares 2D con rigging, animación y exportación para Unity.">
+    <meta name="theme-color" content="#090b10">
+    <title>LiamToolAvatar2Unity V5.1</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -147,7 +151,7 @@
                 </div>
                 <div class="flex items-center gap-1.5">
                     <span class="font-extrabold tracking-tight text-xs sm:text-sm bg-gradient-to-r from-white via-slate-100 to-slate-300 bg-clip-text text-transparent">LiamTool <span class="bg-gradient-to-r from-cyan-400 to-sky-300 bg-clip-text text-transparent font-bold">Avatar2Unity</span></span>
-                    <span class="mono text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/30">V5</span>
+                    <span class="mono text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/30">V5.1</span>
                 </div>
             </div>
 
@@ -452,7 +456,7 @@
             </div>
 
             <div id="viewportContainer" class="flex-1 relative overflow-hidden bg-[#0a0d14]">
-                <canvas id="viewportCanvas" class="w-full h-full block"></canvas>
+                <canvas id="viewportCanvas" class="w-full h-full block" role="img" aria-label="Lienzo interactivo del avatar"></canvas>
 
                 <div id="weightLegendOverlay" class="hidden absolute top-3 right-3 bg-[#10141f]/95 border border-[#26304a] rounded p-2.5 w-52 space-y-1.5 pointer-events-none shadow-xl">
                     <div class="flex items-center justify-between text-[10px] font-semibold">
@@ -505,7 +509,7 @@
                 </div>
 
                 <div class="flex-1 relative overflow-hidden flex flex-col">
-                    <canvas id="timelineCanvas" class="w-full h-full block cursor-pointer"></canvas>
+                    <canvas id="timelineCanvas" class="w-full h-full block cursor-pointer" role="img" aria-label="Línea de tiempo de animación"></canvas>
                 </div>
             </section>
         </main>
@@ -1063,7 +1067,7 @@
                 <div class="flex items-center gap-3">
                     <span class="px-2 py-0.5 rounded bg-gradient-to-r from-pink-500/20 to-purple-500/20 border border-pink-500/40 text-pink-300 mono text-xs font-bold flex items-center gap-1.5">
                         <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="2" width="20" height="20" rx="4"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
-                        ANIMATION EXPORTER V5
+                        ANIMATION EXPORTER V5.1
                     </span>
                     <span class="text-sm font-bold text-white">Exportador de Animación (APNG • GIF)</span>
                 </div>
@@ -1388,7 +1392,7 @@
             avatarName: 'CustomAvatar',
             systemState: 'setup',
             activeTool: 'bone',
-            activePosePreset: 'dynamic',
+            activePosePreset: 'casual',
             activeLayerPreset: 'preset1',
             legVariantStyle: 'calcetas',
 
@@ -1410,10 +1414,10 @@
                 showBones: true,
                 showAnchors: true,
                 showWeights: false,
-                footIK: true
+                footIK: false
             },
 
-            weightRigidity: 0.5,
+            weightRigidity: 0.7,
 
             weightBrush: {
                 mode: 'add',
@@ -1563,8 +1567,12 @@
         function loadStudioSettings() {
             try {
                 const raw = localStorage.getItem('LIAM_STUDIO_SETTINGS_V5');
-                studio.settings = raw ? { ...DEFAULT_STUDIO_SETTINGS, ...JSON.parse(raw) } : { ...DEFAULT_STUDIO_SETTINGS };
+                const parsed = raw ? JSON.parse(raw) : null;
+                studio.settings = parsed && typeof parsed === 'object' && !Array.isArray(parsed)
+                    ? { ...DEFAULT_STUDIO_SETTINGS, ...parsed }
+                    : { ...DEFAULT_STUDIO_SETTINGS };
             } catch(e) {
+                console.warn('No se pudieron cargar las preferencias guardadas; se usarán los valores por defecto.', e);
                 studio.settings = { ...DEFAULT_STUDIO_SETTINGS };
             }
             syncSettingsUI();
@@ -1573,7 +1581,9 @@
         function saveStudioSettings() {
             try {
                 localStorage.setItem('LIAM_STUDIO_SETTINGS_V5', JSON.stringify(studio.settings));
-            } catch(e) {}
+            } catch(e) {
+                console.warn('No se pudieron guardar las preferencias del estudio.', e);
+            }
         }
 
         function updateStudioSetting(key, val) {
@@ -1627,7 +1637,7 @@
 
         function initApplication() {
             loadStudioSettings();
-            applyPoseTemplate('dynamic', false);
+            applyPoseTemplate('casual', false);
             loadLayerPreset('preset1', false);
 
             resizeAllCanvases();
@@ -2574,7 +2584,7 @@
                 neighbors[b].add(a);
             };
 
-            const cellRadius = Math.max(bw / cols, bh / rows) * 1.25 + padPx * 0.35;
+            const cellRadius = Math.max(bw / cols, bh / rows) * 0.78 + padPx * 0.12;
 
             for (let r = 0; r < rows; r++) {
                 for (let c = 0; c < cols; c++) {
@@ -2653,7 +2663,8 @@
             const fallbackBones = activeBones.length > 0 ? activeBones : studio.bones;
 
             const globalRigid = Math.max(0, Math.min(1, studio.weightRigidity));
-            const sharpness = 1 + 8 * globalRigid;
+            const sharpness = 1 + 11 * globalRigid;
+            const allowedBoneIds = new Set(fallbackBones.map(b => b.id));
 
             const bonePixels = fallbackBones.map(b => ({
                 id: b.id,
@@ -2699,7 +2710,14 @@
                     }
                 }
 
-                vt.weights = wMap;
+                const ranked = Object.entries(wMap)
+                    .filter(([boneId, weight]) => allowedBoneIds.has(boneId) && Number.isFinite(weight) && weight > 0.0001)
+                    .sort((a, b) => b[1] - a[1])
+                    .slice(0, 4);
+                const rankedTotal = ranked.reduce((sum, [, weight]) => sum + weight, 0);
+                vt.weights = rankedTotal > 0
+                    ? Object.fromEntries(ranked.map(([boneId, weight]) => [boneId, weight / rankedTotal]))
+                    : (fallbackBones[0] ? { [fallbackBones[0].id]: 1 } : {});
             });
 
             relaxSinglePartWeights(part, Math.max(0, Math.round(2 - 2 * globalRigid)));
@@ -2710,7 +2728,18 @@
                 } else if (vt.paintW) {
                     vt.weights = { ...vt.paintW };
                 }
+                vt.weights = normalizeWeightMap(vt.weights, allowedBoneIds, fallbackBones[0] && fallbackBones[0].id);
             });
+        }
+
+        function normalizeWeightMap(weights, allowedBoneIds, fallbackBoneId) {
+            const entries = Object.entries(weights || {})
+                .filter(([boneId, weight]) => allowedBoneIds.has(boneId) && Number.isFinite(weight) && weight > 0.0001)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 4);
+            const total = entries.reduce((sum, [, weight]) => sum + weight, 0);
+            if (total <= 0) return fallbackBoneId ? { [fallbackBoneId]: 1 } : {};
+            return Object.fromEntries(entries.map(([boneId, weight]) => [boneId, weight / total]));
         }
 
         function recomputeAllPartsWeights(recordUndo = false, resetPainted = false) {
@@ -2721,7 +2750,12 @@
         function relaxSinglePartWeights(part, iterations = 2) {
             const verts = part.mesh.vertices;
             const nbrs = part.mesh.neighbors;
-            const boneIds = studio.bones.map(b => b.id);
+            const allowedBones = studio.bones.filter(b =>
+                !part.allowedBones || part.allowedBones.length === 0 || part.allowedBones.includes(b.id)
+            );
+            const boneIds = (allowedBones.length > 0 ? allowedBones : studio.bones).map(b => b.id);
+            const allowedBoneIds = new Set(boneIds);
+            const fallbackBoneId = boneIds[0];
 
             for (let it = 0; it < iterations; it++) {
                 const nextW = verts.map(v => ({ ...v.weights }));
@@ -2743,7 +2777,7 @@
                     });
                     if (sum > 0) {
                         Object.keys(blended).forEach(k => { blended[k] /= sum; });
-                        nextW[i] = blended;
+                        nextW[i] = normalizeWeightMap(blended, allowedBoneIds, fallbackBoneId);
                     }
                 }
                 for (let i = 0; i < verts.length; i++) {
@@ -3776,6 +3810,7 @@
             studio.parts.forEach(part => {
                 if (!part.visible) return;
                 if (!paintAll && part.id !== studio.selectedPartId) return;
+                if (part.allowedBones && part.allowedBones.length > 0 && !part.allowedBones.includes(targetBoneId)) return;
 
                 const verts = part.mesh.vertices;
                 const nbrs = part.mesh.neighbors;
@@ -3818,11 +3853,20 @@
                                 vt.weights[k] = (vt.weights[k] / otherSum) * remainder;
                             }
                         });
-                    } else if (remainder > 0.001 && studio.bones[0]) {
-                        const fb = studio.bones.find(b => b.id !== targetBoneId) || studio.bones[0];
-                        vt.weights[fb.id] = remainder;
+                    } else if (remainder > 0.001) {
+                        const fb = studio.bones.find(b =>
+                            b.id !== targetBoneId &&
+                            (!part.allowedBones || part.allowedBones.length === 0 || part.allowedBones.includes(b.id))
+                        );
+                        if (fb) vt.weights[fb.id] = remainder;
                     }
 
+                    const allowedIds = new Set(
+                        (!part.allowedBones || part.allowedBones.length === 0)
+                            ? studio.bones.map(b => b.id)
+                            : part.allowedBones
+                    );
+                    vt.weights = normalizeWeightMap(vt.weights, allowedIds, targetBoneId);
                     vt.paintW = { ...vt.weights };
                 }
             });
@@ -3961,16 +4005,22 @@
                 }
 
                 if (studio.activeTool === 'part') {
-                    pushUndoState();
+                    let hitPartId = null;
                     for (let i = 0; i < studio.parts.length; i++) {
                         const p = studio.parts[i];
-                        if (!p.visible) return;
+                        if (!p.visible) continue;
                         const b = p.mesh.bounds;
                         if (world.x >= b.minX && world.x <= b.maxX && world.y >= b.minY && world.y <= b.maxY) {
-                            selectPartById(p.id);
+                            hitPartId = p.id;
                             break;
                         }
                     }
+                    if (!hitPartId) {
+                        studio.draggingPart = false;
+                        return;
+                    }
+                    pushUndoState();
+                    selectPartById(hitPartId);
                     studio.draggingPart = true;
                     return;
                 }
@@ -4753,7 +4803,7 @@
 
             const exportData = {
                 avatarName: avatarName,
-                exporter: 'LiamToolAvatar2Unity V5',
+                exporter: 'LiamToolAvatar2Unity V5.1',
                 preset: studio.activeLayerPreset,
                 skeleton: {
                     width: w,

@@ -1,9 +1,18 @@
-# LiamToolAvatar2Unity V5
+# LiamToolAvatar2Unity V5.1
 
 Herramienta web profesional para crear, configurar rig, animar avatares 2D en alta resolucion y exportarlos directamente a Unity y al juego.
 
 - Google Sites: https://sites.google.com/view/liamtoolavatar2unity/full-page-embed
 - GitHub Pages: https://ey-liam.github.io/LiamToolAvatar2Unity/
+
+## Novedades en V5.1
+
+- Normalizacion estandar de pesos: Limitacion automatica a un maximo de 4 influencias oseas por vertice con suma normalizada exacta (1.0), garantizando compatibilidad nativa total con el sistema de skinning de Unity.
+- Mallas poligonales mas fieles: Reduccion del radio de celda adaptativo en la generacion de mallas para contornear los bordes y siluetas de cada sprite sin distorsiones marginales.
+- Mascara estricta de huesos permitidos: Las funciones de pintura de pesos y relajacion ahora respetan de forma estricta los huesos asignados a cada pieza, evitando fugas de influencia entre capas y extremidades.
+- Seleccion fluida en el visor: Correccion en la deteccion de clics sobre el lienzo cuando existen capas invisibles u ocultas, permitiendo seleccionar cualquier pieza visible sin bloqueos.
+- Optimizacion y accesibilidad: Preconexiones de fuentes web, metadatos de entorno y roles de accesibilidad integrados en los lienzos interactivos.
+- Postura inicial predeterminada: Inicio automatico en postura Casual con parametros de amortiguacion y rigidez equilibrados para un comportamiento mas natural desde el primer instante.
 
 ## Novedades en V5
 
