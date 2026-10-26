@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Editor de avatares 2D con rigging, animación y exportación para Unity.">
     <meta name="theme-color" content="#090b10">
-    <title>LiamToolAvatar2Unity V5.1</title>
+    <title>LiamToolAvatar2Unity V6 - Avatar Studio</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -26,6 +26,11 @@
             user-select: none;
             -webkit-user-select: none;
             -webkit-user-drag: none;
+        }
+        input, select, textarea, [contenteditable="true"] {
+            user-select: text;
+            -webkit-user-select: text;
+            -webkit-user-drag: auto;
         }
         body {
             margin: 0;
@@ -119,9 +124,162 @@
             border-color: #38bdf8 !important;
             color: #ffffff !important;
         }
+        /* V6 application shell */
+        :root {
+            --v6-header: 52px;
+            --v6-toolrail: 48px;
+            --v6-inspector: 320px;
+        }
+        body {
+            background:
+                radial-gradient(circle at 75% -10%, rgba(14, 165, 233, 0.10), transparent 34rem),
+                var(--bg-main);
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background-image: linear-gradient(rgba(255,255,255,.018) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.018) 1px, transparent 1px);
+            background-size: 32px 32px;
+            mask-image: linear-gradient(to bottom, black, transparent 70%);
+            opacity: .35;
+            z-index: -1;
+        }
+        header {
+            min-height: var(--v6-header);
+            height: var(--v6-header) !important;
+        }
+        #v6CommandBar {
+            display: flex;
+            align-items: center;
+            gap: .35rem;
+            min-width: 0;
+        }
+        .v6-status-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 999px;
+            background: #34d399;
+            box-shadow: 0 0 10px rgba(52,211,153,.65);
+        }
+        .v6-toast {
+            position: fixed;
+            right: 1rem;
+            bottom: 1rem;
+            z-index: 100;
+            max-width: min(360px, calc(100vw - 2rem));
+            padding: .7rem .85rem;
+            border: 1px solid rgba(56,189,248,.35);
+            border-radius: .65rem;
+            background: rgba(13,18,30,.94);
+            box-shadow: 0 14px 40px rgba(0,0,0,.35);
+            color: #dbeafe;
+            transform: translateY(1rem);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .18s ease, transform .18s ease;
+        }
+        .v6-toast.is-visible { opacity: 1; transform: translateY(0); }
+        .v6-modal-backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 90;
+            display: none;
+            align-items: flex-start;
+            justify-content: center;
+            padding-top: 12vh;
+            background: rgba(2, 6, 14, .68);
+            backdrop-filter: blur(7px);
+        }
+        .v6-modal-backdrop.is-visible { display: flex; }
+        .v6-command-modal {
+            width: min(560px, calc(100vw - 2rem));
+            overflow: hidden;
+            border: 1px solid #2d4265;
+            border-radius: .85rem;
+            background: #101725;
+            box-shadow: 0 24px 80px rgba(0,0,0,.55);
+        }
+        .v6-command-modal input {
+            width: 100%;
+            padding: .9rem 1rem;
+            border: 0;
+            border-bottom: 1px solid #25334d;
+            outline: 0;
+            background: #0b111d;
+            color: #f8fafc;
+        }
+        .v6-command-list { max-height: 340px; overflow: auto; padding: .35rem; }
+        .v6-command-item {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            gap: .75rem;
+            padding: .65rem .7rem;
+            border: 1px solid transparent;
+            border-radius: .5rem;
+            color: #cbd5e1;
+            text-align: left;
+        }
+        .v6-command-item:hover, .v6-command-item.is-active {
+            border-color: rgba(56,189,248,.45);
+            background: rgba(14,165,233,.13);
+            color: white;
+        }
+        @media (max-width: 1100px) {
+            :root { --v6-inspector: 280px; }
+            aside.w-72 { width: 250px; }
+            aside.w-80 { width: var(--v6-inspector); }
+            .text-xs { font-size: .68rem; }
+        }
+        @media (max-width: 820px) {
+            body { overflow: hidden; }
+            aside.w-72, aside.w-80 {
+                position: fixed;
+                top: var(--v6-header);
+                bottom: 0;
+                z-index: 45;
+                width: min(88vw, 320px);
+                transition: transform .2s ease;
+                box-shadow: 0 20px 60px rgba(0,0,0,.42);
+            }
+            aside.w-72 { left: 0; transform: translateX(-105%); }
+            aside.w-80 { right: 0; transform: translateX(105%); }
+            body.v6-left-open aside.w-72 { transform: translateX(0); }
+            body.v6-right-open aside.w-80 { transform: translateX(0); }
+            aside.w-11 { width: var(--v6-toolrail); }
+            #v6MobileControls { display: flex !important; }
+            #v6MobileShade { display: block; }
+            body:not(.v6-left-open):not(.v6-right-open) #v6MobileShade { display: none; }
+        }
+        @media (max-width: 520px) {
+            header { padding-left: .5rem !important; padding-right: .5rem !important; }
+            header .text-slate-400, header .mono { display: none; }
+            #inpHeaderAvatarName { width: 6rem; }
+            .v6-hide-small { display: none !important; }
+        }
+        #v6MobileControls { display: none; }
+        #v6MobileShade { display: none; position: fixed; inset: var(--v6-header) 0 0; z-index: 40; background: rgba(2,6,14,.5); }
+        .v6-top-action { display: none !important; }
+        .v6-settings-button { order: 20; }
     </style>
 </head>
 <body class="flex flex-col select-none">
+    <div id="v6MobileShade" onclick="closeV6Panels()"></div>
+    <div id="v6MobileControls" class="fixed top-1.5 left-14 right-14 z-50 items-center justify-center gap-1 pointer-events-none">
+        <button onclick="toggleV6Panel('left')" class="pointer-events-auto px-2.5 py-1 rounded-md border border-sky-500/40 bg-[#101827]/95 text-[10px] text-sky-200 shadow-lg">Panel</button>
+        <button onclick="openV6CommandPalette()" class="pointer-events-auto px-2.5 py-1 rounded-md border border-fuchsia-500/40 bg-[#101827]/95 text-[10px] text-fuchsia-200 shadow-lg">Comandos</button>
+        <button onclick="toggleV6Panel('right')" class="pointer-events-auto px-2.5 py-1 rounded-md border border-emerald-500/40 bg-[#101827]/95 text-[10px] text-emerald-200 shadow-lg">Inspector</button>
+    </div>
+    <div id="v6Toast" class="v6-toast" role="status" aria-live="polite"></div>
+    <div id="v6CommandPalette" class="v6-modal-backdrop" onclick="if(event.target===this) closeV6CommandPalette()">
+        <div class="v6-command-modal" role="dialog" aria-modal="true" aria-label="Comandos rápidos">
+            <input id="v6CommandInput" type="search" placeholder="Buscar comando..." autocomplete="off">
+            <div id="v6CommandList" class="v6-command-list"></div>
+            <div class="px-3 py-2 border-t border-[#25334d] text-[9px] text-slate-500">Enter ejecutar · Esc cerrar · Ctrl+K abrir</div>
+        </div>
+    </div>
 
     <header class="h-12 bg-[#090d16]/95 backdrop-blur-md border-b border-[#1c2438] px-3 flex items-center justify-between shrink-0 z-30 gap-2.5 shadow-sm">
         <div class="flex items-center gap-2.5 overflow-x-auto py-1">
@@ -151,7 +309,7 @@
                 </div>
                 <div class="flex items-center gap-1.5">
                     <span class="font-extrabold tracking-tight text-xs sm:text-sm bg-gradient-to-r from-white via-slate-100 to-slate-300 bg-clip-text text-transparent">LiamTool <span class="bg-gradient-to-r from-cyan-400 to-sky-300 bg-clip-text text-transparent font-bold">Avatar2Unity</span></span>
-                    <span class="mono text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/30">V5.1</span>
+                    <span class="mono text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/30">V6</span>
                 </div>
             </div>
 
@@ -175,11 +333,15 @@
             <div class="h-5 w-px bg-[#1c2438]"></div>
 
             <div class="flex items-center gap-1 shrink-0">
-                <button id="btnUndo" onclick="performUndo()" disabled class="px-2 py-1 rounded-lg bg-[#101522] hover:bg-[#1a2236] disabled:opacity-30 border border-[#212b42] text-slate-200 text-[11px] font-medium flex items-center gap-1 transition" title="Ctrl+Z">
+                <button onclick="openV6CommandPalette()" class="v6-top-action v6-hide-small px-2 py-1 rounded-lg bg-[#101522] hover:bg-sky-500/15 border border-sky-500/35 text-sky-200 text-[11px] font-semibold flex items-center gap-1 transition" title="Abrir comandos rápidos (Ctrl+K)">
+                    <span class="mono text-[10px]">Ctrl K</span>
+                    <span>Comandos</span>
+                </button>
+                <button id="btnUndo" onclick="performUndo()" disabled class="v6-top-action px-2 py-1 rounded-lg bg-[#101522] hover:bg-[#1a2236] disabled:opacity-30 border border-[#212b42] text-slate-200 text-[11px] font-medium flex items-center gap-1 transition" title="Ctrl+Z">
                     <svg class="w-3.5 h-3.5 text-sky-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg>
                     <span>Deshacer</span>
                 </button>
-                <button id="btnRedo" onclick="performRedo()" disabled class="px-2 py-1 rounded-lg bg-[#101522] hover:bg-[#1a2236] disabled:opacity-30 border border-[#212b42] text-slate-200 text-[11px] font-medium flex items-center gap-1 transition" title="Ctrl+Y">
+                <button id="btnRedo" onclick="performRedo()" disabled class="v6-top-action px-2 py-1 rounded-lg bg-[#101522] hover:bg-[#1a2236] disabled:opacity-30 border border-[#212b42] text-slate-200 text-[11px] font-medium flex items-center gap-1 transition" title="Ctrl+Y">
                     <svg class="w-3.5 h-3.5 text-sky-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"/></svg>
                     <span>Rehacer</span>
                 </button>
@@ -195,8 +357,12 @@
 
                 <label class="cursor-pointer px-2 py-1 rounded-lg bg-[#101522] hover:bg-[#1a2236] border border-amber-500/40 text-amber-300 text-[11px] font-semibold flex items-center gap-1 transition" title="Cargar proyecto .L2U">
                     <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-                    <span>Cargar (.L2U)</span>
-                    <input type="file" id="fileLoadProject" accept=".l2u,.json,application/json" class="hidden" onchange="loadProjectFromFile(event)">
+                    <span>Cargar (.L2U/.L2A)</span>
+                    <input type="file" id="fileLoadProject" accept=".l2u,.l2a,.json,application/json" class="hidden" onchange="loadProjectFromFile(event)">
+                </label>
+                <label class="cursor-pointer px-2 py-1 rounded-lg bg-[#151322] hover:bg-[#211b38] border border-fuchsia-500/40 text-fuchsia-300 text-[11px] font-semibold flex items-center gap-1 transition" title="Unir dos proyectos .L2A/.L2U como pareja">
+                    <span>Unir Pareja</span>
+                    <input type="file" id="fileMergeProjects" accept=".l2a,.l2u,.json,application/json" multiple class="hidden" onchange="mergeAvatarProjects(event)">
                 </label>
 
                 <label class="cursor-pointer px-2 py-1 rounded-lg bg-[#131928] hover:bg-[#1d263b] border border-[#27324c] text-slate-200 text-[11px] font-medium flex items-center gap-1 transition">
@@ -220,24 +386,27 @@
                 </button>
             </div>
 
-            <button onclick="openSettingsModal()" class="px-2.5 py-1.5 rounded-lg bg-[#101522] hover:bg-[#1a2236] border border-[#212b42] hover:border-cyan-500/40 text-slate-300 hover:text-white text-[11px] font-medium flex items-center gap-1.5 transition shadow-sm" title="Configuracion del Estudio">
+            <button onclick="openSettingsModal()" class="v6-settings-button px-2.5 py-1.5 rounded-lg bg-[#101522] hover:bg-[#1a2236] border border-[#212b42] hover:border-cyan-500/40 text-slate-300 hover:text-white text-[11px] font-medium flex items-center gap-1.5 transition shadow-sm" title="Configuracion del Estudio">
                 <svg class="w-3.5 h-3.5 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-                <span class="hidden sm:inline">Configuracion</span>
+                <span class="hidden">Configuracion</span>
             </button>
 
-            <button onclick="openStaticTexturesModal()" class="px-3 py-1.5 rounded-lg bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 hover:from-amber-400 hover:via-orange-400 hover:to-rose-400 text-white text-[11px] font-bold flex items-center gap-1.5 shadow transition" title="Exportar las 7 texturas para CustomAvatars (Banner, Cursor, DancerCard, Full, Hud, Portrait, Square)">
+            <button onclick="openStaticTexturesModal()" class="v6-top-export-old hidden px-3 py-1.5 rounded-lg bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 hover:from-amber-400 hover:via-orange-400 hover:to-rose-400 text-white text-[11px] font-bold flex items-center gap-1.5 shadow transition" title="Exportar las 7 texturas para CustomAvatars (Banner, Cursor, DancerCard, Full, Hud, Portrait, Square)">
                 <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
                 <span>Texturas CustomAvatars</span>
             </button>
 
-            <button onclick="openGifModal()" class="px-3 py-1.5 rounded-lg bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 hover:from-purple-500 hover:via-pink-500 hover:to-rose-500 text-white text-[11px] font-semibold flex items-center gap-1.5 shadow transition" title="Exportar animacion (APNG / GIF)">
+            <button onclick="openGifModal()" class="v6-top-export-old hidden px-3 py-1.5 rounded-lg bg-gradient-to-r from-purple-600 via-pink-600 to-rose-500 hover:from-purple-500 hover:via-pink-500 hover:to-rose-500 text-white text-[11px] font-semibold flex items-center gap-1.5 shadow transition" title="Exportar animacion (APNG / GIF)">
                 <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="2" width="20" height="20" rx="4"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
                 <span>Exportar Animacion</span>
             </button>
 
-            <button onclick="openExportModal()" class="px-3 py-1.5 rounded-lg bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-500 hover:via-teal-500 hover:to-cyan-500 text-white text-[11px] font-bold flex items-center gap-1.5 shadow transition" title="Exportar atlas PNG, esqueleto JSON y script C# Unity">
+            <button onclick="openV6ExportHub()" class="px-3 py-1.5 rounded-lg bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-500 hover:via-teal-500 hover:to-cyan-500 text-white text-[11px] font-bold flex items-center gap-1.5 shadow transition" title="Exportar atlas PNG, esqueleto JSON y script C# Unity">
                 <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
-                <span>Exportar Unity</span>
+                <span>Exportar</span>
+            </button>
+            <button id="btnCoupleMode" onclick="toggleCoupleMode()" class="px-3 py-1.5 rounded-lg bg-[#101522] hover:bg-[#1a2236] border border-fuchsia-500/40 text-fuchsia-300 text-[11px] font-bold flex items-center gap-1.5 shadow transition" title="Añadir un segundo personaje usando el mismo rig">
+                <span>+ Pareja</span>
             </button>
         </div>
     </header>
@@ -293,7 +462,7 @@
                 </svg>
             </button>
 
-            <button id="toolBtn_pan" onclick="setActiveTool('pan')" title="Mover Camara" class="w-8 h-8 rounded border border-transparent flex items-center justify-center text-slate-400 hover:text-white transition">
+            <button id="toolBtn_pan" type="button" disabled title="Lienzo fijo: usa la herramienta Partes para mover el avatar" class="w-8 h-8 rounded border border-transparent flex items-center justify-center text-slate-500 opacity-50 cursor-not-allowed">
                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"/>
                     <path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v2"/>
@@ -319,47 +488,67 @@
                     <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
                 </svg>
             </button>
+            <div class="h-px w-6 bg-[#22293c] my-1"></div>
+            <button onclick="performUndo()" title="Deshacer (Ctrl+Z)" class="w-8 h-8 rounded border border-transparent bg-[#141926] flex items-center justify-center text-slate-300 hover:text-white hover:bg-sky-500/20 transition">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg>
+            </button>
+            <button onclick="performRedo()" title="Rehacer (Ctrl+Y)" class="w-8 h-8 rounded border border-transparent bg-[#141926] flex items-center justify-center text-slate-300 hover:text-white hover:bg-sky-500/20 transition">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"/></svg>
+            </button>
+            <button onclick="openV6CommandPalette()" title="Comandos rápidos (Ctrl+K)" class="w-8 h-8 rounded border border-transparent bg-[#141926] flex items-center justify-center text-fuchsia-300 hover:text-white hover:bg-fuchsia-500/20 transition">
+                <span class="mono text-[9px] font-bold">K</span>
+            </button>
         </aside>
 
         <aside class="w-72 bg-[#10141f] border-r border-[#22293c] flex flex-col min-h-0 shrink-0 z-10">
 
             <div class="p-2.5 border-b border-[#22293c] space-y-2">
                 <div class="flex items-center justify-between">
-                    <span class="text-[10px] font-bold uppercase tracking-wider text-sky-400">Presets de Estructura</span>
-                    <span id="lblActivePresetName" class="mono text-[9px] text-emerald-400">Preset 1 (Principal)</span>
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-sky-400">Constructor de capas</span>
+                    <span class="mono text-[9px] text-emerald-400">Base lista</span>
                 </div>
                 <div class="grid grid-cols-2 gap-1.5">
-                    <button id="btnPreset1" onclick="loadLayerPreset('preset1', true)" class="py-1.5 px-2 rounded border border-[#28324e] bg-[#141926] text-left transition preset-active">
-                        <div class="text-[10px] font-bold">Preset 1 (Principal)</div>
-                        <div class="text-[9px] text-slate-300 truncate">Cabeza, Brazo1, Torso, Brazo2, Falda, Piernas</div>
-                    </button>
-                    <button id="btnPreset2" onclick="loadLayerPreset('preset2', true)" class="py-1.5 px-2 rounded border border-[#28324e] bg-[#141926] text-left text-slate-300 hover:text-white transition">
-                        <div class="text-[10px] font-bold">Preset 2 (15 Capas)</div>
-                        <div class="text-[9px] text-slate-400 truncate">Full Segmented + Layer Falda</div>
-                    </button>
-                </div>
-                <div class="flex items-center justify-between bg-[#151a28] px-2 py-1 rounded border border-[#242d44]">
-                    <span class="text-[10px] text-slate-300">Variante Piernas:</span>
-                    <div class="flex gap-1">
-                        <button id="btnLegStyleCalcetas" onclick="setLegVariantStyle('calcetas')" class="px-2 py-0.5 rounded text-[9px] font-semibold bg-sky-500/20 text-sky-300 border border-sky-500/40">
-                            Calcetas + Tenis
-                        </button>
-                        <button id="btnLegStylePantalon" onclick="setLegVariantStyle('pantalon')" class="px-2 py-0.5 rounded text-[9px] font-semibold bg-[#0e121b] text-slate-400 border border-[#252e45]">
-                            Pantalon + Tenis
-                        </button>
+                    <select id="v6LayerType" class="bg-[#0d121d] border border-[#28324e] rounded px-2 py-1.5 text-[10px] text-slate-200">
+                        <option value="Tela">Tela</option><option value="Cuello">Cuello</option><option value="Cabeza">Cabeza</option>
+                        <option value="Pierna">Pierna</option><option value="Muslo">Muslo</option><option value="Torso">Torso</option>
+                        <option value="Brazo">Brazo</option><option value="Antebrazo">Antebrazo</option><option value="Mano">Mano</option>
+                        <option value="Dedos">Dedos</option><option value="Pies">Pies</option><option value="Pelo">Pelo</option>
+                        <option value="Pelo trasero">Pelo trasero</option><option value="Pelo delantero">Pelo delantero</option>
+                        <option value="Ojos">Ojos / Parpadeo</option><option value="Boca">Boca / Expresión</option>
+                        <option value="Cadera / Pelvis">Cadera / Pelvis</option>
+                    </select>
+                    <div class="grid grid-cols-2 gap-1">
+                        <button onclick="addV6LayerFromMenu()" class="rounded bg-sky-500/20 border border-sky-500/40 text-sky-300 text-[10px] font-bold">+ Capa</button>
+                        <button onclick="addV6BoneFromMenu()" class="rounded bg-fuchsia-500/20 border border-fuchsia-500/40 text-fuchsia-300 text-[10px] font-bold">+ Hueso</button>
                     </div>
                 </div>
+                <div class="grid grid-cols-2 gap-1.5">
+                    <label class="flex items-center justify-center gap-1.5 rounded border border-[#28324e] bg-[#141926] px-2 py-1.5 text-[10px] text-slate-300 cursor-pointer">
+                        <input type="radio" name="v6TextureMode" value="parts" checked class="accent-sky-400"> Por partes
+                    </label>
+                    <label class="flex items-center justify-center gap-1.5 rounded border border-[#28324e] bg-[#141926] px-2 py-1.5 text-[10px] text-slate-300 cursor-pointer">
+                        <input type="radio" name="v6TextureMode" value="single" class="accent-sky-400"> Una imagen
+                    </label>
+                </div>
+                <label class="flex items-center justify-center gap-2 rounded border border-dashed border-sky-500/40 bg-sky-500/5 px-2 py-2 text-[10px] text-sky-200 cursor-pointer">
+                    Cargar textura del modo seleccionado
+                    <input type="file" accept="image/png,image/jpeg,image/webp" class="hidden" onchange="importV6TextureMode(event)">
+                </label>
             </div>
 
             <div class="p-2.5 border-b border-[#22293c] flex flex-col min-h-[210px] max-h-[44%]">
                 <div class="flex items-center justify-between mb-1.5">
-                    <span class="text-[10px] font-bold uppercase tracking-wider text-sky-400">Partes / Capas (Orden Z)</span>
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-sky-400">Capas</span>
                     <div class="flex items-center gap-1">
-                        <button onclick="createNewEmptyPart()" class="px-2 py-0.5 rounded bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 border border-sky-500/40 text-[10px] font-semibold transition">
-                            + Parte
+                        <button id="btnMultiSelect" onclick="toggleMultiSelectMode()" class="px-2 py-0.5 rounded bg-[#141926] text-slate-300 border border-[#28324e] text-[10px]">Multi</button>
+                        <button onclick="clearPartSelection()" title="No seleccionar ninguna capa" aria-label="No seleccionar ninguna capa" class="w-6 h-6 rounded bg-[#141926] text-slate-300 border border-[#28324e] flex items-center justify-center">
+                            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="m8 8 8 8M16 8l-8 8"/></svg>
                         </button>
-                        <button onclick="deletePartById(studio.selectedPartId)" class="px-2 py-0.5 rounded bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/30 text-[10px] font-semibold transition">
-                            Eliminar
+                        <button onclick="createNewEmptyPart()" title="Añadir capa" aria-label="Añadir capa" class="w-6 h-6 rounded bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 border border-sky-500/40 flex items-center justify-center transition">
+                            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>
+                        </button>
+                        <button onclick="deletePartById(studio.selectedPartId)" title="Eliminar capa seleccionada" aria-label="Eliminar capa seleccionada" class="w-6 h-6 rounded bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/30 flex items-center justify-center transition">
+                            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>
                         </button>
                     </div>
                 </div>
@@ -376,8 +565,8 @@
                         </button>
                     </div>
                     <div class="grid grid-cols-2 gap-1">
-                        <button id="poseBtn_dynamic" onclick="applyPoseTemplate('dynamic', true)" class="px-2 py-1 rounded bg-[#101420] border border-sky-500/60 text-left text-[10px] font-medium text-white">
-                            Dinamica
+                        <button id="poseBtn_dynamic" onclick="applyPoseTemplate('dynamic', true)" class="hidden px-2 py-1 rounded bg-[#101420] border border-sky-500/60 text-left text-[10px] font-medium text-white">
+                            Dinamica Coach
                         </button>
                         <button id="poseBtn_casual" onclick="applyPoseTemplate('casual', true)" class="px-2 py-1 rounded bg-[#101420] border border-[#252d44] text-left text-[10px] font-medium text-slate-300">
                             Casual Recta
@@ -385,8 +574,8 @@
                         <button id="poseBtn_apose" onclick="applyPoseTemplate('apose', true)" class="px-2 py-1 rounded bg-[#101420] border border-[#252d44] text-left text-[10px] font-medium text-slate-300">
                             Simetrica A
                         </button>
-                        <button id="poseBtn_compact" onclick="applyPoseTemplate('compact', true)" class="px-2 py-1 rounded bg-[#101420] border border-[#252d44] text-left text-[10px] font-medium text-slate-300">
-                            Compacta
+                        <button id="poseBtn_compact" onclick="applyPoseTemplate('dynamic', true)" class="px-2 py-1 rounded bg-[#101420] border border-sky-500/60 text-left text-[10px] font-medium text-white">
+                            Dinamica Coach
                         </button>
                     </div>
                 </div>
@@ -588,6 +777,30 @@
                                 <input type="range" id="sl_partRot" min="-180" max="180" step="1" value="0" onchange="pushUndoState()" oninput="updateSelectedPartTransformFromSliders()">
                             </div>
                         </div>
+                    </div>
+
+                    <div id="couplePositionPanel" class="hidden bg-[#171326] border border-fuchsia-500/40 rounded p-2.5 space-y-2">
+                        <div class="flex items-center justify-between border-b border-fuchsia-500/20 pb-1.5">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-fuchsia-300">Posicion de Personajes</span>
+                            <span id="lblCoupleTarget" class="mono text-[10px] text-fuchsia-200 bg-fuchsia-500/15 px-1.5 py-0.5 rounded">Principal</span>
+                        </div>
+                        <div class="flex gap-1">
+                            <button id="btnCharacterPrimary" onclick="selectCharacterForTransform('primary')" class="flex-1 px-2 py-1 rounded bg-fuchsia-500/25 border border-fuchsia-400/60 text-[10px] text-fuchsia-100 font-semibold">Principal</button>
+                            <button id="btnCharacterCompanion" onclick="selectCharacterForTransform('companion')" class="flex-1 px-2 py-1 rounded bg-[#0f101a] border border-[#34304d] text-[10px] text-slate-400 font-semibold">Pareja</button>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <label class="text-[10px] text-slate-400">Mover X
+                                <input type="range" id="sl_characterX" min="-1600" max="1600" step="1" oninput="updateSelectedCharacterOffset()">
+                            </label>
+                            <label class="text-[10px] text-slate-400">Mover Y
+                                <input type="range" id="sl_characterY" min="-1600" max="1600" step="1" oninput="updateSelectedCharacterOffset()">
+                            </label>
+                        </div>
+                        <div class="flex justify-between mono text-[9px] text-fuchsia-200">
+                            <span id="val_characterX">X: 0 px</span>
+                            <span id="val_characterY">Y: 0 px</span>
+                        </div>
+                        <button onclick="resetSelectedCharacterOffset()" class="w-full px-2 py-1 rounded bg-[#0f101a] hover:bg-fuchsia-500/20 border border-[#34304d] text-[10px] text-slate-300">Centrar personaje seleccionado</button>
                     </div>
 
                     <div class="bg-[#161b29] border border-amber-500/40 rounded p-2.5 space-y-2">
@@ -1061,13 +1274,55 @@
         </div>
     </div>
 
+    <div id="v6ExportHub" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-[60] hidden items-center justify-center p-4">
+        <div class="bg-[#101420] border border-emerald-500/35 rounded-xl max-w-xl w-full shadow-2xl overflow-hidden">
+            <div class="px-5 py-4 border-b border-[#22293f] flex items-center justify-between bg-[#151a28]">
+                <div>
+                    <div class="text-sm font-bold text-white">Exportar proyecto</div>
+                    <div class="text-[10px] text-slate-400 mt-0.5">Selecciona los archivos que quieres generar</div>
+                </div>
+                <button onclick="closeV6ExportHub()" class="w-7 h-7 rounded bg-[#1e2538] text-slate-300 hover:text-white">X</button>
+            </div>
+            <div class="p-5 space-y-4">
+                <div class="grid grid-cols-2 gap-2">
+                    <label class="flex items-center gap-2 p-3 rounded-lg border border-[#28324e] bg-[#141a29] cursor-pointer hover:border-emerald-400/50">
+                        <input id="v6ExportImages" type="checkbox" checked class="accent-emerald-400">
+                        <span><b class="block text-xs text-white">Texturas del juego</b><small class="text-[10px] text-slate-400">Banner, Cursor, HUD, Retrato y más</small></span>
+                    </label>
+                    <label class="flex items-center gap-2 p-3 rounded-lg border border-[#28324e] bg-[#141a29] cursor-pointer hover:border-emerald-400/50">
+                        <input id="v6ExportAtlas" type="checkbox" checked class="accent-emerald-400">
+                        <span><b class="block text-xs text-white">Atlas</b><small class="text-[10px] text-slate-400">Textura unificada</small></span>
+                    </label>
+                    <label class="flex items-center gap-2 p-3 rounded-lg border border-[#28324e] bg-[#141a29] cursor-pointer hover:border-emerald-400/50">
+                        <input id="v6ExportJson" type="checkbox" checked class="accent-emerald-400">
+                        <span><b class="block text-xs text-white">JSON</b><small class="text-[10px] text-slate-400">Esqueleto y configuración</small></span>
+                    </label>
+                    <label class="flex items-center gap-2 p-3 rounded-lg border border-[#28324e] bg-[#141a29] cursor-pointer hover:border-emerald-400/50">
+                        <input id="v6ExportCs" type="checkbox" checked class="accent-emerald-400">
+                        <span><b class="block text-xs text-white">C#</b><small class="text-[10px] text-slate-400">Runtime Unity</small></span>
+                    </label>
+                </div>
+                <div class="p-3 rounded-lg border border-fuchsia-500/30 bg-fuchsia-500/5">
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input id="v6ExportAnimation" type="checkbox" class="accent-fuchsia-400">
+                        <span><b class="block text-xs text-white">Exportar como animación</b><small class="text-[10px] text-slate-400">Abre el exportador APNG/GIF con la animación actual</small></span>
+                    </label>
+                </div>
+                <div class="flex items-center justify-end gap-2">
+                    <button onclick="closeV6ExportHub()" class="px-3 py-2 rounded-lg border border-[#2b3854] text-xs text-slate-300">Cancelar</button>
+                    <button onclick="exportV6Selection()" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-xs font-bold text-white">Exportar selección</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="gifModal" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
         <div class="bg-[#101420] border border-[#28324e] rounded-xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
             <div class="px-5 py-3.5 border-b border-[#22293f] flex items-center justify-between bg-[#151a28]">
                 <div class="flex items-center gap-3">
                     <span class="px-2 py-0.5 rounded bg-gradient-to-r from-pink-500/20 to-purple-500/20 border border-pink-500/40 text-pink-300 mono text-xs font-bold flex items-center gap-1.5">
                         <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="2" width="20" height="20" rx="4"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
-                        ANIMATION EXPORTER V5.1
+                        ANIMATION EXPORTER V6
                     </span>
                     <span class="text-sm font-bold text-white">Exportador de Animación (APNG • GIF)</span>
                 </div>
@@ -1082,9 +1337,18 @@
                             <span id="lblFormatBadge" class="text-[10px] text-pink-400 font-bold">APNG 32-bit</span>
                         </label>
                         <select id="selExportFormat" onchange="onExportFormatChanged()" class="bg-[#121622] border border-pink-500/60 rounded px-2.5 py-1.5 text-xs text-pink-200 font-bold focus:outline-none focus:border-pink-400">
-                            <option value="apng" selected> APNG (.png) - Calidad 32-bit sin perdida</option>
-                            <option value="gif"> GIF (.gif) - 256 colores</option>
+                            <option value="apng" selected> APNG (.png) - Canal alfa sin pérdida</option>
+                            <option value="gif"> GIF (.gif)</option>
+                            <option value="webm"> Video WebM (.webm) - Render rápido</option>
                         </select>
+                        <div id="rowApngDepth" class="flex flex-col gap-1 mt-2">
+                            <label class="text-[11px] font-semibold text-slate-300">Profundidad APNG</label>
+                            <select id="selApngDepth" onchange="onExportFormatChanged()" class="bg-[#121622] border border-[#28324d] rounded px-2 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-pink-500">
+                                <option value="8">8-bit</option>
+                                <option value="16">16-bit</option>
+                                <option value="32" selected>32-bit RGBA</option>
+                            </select>
+                        </div>
                     </div>
 
                     <div class="flex flex-col gap-1">
@@ -1115,7 +1379,7 @@
                                 <option value="720">720 px (720p HD)</option>
                                 <option value="480">480 px (480p SD)</option>
                             </select>
-                            <span class="text-[10px] text-sky-300/80 leading-tight">APNG genera animación en 32-bit con canal alfa.</span>
+                            <span id="lblAnimFormatHelp" class="text-[10px] text-sky-300/80 leading-tight">El lienzo del navegador procesa color RGBA de 8 bits por canal.</span>
                         </div>
                     </div>
 
@@ -1151,7 +1415,7 @@
                             <option value="red"> Chroma Key Rojo (#FF0000) </option>
                             <option value="dark"> Fondo Oscuro Estudio (#090b10)</option>
                         </select>
-                        <span class="text-[10px] text-slate-400 leading-tight">Opciones de fondo para composición.</span>
+                        <span class="text-[10px] text-slate-400 leading-tight">Opciones de fondo para composición y vídeo.</span>
                     </div>
 
                     <div class="flex flex-col gap-2 pt-1 border-t border-[#1e2538]">
@@ -1196,6 +1460,7 @@
                             <span class="text-[10px] text-slate-500 max-w-xs text-center">Selecciona el formato deseado (APNG o GIF) y presiona "Generar Animación" para procesarla.</span>
                         </div>
                         <img id="gifResultImg" class="hidden max-h-[340px] max-w-full object-contain filter drop-shadow-xl" alt="Preview Animation">
+                        <video id="gifResultVideo" class="hidden max-h-[340px] max-w-full object-contain filter drop-shadow-xl" controls loop muted playsinline></video>
                     </div>
 
                     <div id="gifResultActions" class="hidden p-3 bg-[#0d101a] border border-[#22293d] rounded-xl flex items-center justify-between gap-3 flex-wrap">
@@ -1392,7 +1657,7 @@
             avatarName: 'CustomAvatar',
             systemState: 'setup',
             activeTool: 'bone',
-            activePosePreset: 'casual',
+            activePosePreset: 'dynamic',
             activeLayerPreset: 'preset1',
             legVariantStyle: 'calcetas',
 
@@ -1418,6 +1683,14 @@
             },
 
             weightRigidity: 0.7,
+
+            coupleMode: false,
+            coupleGap: 0.62,
+            coupleName: 'Companion',
+            characterOffsets: {
+                primary: { x: 0, y: 0 },
+                companion: { x: 0, y: 0 }
+            },
 
             weightBrush: {
                 mode: 'add',
@@ -1458,10 +1731,14 @@
 
             selectedBoneId: 'upperArmR',
             selectedPartId: 'Brazo1',
+            selectedPartIds: ['Brazo1'],
+            multiSelectMode: false,
             draggingEndpoint: null,
             draggingAnchorPartId: null,
             draggingVertex: null,
             draggingPart: false,
+            draggingPartGroupId: null,
+            selectedCharacterId: 'primary',
             creatingBoneOrigin: null,
             creatingBoneCursor: null,
 
@@ -1486,18 +1763,18 @@
 
         const POSE_TEMPLATES = {
             dynamic: {
-                torso:     { x1: 0.49, y1: 0.48, x2: 0.49, y2: 0.29, color: '#e2e8f0', role: 'breath', label: 'Torso Central' },
-                neck:      { x1: 0.49, y1: 0.29, x2: 0.47, y2: 0.22, color: '#38bdf8', role: 'head', label: 'Cuello' },
-                head:      { x1: 0.47, y1: 0.22, x2: 0.46, y2: 0.11, color: '#0ea5e9', role: 'head', label: 'Cabeza' },
-                upperArmR: { x1: 0.41, y1: 0.28, x2: 0.26, y2: 0.36, color: '#10b981', role: 'armR', label: 'Brazo 1 Sup (Izq)' },
-                forearmR:  { x1: 0.26, y1: 0.36, x2: 0.12, y2: 0.45, color: '#34d399', role: 'armR', label: 'Brazo 1 Inf (Izq)' },
-                upperArmL: { x1: 0.57, y1: 0.28, x2: 0.72, y2: 0.35, color: '#10b981', role: 'armL', label: 'Brazo 2 Sup (Der)' },
-                forearmL:  { x1: 0.72, y1: 0.35, x2: 0.88, y2: 0.28, color: '#34d399', role: 'armL', label: 'Brazo 2 Inf (Der)' },
-                strap:     { x1: 0.49, y1: 0.48, x2: 0.49, y2: 0.58, color: '#c084fc', role: 'pendulum', label: 'Falda / Correa' },
-                upperLegR: { x1: 0.43, y1: 0.49, x2: 0.42, y2: 0.67, color: '#f59e0b', role: 'legR', label: 'Muslo Izq' },
-                lowerLegR: { x1: 0.42, y1: 0.67, x2: 0.36, y2: 0.85, color: '#fbbf24', role: 'legR', label: 'Pantorrilla Izq' },
-                upperLegL: { x1: 0.52, y1: 0.49, x2: 0.58, y2: 0.64, color: '#f59e0b', role: 'legL', label: 'Muslo Der' },
-                lowerLegL: { x1: 0.58, y1: 0.64, x2: 0.48, y2: 0.81, color: '#fbbf24', role: 'legL', label: 'Pantorrilla Der' }
+                torso:     { x1: 0.48, y1: 0.53, x2: 0.44, y2: 0.32, color: '#e2e8f0', role: 'breath', label: 'Torso Coach' },
+                neck:      { x1: 0.44, y1: 0.32, x2: 0.42, y2: 0.25, color: '#38bdf8', role: 'head', label: 'Cuello' },
+                head:      { x1: 0.42, y1: 0.25, x2: 0.41, y2: 0.14, color: '#0ea5e9', role: 'head', label: 'Cabeza' },
+                upperArmR: { x1: 0.38, y1: 0.31, x2: 0.25, y2: 0.42, color: '#10b981', role: 'armR', label: 'Brazo Izq Sup' },
+                forearmR:  { x1: 0.25, y1: 0.42, x2: 0.10, y2: 0.48, color: '#34d399', role: 'armR', label: 'Brazo Izq Inf' },
+                upperArmL: { x1: 0.51, y1: 0.29, x2: 0.66, y2: 0.22, color: '#10b981', role: 'armL', label: 'Brazo Der Sup' },
+                forearmL:  { x1: 0.66, y1: 0.22, x2: 0.75, y2: 0.06, color: '#34d399', role: 'armL', label: 'Brazo Der Inf' },
+                strap:     { x1: 0.47, y1: 0.52, x2: 0.46, y2: 0.61, color: '#c084fc', role: 'pendulum', label: 'Chaleco / Correa' },
+                upperLegR: { x1: 0.42, y1: 0.54, x2: 0.34, y2: 0.71, color: '#f59e0b', role: 'legR', label: 'Pierna Izq Sup' },
+                lowerLegR: { x1: 0.34, y1: 0.71, x2: 0.28, y2: 0.91, color: '#fbbf24', role: 'legR', label: 'Pierna Izq Inf' },
+                upperLegL: { x1: 0.50, y1: 0.54, x2: 0.61, y2: 0.70, color: '#f59e0b', role: 'legL', label: 'Pierna Der Sup' },
+                lowerLegL: { x1: 0.61, y1: 0.70, x2: 0.72, y2: 0.91, color: '#fbbf24', role: 'legL', label: 'Pierna Der Inf' }
             },
             casual: {
                 torso:     { x1: 0.50, y1: 0.50, x2: 0.50, y2: 0.29, color: '#e2e8f0', role: 'breath', label: 'Torso Central' },
@@ -1550,6 +1827,192 @@
 
         let lastFrameTimestamp = performance.now();
         let fpsTracker = 60;
+        let v6TimelineFrame = 0;
+        let v6ToastTimer = null;
+        let v6AutosaveTimer = null;
+
+        const V6_COMMANDS = [
+            { label: 'Guardar proyecto', hint: 'Ctrl+S', run: () => saveProjectToFile() },
+            { label: 'Deshacer último cambio', hint: 'Ctrl+Z', run: () => performUndo() },
+            { label: 'Rehacer cambio', hint: 'Ctrl+Y', run: () => performRedo() },
+            { label: 'Enfocar composición', hint: 'F', run: () => resetCameraView() },
+            { label: 'Activar modo pareja', hint: 'P', run: () => setCoupleMode(!studio.coupleMode) },
+            { label: 'Recalcular pesos y anclajes', hint: '', run: () => recomputeAllPartsWeights(true, true) },
+            { label: 'Auto-detectar pose', hint: '', run: () => autoDetectPoseFromAllParts() },
+            { label: 'Abrir ajustes', hint: '', run: () => openSettingsModal() }
+        ];
+
+        function showV6Toast(message, tone = 'info') {
+            const toast = document.getElementById('v6Toast');
+            if (!toast) return;
+            toast.textContent = message;
+            toast.style.borderColor = tone === 'error' ? 'rgba(248,113,113,.55)' : 'rgba(56,189,248,.35)';
+            toast.classList.add('is-visible');
+            clearTimeout(v6ToastTimer);
+            v6ToastTimer = setTimeout(() => toast.classList.remove('is-visible'), 2600);
+        }
+
+        function toggleV6Panel(side) {
+            document.body.classList.toggle(side === 'left' ? 'v6-left-open' : 'v6-right-open');
+        }
+
+        function closeV6Panels() {
+            document.body.classList.remove('v6-left-open', 'v6-right-open');
+        }
+
+        function renderV6CommandList(query = '') {
+            const list = document.getElementById('v6CommandList');
+            if (!list) return;
+            const normalized = query.trim().toLowerCase();
+            const commands = V6_COMMANDS.filter(command => !normalized || command.label.toLowerCase().includes(normalized));
+            list.innerHTML = commands.length
+                ? commands.map((command, index) => `<button class="v6-command-item${index === 0 ? ' is-active' : ''}" data-command-index="${V6_COMMANDS.indexOf(command)}"><span>${escapeHtml(command.label)}</span><span class="mono text-[9px] text-slate-500">${escapeHtml(command.hint)}</span></button>`).join('')
+                : '<div class="p-4 text-center text-slate-500 text-xs">No hay comandos coincidentes</div>';
+            list.querySelectorAll('[data-command-index]').forEach(button => {
+                button.addEventListener('click', () => {
+                    const command = V6_COMMANDS[Number(button.dataset.commandIndex)];
+                    closeV6CommandPalette();
+                    if (command) command.run();
+                });
+            });
+        }
+
+        function openV6CommandPalette() {
+            const modal = document.getElementById('v6CommandPalette');
+            const input = document.getElementById('v6CommandInput');
+            if (!modal || !input) return;
+            modal.classList.add('is-visible');
+            input.value = '';
+            renderV6CommandList();
+            requestAnimationFrame(() => input.focus());
+        }
+
+        function closeV6CommandPalette() {
+            const modal = document.getElementById('v6CommandPalette');
+            if (modal) modal.classList.remove('is-visible');
+        }
+
+        function openV6ExportHub() {
+            const modal = document.getElementById('v6ExportHub');
+            if (modal) modal.classList.remove('hidden'), modal.classList.add('flex');
+        }
+
+        function closeV6ExportHub() {
+            const modal = document.getElementById('v6ExportHub');
+            if (modal) modal.classList.add('hidden'), modal.classList.remove('flex');
+        }
+
+        async function exportV6Selection() {
+            const animation = document.getElementById('v6ExportAnimation')?.checked;
+            closeV6ExportHub();
+            if (animation) {
+                openGifModal();
+                return;
+            }
+            const files = [];
+            const staticTextures = document.getElementById('v6ExportImages')?.checked;
+            const avatarName = (studio.avatarName || 'CustomAvatar').replace(/[^\w.-]+/g, '_');
+            if (document.getElementById('v6ExportAtlas')?.checked) {
+                const atlas = buildSmartTextureAtlas();
+                files.push({ name: `${avatarName}_Atlas.png`, blob: await canvasToBlob(atlas.canvas || studio.packedAtlasCanvas, 'image/png') });
+            }
+            if (document.getElementById('v6ExportJson')?.checked) {
+                files.push({ name: `${avatarName}.json`, blob: new Blob([buildSpineUnityJSON()], { type: 'application/json' }) });
+            }
+            if (document.getElementById('v6ExportCs')?.checked) {
+                files.push({ name: `${avatarName}2UnityRuntime.cs`, blob: new Blob([buildUnityCSharpScript()], { type: 'text/plain' }) });
+            }
+            if (!files.length) {
+                if (staticTextures) {
+                    openStaticTexturesModal();
+                    return;
+                }
+                showV6Toast('Selecciona al menos un tipo de exportación.', 'error');
+                return;
+            }
+            if (window.showDirectoryPicker) {
+                try {
+                    const directory = await window.showDirectoryPicker({ mode: 'readwrite' });
+                    for (const file of files) {
+                        const segments = file.name.split('/');
+                        let target = directory;
+                        for (const segment of segments.slice(0, -1)) target = await target.getDirectoryHandle(segment, { create: true });
+                        const handle = await target.getFileHandle(segments[segments.length - 1], { create: true });
+                        const writable = await handle.createWritable();
+                        await writable.write(file.blob);
+                        await writable.close();
+                    }
+                    showV6Toast(`${files.length} archivos exportados en la carpeta seleccionada.`);
+                    if (staticTextures) openStaticTexturesModal();
+                } catch (error) {
+                    if (error?.name !== 'AbortError') showV6Toast('No se pudo escribir la carpeta de exportación.', 'error');
+                }
+                return;
+            }
+            files.forEach(file => {
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(file.blob);
+                link.download = file.name.replace('/', '_');
+                link.click();
+                setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+            });
+            showV6Toast(`${files.length} archivos preparados para descargar.`);
+            if (staticTextures) openStaticTexturesModal();
+        }
+
+        function canvasToBlob(canvas, type) {
+            return new Promise((resolve, reject) => {
+                if (!canvas || typeof canvas.toBlob !== 'function') {
+                    reject(new Error('Canvas no disponible'));
+                    return;
+                }
+                canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('No se pudo convertir el canvas')), type);
+            });
+        }
+
+        function initV6Experience() {
+            const input = document.getElementById('v6CommandInput');
+            if (input) {
+                input.addEventListener('input', () => renderV6CommandList(input.value));
+                input.addEventListener('keydown', (event) => {
+                    if (event.key === 'Escape') closeV6CommandPalette();
+                    if (event.key === 'Enter') {
+                        const active = document.querySelector('.v6-command-item.is-active');
+                        if (active) active.click();
+                    }
+                });
+            }
+            window.addEventListener('keydown', (event) => {
+                const active = document.activeElement;
+                const editing = active && ['INPUT', 'TEXTAREA', 'SELECT'].includes(active.tagName);
+                if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+                    event.preventDefault();
+                    openV6CommandPalette();
+                } else if (!editing && event.key.toLowerCase() === 'f') {
+                    event.preventDefault();
+                    resetCameraView();
+                } else if (!editing && event.key.toLowerCase() === 'p') {
+                    event.preventDefault();
+                    setCoupleMode(!studio.coupleMode);
+                } else if (event.key === 'Escape') {
+                    closeV6CommandPalette();
+                    closeV6Panels();
+                }
+            });
+            window.addEventListener('error', () => showV6Toast('Se detectó un error en la interfaz. Revisa la consola para más detalles.', 'error'));
+            window.addEventListener('unhandledrejection', () => showV6Toast('Una operación no pudo completarse.', 'error'));
+            v6AutosaveTimer = setInterval(() => {
+                try {
+                    const snapshot = JSON.stringify(serializeStudioSnapshot(true));
+                    if (snapshot.length < 4500000) {
+                        localStorage.setItem('LIAM_STUDIO_AUTOSAVE_V6', snapshot);
+                    }
+                } catch (error) {
+                    showV6Toast('El auto-guardado no está disponible en este navegador.', 'error');
+                }
+            }, 8000);
+            showV6Toast('Avatar Studio V6 listo · Ctrl+K para comandos');
+        }
 
                 const DEFAULT_STUDIO_SETTINGS = {
             canvasBg: 'grid',
@@ -1635,10 +2098,15 @@
             if (m) m.classList.add('hidden'), m.classList.remove('flex');
         }
 
-        function initApplication() {
+        async function initApplication() {
             loadStudioSettings();
-            applyPoseTemplate('casual', false);
-            loadLayerPreset('preset1', false);
+            applyPoseTemplate('dynamic', false);
+            try {
+                await loadCoachDefaultTemplate();
+            } catch (error) {
+                console.warn('No se pudo cargar el template Coach; se usará el avatar base.', error);
+                loadLayerPreset('preset1', false);
+            }
 
             resizeAllCanvases();
             window.addEventListener('resize', resizeAllCanvases);
@@ -1653,8 +2121,10 @@
             syncBoneInspectorUI();
             syncWeightBrushSliders();
             syncAnimSliders();
+            syncCharacterTransformUI();
             setSystemState('setup');
             updateUndoRedoButtons();
+            initV6Experience();
 
             requestAnimationFrame(mainStudioLoop);
         }
@@ -1700,12 +2170,105 @@
             };
         }
 
+        function getPartInstanceId(part) {
+            return part && part.instanceId === 'companion' ? 'companion' : 'primary';
+        }
+
+        function getCharacterOffset(instanceId) {
+            const offset = studio.characterOffsets && studio.characterOffsets[instanceId];
+            return {
+                x: Number(offset && offset.x) || 0,
+                y: Number(offset && offset.y) || 0
+            };
+        }
+
+        function syncCharacterTransformUI() {
+            const panel = document.getElementById('couplePositionPanel');
+            if (!panel) return;
+            panel.classList.toggle('hidden', !studio.coupleMode);
+            const id = studio.selectedCharacterId || 'primary';
+            const offset = getCharacterOffset(id);
+            const label = document.getElementById('lblCoupleTarget');
+            const x = document.getElementById('sl_characterX');
+            const y = document.getElementById('sl_characterY');
+            if (label) label.textContent = id === 'companion' ? 'Pareja' : 'Principal';
+            if (x) x.value = offset.x;
+            if (y) y.value = offset.y;
+            document.getElementById('val_characterX').textContent = `X: ${Math.round(offset.x)} px`;
+            document.getElementById('val_characterY').textContent = `Y: ${Math.round(offset.y)} px`;
+            const primary = document.getElementById('btnCharacterPrimary');
+            const companion = document.getElementById('btnCharacterCompanion');
+            if (primary) primary.className = id === 'primary'
+                ? 'flex-1 px-2 py-1 rounded bg-fuchsia-500/25 border border-fuchsia-400/60 text-[10px] text-fuchsia-100 font-semibold'
+                : 'flex-1 px-2 py-1 rounded bg-[#0f101a] border border-[#34304d] text-[10px] text-slate-400 font-semibold';
+            if (companion) companion.className = id === 'companion'
+                ? 'flex-1 px-2 py-1 rounded bg-fuchsia-500/25 border border-fuchsia-400/60 text-[10px] text-fuchsia-100 font-semibold'
+                : 'flex-1 px-2 py-1 rounded bg-[#0f101a] border border-[#34304d] text-[10px] text-slate-400 font-semibold';
+        }
+
+        function selectCharacterForTransform(instanceId) {
+            if (instanceId === 'companion' && !studio.coupleMode) return;
+            studio.selectedCharacterId = instanceId === 'companion' ? 'companion' : 'primary';
+            syncCharacterTransformUI();
+        }
+
+        function updateSelectedCharacterOffset() {
+            if (!studio.coupleMode) return;
+            const id = studio.selectedCharacterId || 'primary';
+            studio.characterOffsets[id] = {
+                x: Number(document.getElementById('sl_characterX').value) || 0,
+                y: Number(document.getElementById('sl_characterY').value) || 0
+            };
+            const offset = studio.characterOffsets[id];
+            document.getElementById('val_characterX').textContent = `X: ${Math.round(offset.x)} px`;
+            document.getElementById('val_characterY').textContent = `Y: ${Math.round(offset.y)} px`;
+            resetCameraView();
+        }
+
+        function resetSelectedCharacterOffset() {
+            pushUndoState();
+            const id = studio.selectedCharacterId || 'primary';
+            studio.characterOffsets[id] = { x: 0, y: 0 };
+            syncCharacterTransformUI();
+            resetCameraView();
+        }
+
+        function getCharacterFrameOrigin(instanceId) {
+            const parts = studio.parts.filter(p => getPartInstanceId(p) === instanceId);
+            const groupOffset = getCharacterOffset(instanceId);
+            return {
+                x: groupOffset.x + (parts.length ? Math.min(...parts.map(p => (p.instanceOffset && p.instanceOffset.x || 0) + (p.x || 0))) : 0),
+                y: groupOffset.y + (parts.length ? Math.min(...parts.map(p => (p.instanceOffset && p.instanceOffset.y || 0) + (p.y || 0))) : 0)
+            };
+        }
+
+        function getCompositionBounds() {
+            const groups = ['primary'];
+            if (studio.coupleMode || studio.parts.some(p => getPartInstanceId(p) === 'companion')) groups.push('companion');
+            const bounds = { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity };
+            groups.forEach(groupId => {
+                const parts = studio.parts.filter(p => getPartInstanceId(p) === groupId);
+                const groupOffset = getCharacterOffset(groupId);
+                const originX = parts.length ? Math.min(...parts.map(p => groupOffset.x + (p.instanceOffset && p.instanceOffset.x || 0) + (p.x || 0))) : groupOffset.x;
+                const originY = parts.length ? Math.min(...parts.map(p => groupOffset.y + (p.instanceOffset && p.instanceOffset.y || 0) + (p.y || 0))) : groupOffset.y;
+                bounds.minX = Math.min(bounds.minX, originX);
+                bounds.minY = Math.min(bounds.minY, originY);
+                bounds.maxX = Math.max(bounds.maxX, originX + RefWidth);
+                bounds.maxY = Math.max(bounds.maxY, originY + RefHeight);
+            });
+            if (!Number.isFinite(bounds.minX)) return { minX: 0, minY: 0, maxX: RefWidth, maxY: RefHeight };
+            return bounds;
+        }
+
         function resetCameraView() {
             const vpRect = document.getElementById('viewportContainer').getBoundingClientRect();
-            const fitZoom = Math.min((vpRect.width * 0.84) / RefWidth, (vpRect.height * 0.88) / RefHeight);
+            const bounds = getCompositionBounds();
+            const sceneWidth = Math.max(1, bounds.maxX - bounds.minX);
+            const sceneHeight = Math.max(1, bounds.maxY - bounds.minY);
+            const fitZoom = Math.min((vpRect.width * 0.84) / sceneWidth, (vpRect.height * 0.88) / sceneHeight);
             studio.camera.zoom = Math.max(studio.camera.minZoom, Math.min(studio.camera.maxZoom, fitZoom || 0.25));
-            studio.camera.x = (vpRect.width - RefWidth * studio.camera.zoom) * 0.5;
-            studio.camera.y = (vpRect.height - RefHeight * studio.camera.zoom) * 0.5;
+            studio.camera.x = (vpRect.width - sceneWidth * studio.camera.zoom) * 0.5 - bounds.minX * studio.camera.zoom;
+            studio.camera.y = (vpRect.height - sceneHeight * studio.camera.zoom) * 0.5 - bounds.minY * studio.camera.zoom;
             updateCameraReadout();
         }
 
@@ -1730,6 +2293,13 @@
         function serializeStudioSnapshot(includeImages = false) {
             return {
                 avatarName: studio.avatarName || 'CustomAvatar',
+                coupleMode: !!studio.coupleMode,
+                coupleGap: studio.coupleGap,
+                coupleName: studio.coupleName,
+                characterOffsets: JSON.parse(JSON.stringify(studio.characterOffsets || {
+                    primary: { x: 0, y: 0 },
+                    companion: { x: 0, y: 0 }
+                })),
                 refWidth: RefWidth,
                 refHeight: RefHeight,
                 activePosePreset: studio.activePosePreset,
@@ -1737,6 +2307,7 @@
                 legVariantStyle: studio.legVariantStyle,
                 selectedBoneId: studio.selectedBoneId,
                 selectedPartId: studio.selectedPartId,
+                selectedPartIds: [...(studio.selectedPartIds || [])],
                 weightRigidity: studio.weightRigidity,
                 bones: JSON.parse(JSON.stringify(studio.bones)),
                 anim: JSON.parse(JSON.stringify(studio.anim)),
@@ -1751,6 +2322,9 @@
                     scaleX: p.scaleX,
                     scaleY: p.scaleY,
                     rot: p.rot,
+                    instanceId: p.instanceId || 'primary',
+                    sourcePartId: p.sourcePartId || p.id,
+                    instanceOffset: p.instanceOffset ? { ...p.instanceOffset } : null,
                     allowedBones: [...(p.allowedBones || [])],
                     anchor: p.anchor ? { ...p.anchor } : { parentBone: 'none', nx: 0.5, ny: 0.3, radiusPct: 12, strength: 0 },
                     rawDataUrl: includeImages ? p.rawSourceCanvas.toDataURL('image/png') : null,
@@ -1795,6 +2369,7 @@
             studio.legVariantStyle = snap.legVariantStyle || 'calcetas';
             studio.selectedBoneId = snap.selectedBoneId || 'torso';
             studio.selectedPartId = snap.selectedPartId || (snap.parts && snap.parts[0] ? snap.parts[0].id : 'Cabeza');
+            studio.selectedPartIds = Array.isArray(snap.selectedPartIds) ? [...snap.selectedPartIds] : (studio.selectedPartId ? [studio.selectedPartId] : []);
 
             studio.bones = JSON.parse(JSON.stringify(snap.bones || [])).map(b => ({
                 ...b,
@@ -1803,6 +2378,19 @@
             }));
 
             studio.weightRigidity = (typeof snap.weightRigidity === 'number') ? snap.weightRigidity : 0.5;
+            studio.coupleMode = !!snap.coupleMode;
+            studio.coupleGap = Number.isFinite(snap.coupleGap) ? Math.max(0.25, Math.min(1.4, snap.coupleGap)) : 0.62;
+            studio.coupleName = typeof snap.coupleName === 'string' && snap.coupleName.trim() ? snap.coupleName.trim() : 'Companion';
+            studio.characterOffsets = {
+                primary: {
+                    x: Number(snap.characterOffsets && snap.characterOffsets.primary && snap.characterOffsets.primary.x) || 0,
+                    y: Number(snap.characterOffsets && snap.characterOffsets.primary && snap.characterOffsets.primary.y) || 0
+                },
+                companion: {
+                    x: Number(snap.characterOffsets && snap.characterOffsets.companion && snap.characterOffsets.companion.x) || 0,
+                    y: Number(snap.characterOffsets && snap.characterOffsets.companion && snap.characterOffsets.companion.y) || 0
+                }
+            };
             const slGlobalRigid = document.getElementById('sl_weightRigidity');
             if (slGlobalRigid) {
                 slGlobalRigid.value = studio.weightRigidity;
@@ -1865,6 +2453,9 @@
                         scaleX: sp.scaleX || 1.0,
                         scaleY: sp.scaleY || 1.0,
                         rot: sp.rot || 0,
+                        instanceId: sp.instanceId || (String(sp.id).indexOf('__companion__') === 0 ? 'companion' : 'primary'),
+                        sourcePartId: sp.sourcePartId || sp.id,
+                        instanceOffset: sp.instanceOffset ? { ...sp.instanceOffset } : null,
                         allowedBones: [...(sp.allowedBones || [])],
                         anchor: rawAnc,
                         rawSourceCanvas: rawCanvas,
@@ -1895,9 +2486,15 @@
                 syncPartInspectorUI();
                 syncBoneInspectorUI();
                 resetCameraView();
+                syncCharacterTransformUI();
+                const coupleBtn = document.getElementById('btnCoupleMode');
+                if (coupleBtn) {
+                    coupleBtn.querySelector('span').textContent = studio.coupleMode ? '− Pareja' : '+ Pareja';
+                    coupleBtn.classList.toggle('bg-fuchsia-500/20', studio.coupleMode);
+                }
             };
 
-            restoreParts();
+            return restoreParts();
         }
 
         function dataUrlToCanvas(dataUrl, unletterboxLegacy520 = false) {
@@ -1972,7 +2569,7 @@
             URL.revokeObjectURL(url);
         }
 
-        function loadProjectFromFile(event) {
+        async function loadProjectFromFile(event) {
             const file = event.target.files && event.target.files[0];
             if (!file) return;
             const reader = new FileReader();
@@ -1981,10 +2578,85 @@
                     const parsed = JSON.parse(ev.target.result);
                     pushUndoState();
                     restoreStudioSnapshot(parsed);
-                } catch (err) {}
+                } catch (err) {
+                    alert('No se pudo cargar el proyecto: ' + (err.message || 'formato invalido'));
+                }
             };
             reader.readAsText(file);
             event.target.value = '';
+        }
+
+        function readProjectFile(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    try { resolve(JSON.parse(reader.result)); }
+                    catch (err) { reject(new Error(`${file.name}: ${err.message || 'JSON invalido'}`)); }
+                };
+                reader.onerror = () => reject(new Error(`${file.name}: no se pudo leer`));
+                reader.readAsText(file);
+            });
+        }
+
+        async function mergeAvatarProjects(event) {
+            const files = Array.from(event.target.files || []).slice(0, 2);
+            event.target.value = '';
+            if (files.length !== 2) {
+                alert('Selecciona exactamente dos archivos .L2A o .L2U para crear la pareja.');
+                return;
+            }
+            try {
+                const snapshots = await Promise.all(files.map(readProjectFile));
+                pushUndoState();
+                await restoreStudioSnapshot(snapshots[0]);
+                const sourceParts = studio.parts.filter(p => p.instanceId !== 'companion' && p.id.indexOf('__companion__') !== 0);
+                const second = snapshots[1];
+                const secondParts = (Array.isArray(second.parts) ? second.parts : [])
+                    .filter(sp => sp.instanceId !== 'companion' && String(sp.id).indexOf('__companion__') !== 0);
+                const gapPx = Math.max(RefWidth * 0.25, Math.min(RefWidth * 1.4, RefWidth * (Number(studio.coupleGap) || 0.62)));
+                const additions = [];
+                for (let i = 0; i < secondParts.length; i++) {
+                    const sp = secondParts[i];
+                    const rawCanvas = sp.rawDataUrl
+                        ? await dataUrlToCanvas(sp.rawDataUrl)
+                        : createDefaultPartCanvas(sp.id, studio.legVariantStyle);
+                    const id = `__companion__${String(sp.id || 'part').replace(/[^a-zA-Z0-9_]/g, '_')}_${i}`;
+                    const clone = {
+                        id,
+                        name: `${second.avatarName || 'Companion'} / ${sp.name || sp.id || 'Parte'}`,
+                        color: sp.color || '#f472b6',
+                        visible: sp.visible !== false,
+                        x: Number(sp.x) || 0,
+                        y: Number(sp.y) || 0,
+                        scaleX: Number(sp.scaleX) || 1,
+                        scaleY: Number(sp.scaleY) || 1,
+                        rot: Number(sp.rot) || 0,
+                        instanceId: 'companion',
+                        sourcePartId: sp.id,
+                        instanceOffset: { x: gapPx, y: 0 },
+                        allowedBones: Array.isArray(sp.allowedBones) ? [...sp.allowedBones] : studio.bones.map(b => b.id),
+                        anchor: sp.anchor ? { ...sp.anchor } : { parentBone: 'torso', nx: 0.5, ny: 0.3, radiusPct: 12, strength: 0.85 },
+                        rawSourceCanvas: rawCanvas,
+                        bakedCanvas: cloneCanvas(rawCanvas),
+                        mesh: { bounds: {}, vertices: [], triangles: [], hullEdges: [], neighbors: [] }
+                    };
+                    buildSinglePartMesh(clone);
+                    additions.push(clone);
+                }
+                studio.parts = sourceParts.concat(additions);
+                studio.coupleMode = true;
+                studio.coupleName = second.avatarName || 'Companion';
+                studio.selectedCharacterId = 'companion';
+                studio.selectedPartId = additions[0] ? additions[0].id : studio.selectedPartId;
+                recomputeAllPartsWeights(false);
+                renderPartTreeUI();
+                syncPartInspectorUI();
+                syncCharacterTransformUI();
+                resetCameraView();
+                alert(`Pareja creada: ${sourceParts.length} partes + ${additions.length} partes en un solo atlas.`);
+            } catch (err) {
+                alert('No se pudieron unir los avatares: ' + (err.message || 'formato invalido'));
+            }
         }
 
         function createDefaultPartCanvas(partType, legVariant = 'calcetas') {
@@ -2122,6 +2794,236 @@
 
             g.restore();
             return c;
+        }
+
+        function createCoachVectorCanvas(partType) {
+            const canvas = document.createElement('canvas');
+            canvas.width = RefWidth;
+            canvas.height = RefHeight;
+            const g = canvas.getContext('2d');
+            if (!g) throw new Error('No se pudo crear el lienzo vectorial del avatar Coach.');
+            g.save();
+            g.scale(RefWidth / 520, RefHeight / 700);
+            g.lineCap = 'round';
+            g.lineJoin = 'round';
+
+            const skin = '#f6d2c7';
+            const skinShadow = '#e8b3aa';
+            const hair = '#171a2d';
+            const jeans = '#293746';
+            const jeansLight = '#405262';
+            const vest = '#172033';
+            const vestLight = '#28354a';
+            const shirt = '#28c99a';
+            const outline = '#111827';
+            const purple = '#9b5cff';
+
+            const path = (draw, fill, stroke = outline, width = 3) => {
+                g.beginPath();
+                draw();
+                g.fillStyle = fill;
+                g.fill();
+                g.strokeStyle = stroke;
+                g.lineWidth = width;
+                g.stroke();
+            };
+            const limb = (draw) => path(draw, skin, outline, 5);
+
+            if (partType === 'CoachHead') {
+                path(() => g.ellipse(214, 72, 43, 52, -0.08, 0, Math.PI * 2), skin, outline, 4);
+                path(() => {
+                    g.moveTo(179, 76);
+                    g.quadraticCurveTo(180, 34, 221, 25);
+                    g.quadraticCurveTo(260, 28, 264, 70);
+                    g.quadraticCurveTo(245, 50, 218, 48);
+                    g.quadraticCurveTo(196, 50, 179, 76);
+                    g.closePath();
+                }, hair, outline, 4);
+                g.fillStyle = '#30364c';
+                g.fillRect(196, 92, 38, 7);
+                g.fillStyle = '#d98f86';
+                g.beginPath();
+                g.arc(198, 83, 3, 0, Math.PI * 2);
+                g.arc(232, 83, 3, 0, Math.PI * 2);
+                g.fill();
+                g.strokeStyle = purple;
+                g.lineWidth = 3;
+                g.stroke();
+            } else if (partType === 'CoachTorso') {
+                path(() => {
+                    g.moveTo(178, 145);
+                    g.quadraticCurveTo(208, 126, 241, 145);
+                    g.lineTo(271, 319);
+                    g.quadraticCurveTo(223, 344, 171, 319);
+                    g.closePath();
+                }, shirt, outline, 5);
+                path(() => {
+                    g.moveTo(178, 145);
+                    g.lineTo(155, 162);
+                    g.lineTo(178, 306);
+                    g.lineTo(204, 292);
+                    g.lineTo(197, 190);
+                    g.closePath();
+                }, vest, outline, 5);
+                path(() => {
+                    g.moveTo(241, 145);
+                    g.lineTo(268, 155);
+                    g.lineTo(286, 303);
+                    g.lineTo(255, 316);
+                    g.lineTo(236, 190);
+                    g.closePath();
+                }, vest, outline, 5);
+                g.strokeStyle = vestLight;
+                g.lineWidth = 5;
+                g.beginPath();
+                g.moveTo(169, 171);
+                g.lineTo(193, 288);
+                g.moveTo(257, 172);
+                g.lineTo(270, 284);
+                g.stroke();
+                g.strokeStyle = '#f6d365';
+                g.lineWidth = 2;
+                g.beginPath();
+                g.moveTo(177, 182);
+                g.lineTo(199, 282);
+                g.moveTo(247, 181);
+                g.lineTo(264, 281);
+                g.stroke();
+            } else if (partType === 'CoachArmLeft') {
+                limb(() => {
+                    g.moveTo(176, 154);
+                    g.quadraticCurveTo(142, 175, 118, 218);
+                    g.quadraticCurveTo(97, 254, 73, 272);
+                    g.lineTo(91, 291);
+                    g.quadraticCurveTo(130, 266, 151, 231);
+                    g.quadraticCurveTo(174, 197, 194, 184);
+                    g.closePath();
+                });
+                path(() => {
+                    g.moveTo(73, 270);
+                    g.quadraticCurveTo(46, 262, 31, 243);
+                    g.lineTo(22, 251);
+                    g.quadraticCurveTo(38, 281, 77, 291);
+                    g.closePath();
+                }, skin, outline, 4);
+            } else if (partType === 'CoachArmRight') {
+                limb(() => {
+                    g.moveTo(240, 151);
+                    g.quadraticCurveTo(276, 160, 306, 147);
+                    g.quadraticCurveTo(337, 134, 365, 94);
+                    g.lineTo(384, 106);
+                    g.quadraticCurveTo(360, 164, 317, 190);
+                    g.quadraticCurveTo(277, 210, 247, 190);
+                    g.closePath();
+                });
+                limb(() => {
+                    g.moveTo(365, 95);
+                    g.quadraticCurveTo(378, 61, 377, 28);
+                    g.lineTo(401, 27);
+                    g.quadraticCurveTo(407, 69, 392, 109);
+                    g.closePath();
+                });
+                path(() => {
+                    g.moveTo(377, 31);
+                    g.lineTo(367, 13);
+                    g.lineTo(374, 8);
+                    g.lineTo(386, 25);
+                    g.lineTo(391, 4);
+                    g.lineTo(399, 5);
+                    g.lineTo(398, 26);
+                    g.lineTo(409, 10);
+                    g.lineTo(416, 15);
+                    g.lineTo(403, 34);
+                    g.closePath();
+                }, '#f6df00', outline, 3);
+            } else if (partType === 'CoachLegs') {
+                path(() => {
+                    g.moveTo(174, 304);
+                    g.lineTo(217, 313);
+                    g.lineTo(187, 458);
+                    g.lineTo(153, 551);
+                    g.lineTo(123, 546);
+                    g.lineTo(147, 438);
+                    g.closePath();
+                }, jeans, outline, 5);
+                path(() => {
+                    g.moveTo(216, 313);
+                    g.lineTo(263, 307);
+                    g.lineTo(325, 447);
+                    g.lineTo(368, 538);
+                    g.lineTo(337, 553);
+                    g.lineTo(273, 470);
+                    g.lineTo(224, 391);
+                    g.closePath();
+                }, jeans, outline, 5);
+                g.strokeStyle = jeansLight;
+                g.lineWidth = 8;
+                g.beginPath();
+                g.moveTo(181, 338);
+                g.lineTo(157, 477);
+                g.moveTo(239, 337);
+                g.lineTo(296, 452);
+                g.stroke();
+                path(() => {
+                    g.moveTo(123, 540);
+                    g.quadraticCurveTo(100, 550, 93, 574);
+                    g.quadraticCurveTo(117, 584, 154, 566);
+                    g.lineTo(153, 548);
+                    g.closePath();
+                }, '#172033', outline, 5);
+                path(() => {
+                    g.moveTo(337, 539);
+                    g.quadraticCurveTo(366, 547, 382, 570);
+                    g.quadraticCurveTo(358, 584, 329, 563);
+                    g.closePath();
+                }, '#172033', outline, 5);
+            }
+
+            g.restore();
+            return canvas;
+        }
+
+        function loadCoachDefaultTemplate() {
+            const definitions = [
+                { id: 'CoachHead', name: 'Cabeza y Cabello', color: '#38bdf8', bones: ['head', 'neck'], anchor: { parentBone: 'neck', nx: 0.42, ny: 0.25, radiusPct: 12, strength: 0.9 } },
+                { id: 'CoachTorso', name: 'Camisa y Chaleco', color: '#34d399', bones: ['torso', 'neck'], anchor: { parentBone: 'torso', nx: 0.46, ny: 0.43, radiusPct: 14, strength: 0.85 } },
+                { id: 'CoachArmLeft', name: 'Brazo Izquierdo', color: '#fbbf24', bones: ['upperArmR', 'forearmR'], anchor: { parentBone: 'upperArmR', nx: 0.25, ny: 0.40, radiusPct: 15, strength: 0.9 } },
+                { id: 'CoachArmRight', name: 'Brazo Derecho', color: '#f472b6', bones: ['upperArmL', 'forearmL'], anchor: { parentBone: 'upperArmL', nx: 0.64, ny: 0.25, radiusPct: 15, strength: 0.9 } },
+                { id: 'CoachLegs', name: 'Pantalón y Zapatos', color: '#a78bfa', bones: ['torso', 'upperLegR', 'lowerLegR', 'upperLegL', 'lowerLegL'], anchor: { parentBone: 'torso', nx: 0.47, ny: 0.55, radiusPct: 18, strength: 0.8 } }
+            ];
+            studio.parts = definitions.map(def => {
+                const canvas = createCoachVectorCanvas(def.id);
+                const part = {
+                    id: def.id,
+                    name: def.name,
+                    color: def.color,
+                    visible: true,
+                    x: 0,
+                    y: 0,
+                    scaleX: 1,
+                    scaleY: 1,
+                    rot: 0,
+                    allowedBones: [...def.bones],
+                    anchor: { ...def.anchor },
+                    rawSourceCanvas: canvas,
+                    bakedCanvas: cloneCanvas(canvas),
+                    mesh: { bounds: {}, vertices: [], triangles: [], hullEdges: [], neighbors: [] }
+                };
+                buildSinglePartMesh(part);
+                return part;
+            });
+            studio.activeLayerPreset = 'coach-vector-default';
+            studio.characterOffsets.primary = {
+                x: Math.round(41 * RefWidth / 520),
+                y: Math.round(56 * RefHeight / 700)
+            };
+            studio.selectedPartId = 'CoachTorso';
+            studio.selectedPartIds = ['CoachTorso'];
+            recomputeAllPartsWeights(false);
+            studio.avatarName = 'Coach';
+            onAvatarNameChanged('Coach');
+            renderPartTreeUI();
+            syncPartInspectorUI();
         }
 
         function createSegmentedSubPartCanvas(subType) {
@@ -2294,14 +3196,6 @@
                         sourceCanvas: createDefaultPartCanvas('Brazo2', studio.legVariantStyle)
                     },
                     {
-                        id: 'Falda',
-                        name: 'Cadera / Pelvis',
-                        color: '#c084fc',
-                        allowedBones: ['torso', 'strap'],
-                        anchor: { parentBone: 'torso', nx: 0.49, ny: 0.48, radiusPct: 13, strength: 0.85 },
-                        sourceCanvas: createDefaultPartCanvas('Falda', studio.legVariantStyle)
-                    },
-                    {
                         id: 'Piernas',
                         name: 'Piernas',
                         color: '#f59e0b',
@@ -2329,6 +3223,7 @@
                 }));
 
                 studio.selectedPartId = 'Brazo1';
+                studio.selectedPartIds = ['Brazo1'];
             } else {
                 const defs2 = [
                     { id: 'CabelloFrontal', name: 'Cabello Frontal', color: '#38bdf8', allowedBones: ['head'], anchor: { parentBone: 'head', nx: 0.46, ny: 0.16, radiusPct: 10, strength: 0.85 }, canvas: createSegmentedSubPartCanvas('CabelloFrontal') },
@@ -2366,6 +3261,7 @@
                 }));
 
                 studio.selectedPartId = 'Brazo1Hombro';
+                studio.selectedPartIds = ['Brazo1Hombro'];
             }
 
             rebuildAllPartMeshes();
@@ -2378,6 +3274,7 @@
             const b1 = document.getElementById('btnPreset1');
             const b2 = document.getElementById('btnPreset2');
             const lbl = document.getElementById('lblActivePresetName');
+            if (!b1 || !b2 || !lbl) return;
             if (studio.activeLayerPreset === 'preset1') {
                 b1.className = 'py-1.5 px-2 rounded border border-[#28324e] bg-[#141926] text-left transition preset-active';
                 b2.className = 'py-1.5 px-2 rounded border border-[#28324e] bg-[#141926] text-left text-slate-300 hover:text-white transition';
@@ -2733,18 +3630,36 @@
         }
 
         function normalizeWeightMap(weights, allowedBoneIds, fallbackBoneId) {
+            const safeFallback = fallbackBoneId && allowedBoneIds.has(fallbackBoneId)
+                ? fallbackBoneId
+                : (allowedBoneIds.values().next().value || null);
             const entries = Object.entries(weights || {})
                 .filter(([boneId, weight]) => allowedBoneIds.has(boneId) && Number.isFinite(weight) && weight > 0.0001)
                 .sort((a, b) => b[1] - a[1])
                 .slice(0, 4);
             const total = entries.reduce((sum, [, weight]) => sum + weight, 0);
-            if (total <= 0) return fallbackBoneId ? { [fallbackBoneId]: 1 } : {};
+            if (total <= 0) return safeFallback ? { [safeFallback]: 1 } : {};
             return Object.fromEntries(entries.map(([boneId, weight]) => [boneId, weight / total]));
+        }
+
+        function sanitizePartAnchor(part) {
+            if (!part) return;
+            const anchor = part.anchor || {};
+            const validParent = anchor.parentBone === 'none' || studio.bones.some(b => b.id === anchor.parentBone);
+            anchor.parentBone = validParent ? anchor.parentBone : 'none';
+            anchor.nx = Number.isFinite(anchor.nx) ? Math.max(0, Math.min(1, anchor.nx)) : 0.5;
+            anchor.ny = Number.isFinite(anchor.ny) ? Math.max(0, Math.min(1, anchor.ny)) : 0.3;
+            anchor.radiusPct = Number.isFinite(anchor.radiusPct) ? Math.max(3, Math.min(35, anchor.radiusPct)) : 12;
+            anchor.strength = Number.isFinite(anchor.strength) ? Math.max(0, Math.min(1, anchor.strength)) : 0;
+            part.anchor = anchor;
         }
 
         function recomputeAllPartsWeights(recordUndo = false, resetPainted = false) {
             if (recordUndo) pushUndoState();
-            studio.parts.forEach(p => computePartSmoothWeights(p, resetPainted));
+            studio.parts.forEach(p => {
+                sanitizePartAnchor(p);
+                computePartSmoothWeights(p, resetPainted);
+            });
         }
 
         function relaxSinglePartWeights(part, iterations = 2) {
@@ -2811,14 +3726,17 @@
                 envelope: 1.0
             }));
 
+            const activeButtonKey = presetKey === 'dynamic' ? 'compact' : presetKey;
             ['dynamic', 'casual', 'apose', 'compact'].forEach(k => {
                 const el = document.getElementById('poseBtn_' + k);
                 if (el) {
-                    el.className = (k === presetKey)
+                    el.className = (k === activeButtonKey)
                         ? 'px-2 py-1 rounded bg-[#101420] border border-sky-500/70 text-left text-[10px] font-medium text-white'
                         : 'px-2 py-1 rounded bg-[#101420] border border-[#252d44] text-left text-[10px] font-medium text-slate-300';
                 }
             });
+            const hiddenDynamicButton = document.getElementById('poseBtn_dynamic');
+            if (hiddenDynamicButton) hiddenDynamicButton.classList.add('hidden');
 
             if (rebuild) {
                 syncAnchorsWithSkeleton();
@@ -2980,6 +3898,61 @@
             studio.parts[index] = studio.parts[targetIndex];
             studio.parts[targetIndex] = temp;
             renderPartTreeUI();
+        }
+
+        function setCoupleMode(enabled) {
+            const companionPrefix = '__companion__';
+            const existing = studio.parts.filter(p => p.instanceId === 'companion' || p.id.indexOf(companionPrefix) === 0);
+            if (!enabled) {
+                if (existing.length) {
+                    studio.parts = studio.parts.filter(p => p.instanceId !== 'companion' && p.id.indexOf(companionPrefix) !== 0);
+                }
+                studio.coupleMode = false;
+            } else if (!existing.length) {
+                const sourceParts = studio.parts.filter(p => p.instanceId !== 'companion' && p.id.indexOf(companionPrefix) !== 0);
+                const gapPx = Math.max(RefWidth * 0.25, Math.min(RefWidth * 1.4, RefWidth * (Number(studio.coupleGap) || 0.62)));
+                const clones = sourceParts.map((source, index) => {
+                    const clone = {
+                        id: companionPrefix + source.id + '_' + index,
+                        name: (studio.coupleName || 'Companion') + ' / ' + source.name,
+                        color: source.color,
+                        visible: source.visible,
+                        x: source.x,
+                        y: source.y,
+                        scaleX: source.scaleX,
+                        scaleY: source.scaleY,
+                        rot: source.rot,
+                        allowedBones: [...(source.allowedBones || [])],
+                        anchor: source.anchor ? { ...source.anchor } : null,
+                        instanceId: 'companion',
+                        sourcePartId: source.id,
+                        instanceOffset: { x: gapPx, y: 0 },
+                        rawSourceCanvas: cloneCanvas(source.rawSourceCanvas),
+                        bakedCanvas: null,
+                        mesh: { bounds: {}, vertices: [], triangles: [], hullEdges: [], neighbors: [] }
+                    };
+                    clone.bakedCanvas = cloneCanvas(clone.rawSourceCanvas);
+                    buildSinglePartMesh(clone);
+                    return clone;
+                });
+                studio.parts.push(...clones);
+                studio.coupleMode = true;
+            }
+            const btn = document.getElementById('btnCoupleMode');
+            if (btn) {
+                btn.querySelector('span').textContent = studio.coupleMode ? '− Pareja' : '+ Pareja';
+                btn.classList.toggle('bg-fuchsia-500/20', studio.coupleMode);
+            }
+            renderPartTreeUI();
+            syncPartInspectorUI();
+            studio.selectedCharacterId = studio.coupleMode ? (studio.selectedCharacterId || 'primary') : 'primary';
+            syncCharacterTransformUI();
+            resetCameraView();
+        }
+
+        function toggleCoupleMode() {
+            pushUndoState();
+            setCoupleMode(!studio.coupleMode);
         }
 
         function createNewEmptyPart(customName, customCanvas) {
@@ -3412,6 +4385,7 @@
             studio.parts.forEach(part => {
                 if (!part.visible) return;
                 const verts = part.mesh.vertices;
+                const characterOffset = getCharacterOffset(getPartInstanceId(part));
                 for (let i = 0; i < verts.length; i++) {
                     const vt = verts[i];
                     const u = vt.u + vt.ox;
@@ -3420,6 +4394,12 @@
                     if (studio.systemState === 'setup') {
                         vt.dx = u;
                         vt.dy = v;
+                        if (part.instanceOffset) {
+                            vt.dx += part.instanceOffset.x || 0;
+                            vt.dy += part.instanceOffset.y || 0;
+                        }
+                        vt.dx += characterOffset.x;
+                        vt.dy += characterOffset.y;
                         continue;
                     }
 
@@ -3448,6 +4428,12 @@
                         vt.dx = u;
                         vt.dy = v;
                     }
+                    if (part.instanceOffset) {
+                        vt.dx += part.instanceOffset.x || 0;
+                        vt.dy += part.instanceOffset.y || 0;
+                    }
+                    vt.dx += characterOffset.x;
+                    vt.dy += characterOffset.y;
                 }
             });
 
@@ -3537,9 +4523,26 @@
             const z = studio.camera.zoom;
             const camX = studio.camera.x;
             const camY = studio.camera.y;
+            const canvasBg = cfg.canvasBg || 'grid';
+            if (canvasBg === 'black' || canvasBg === 'green' || canvasBg === 'blue') {
+                ctx.fillStyle = canvasBg === 'black' ? '#000000' : (canvasBg === 'green' ? '#00ff00' : '#0000ff');
+                ctx.fillRect(0, 0, cw, ch);
+            } else if (canvasBg === 'checker') {
+                const checkerSize = 20;
+                ctx.fillStyle = '#0c0f18';
+                ctx.fillRect(0, 0, cw, ch);
+                ctx.fillStyle = '#151b29';
+                for (let y = 0; y < ch; y += checkerSize) {
+                    for (let x = 0; x < cw; x += checkerSize) {
+                        if ((Math.floor(x / checkerSize) + Math.floor(y / checkerSize)) % 2 === 0) {
+                            ctx.fillRect(x, y, checkerSize, checkerSize);
+                        }
+                    }
+                }
+            }
 
-            if (studio.flags.showGrid) {
-                const gridStep = Math.max(24, Math.round(80 * z));
+            if (studio.flags.showGrid && cfg.showGridLines !== false && canvasBg === 'grid') {
+                const gridStep = Math.max(24, Math.round((cfg.gridSize || 80) * z));
                 ctx.strokeStyle = '#141a29';
                 ctx.lineWidth = 1;
                 ctx.beginPath();
@@ -3560,9 +4563,18 @@
             ctx.translate(camX, camY);
             ctx.scale(z, z);
 
-            ctx.strokeStyle = 'rgba(56, 189, 248, 0.25)';
-            ctx.lineWidth = 1.2 / z;
-            ctx.strokeRect(0, 0, RefWidth, RefHeight);
+            if (cfg.showCanvasBounds !== false) {
+                ctx.strokeStyle = 'rgba(56, 189, 248, 0.25)';
+                ctx.lineWidth = 1.2 / z;
+                const frameOrigins = [getCharacterFrameOrigin('primary')];
+                if (studio.coupleMode) {
+                    const companion = studio.parts.find(p => getPartInstanceId(p) === 'companion');
+                    if (companion) {
+                        frameOrigins.push(getCharacterFrameOrigin('companion'));
+                    }
+                }
+                frameOrigins.forEach(origin => ctx.strokeRect(origin.x, origin.y, RefWidth, RefHeight));
+            }
 
             for (let pIdx = studio.parts.length - 1; pIdx >= 0; pIdx--) {
                 const part = studio.parts[pIdx];
@@ -3630,8 +4642,9 @@
                 studio.parts.forEach(part => {
                     if (!part.visible || !part.anchor || part.anchor.parentBone === 'none' || part.anchor.strength <= 0) return;
                     const isSel = (part.id === studio.selectedPartId);
-                    const restAx = part.anchor.nx * RefWidth;
-                    const restAy = part.anchor.ny * RefHeight;
+                    const characterOffset = getCharacterOffset(getPartInstanceId(part));
+                    const restAx = characterOffset.x + part.anchor.nx * RefWidth + (part.instanceOffset ? part.instanceOffset.x || 0 : 0);
+                    const restAy = characterOffset.y + part.anchor.ny * RefHeight + (part.instanceOffset ? part.instanceOffset.y || 0 : 0);
                     const pt = frame.evalTorsoSpace ? frame.evalTorsoSpace(restAx, restAy) : { x: restAx, y: restAy };
                     const radPx = ((part.anchor.radiusPct || 12) / 100) * RefWidth;
 
@@ -3668,7 +4681,8 @@
 
                     ctx.fillStyle = isSelected ? 'rgba(255, 255, 255, 0.48)' : (color + '44');
                     ctx.strokeStyle = isSelected ? '#ffffff' : color;
-                    ctx.lineWidth = (isSelected ? 2.4 : 1.6) / z;
+                    ctx.lineWidth = ((isSelected ? 2.4 : 1.6) * (cfg.boneThickness || 1.6)) / z;
+                    ctx.globalAlpha = Math.max(0.1, Math.min(1, cfg.boneOpacity || 0.8));
 
                     ctx.beginPath();
                     ctx.moveTo(x1, y1);
@@ -3680,24 +4694,46 @@
                     ctx.stroke();
                 };
 
-                frame.posedBones.forEach(pb => {
-                    const isSel = (pb.id === studio.selectedBoneId);
-                    drawSpineBoneDiamond(pb.ax1, pb.ay1, pb.ax2, pb.ay2, pb.color, isSel);
+                const primaryBoneOffset = getCharacterOffset('primary');
+                const boneInstances = [{ bones: frame.posedBones, offsetX: primaryBoneOffset.x, offsetY: primaryBoneOffset.y, id: 'primary' }];
+                if (studio.coupleMode) {
+                    const companionPart = studio.parts.find(p => p.instanceId === 'companion' && p.instanceOffset);
+                    if (companionPart) {
+                        boneInstances.push({
+                            bones: frame.posedBones,
+                            offsetX: getCharacterOffset('companion').x + (companionPart.instanceOffset.x || 0),
+                            offsetY: getCharacterOffset('companion').y + (companionPart.instanceOffset.y || 0),
+                            id: 'companion'
+                        });
+                    }
+                }
+                boneInstances.forEach(instance => instance.bones.forEach(pb => {
+                    const ox = instance.offsetX;
+                    const oy = instance.offsetY;
+                    const isSel = (pb.id === studio.selectedBoneId && instance.id === (studio.selectedCharacterId || 'primary'));
+                    drawSpineBoneDiamond(pb.ax1 + ox, pb.ay1 + oy, pb.ax2 + ox, pb.ay2 + oy, pb.color, isSel);
 
                     ctx.fillStyle = isSel ? '#facc15' : '#090b10';
                     ctx.strokeStyle = isSel ? '#ffffff' : pb.color;
                     ctx.lineWidth = 2 / z;
                     ctx.beginPath();
                     const jRad = (cfg && cfg.jointRadius) || 5.0;
-                    ctx.arc(pb.ax1, pb.ay1, (isSel ? jRad * 1.25 : jRad) / z, 0, Math.PI * 2);
+                    ctx.arc(pb.ax1 + ox, pb.ay1 + oy, (isSel ? jRad * 1.25 : jRad) / z, 0, Math.PI * 2);
                     ctx.fill();
                     ctx.stroke();
 
                     ctx.fillStyle = isSel ? '#38bdf8' : pb.color;
                     ctx.beginPath();
-                    ctx.arc(pb.ax2, pb.ay2, (isSel ? 5.2 : 3.8) / z, 0, Math.PI * 2);
+                    ctx.arc(pb.ax2 + ox, pb.ay2 + oy, (isSel ? 5.2 : 3.8) / z, 0, Math.PI * 2);
                     ctx.fill();
-                });
+                    if (cfg.showBoneLabels !== false) {
+                        ctx.globalAlpha = 1;
+                        ctx.font = `${Math.max(9, 11 / z)}px Inter, sans-serif`;
+                        ctx.fillStyle = isSel ? '#facc15' : '#cbd5e1';
+                        ctx.fillText(instance.id === 'companion' ? `2: ${pb.label || pb.id}` : (pb.label || pb.id), pb.ax2 + ox + 7 / z, pb.ay2 + oy - 7 / z);
+                    }
+                    ctx.globalAlpha = 1;
+                }));
 
                 if (studio.creatingBoneOrigin && studio.creatingBoneCursor) {
                     drawSpineBoneDiamond(
@@ -3733,7 +4769,7 @@
             const leftPad = 120;
             const rightPad = 24;
             const trackW = Math.max(50, w - leftPad - rightPad);
-            const dur = studio.anim.duration;
+            const dur = Math.max(0.001, Number(studio.anim.duration) || 2);
 
             tCtx.fillStyle = '#0c0f17';
             tCtx.fillRect(0, 0, leftPad, h);
@@ -3793,7 +4829,8 @@
 
             const frame = solveSkeletonAndDeformParts(dt);
             renderViewport(frame);
-            renderTimeline();
+            v6TimelineFrame = (v6TimelineFrame + 1) % 4;
+            if (v6TimelineFrame === 0 || studio.anim.playing) renderTimeline();
 
             requestAnimationFrame(mainStudioLoop);
         }
@@ -3883,19 +4920,34 @@
             const findNearestBoneEndpoint = (wx, wy) => {
                 const hitRadius = 12 / studio.camera.zoom;
                 const frame = solveSkeletonAndDeformParts(0);
-                for (let i = frame.posedBones.length - 1; i >= 0; i--) {
-                    const b = frame.posedBones[i];
-                    if (Math.hypot(wx - b.ax2, wy - b.ay2) <= hitRadius) {
-                        return { boneId: b.id, point: 'end' };
-                    }
-                    if (Math.hypot(wx - b.ax1, wy - b.ay1) <= hitRadius) {
-                        return { boneId: b.id, point: 'start' };
+                const instances = [{ bones: frame.posedBones, x: getCharacterOffset('primary').x, y: getCharacterOffset('primary').y, id: 'primary' }];
+                if (studio.coupleMode) {
+                    const companionPart = studio.parts.find(p => p.instanceId === 'companion' && p.instanceOffset);
+                    if (companionPart) {
+                        instances.push({
+                            bones: frame.posedBones,
+                            x: getCharacterOffset('companion').x + (companionPart.instanceOffset.x || 0),
+                            y: getCharacterOffset('companion').y + (companionPart.instanceOffset.y || 0),
+                            id: 'companion'
+                        });
                     }
                 }
-                for (let i = frame.posedBones.length - 1; i >= 0; i--) {
-                    const b = frame.posedBones[i];
-                    if (pointToSegmentDist(wx, wy, b.ax1, b.ay1, b.ax2, b.ay2) <= hitRadius) {
-                        return { boneId: b.id, point: 'body' };
+                for (let instanceIndex = instances.length - 1; instanceIndex >= 0; instanceIndex--) {
+                    const instance = instances[instanceIndex];
+                    for (let i = instance.bones.length - 1; i >= 0; i--) {
+                        const b = instance.bones[i];
+                        if (Math.hypot(wx - (b.ax2 + instance.x), wy - (b.ay2 + instance.y)) <= hitRadius) {
+                            return { boneId: b.id, point: 'end', instanceId: instance.id, offsetX: instance.x, offsetY: instance.y };
+                        }
+                        if (Math.hypot(wx - (b.ax1 + instance.x), wy - (b.ay1 + instance.y)) <= hitRadius) {
+                            return { boneId: b.id, point: 'start', instanceId: instance.id, offsetX: instance.x, offsetY: instance.y };
+                        }
+                    }
+                    for (let i = instance.bones.length - 1; i >= 0; i--) {
+                        const b = instance.bones[i];
+                        if (pointToSegmentDist(wx, wy, b.ax1 + instance.x, b.ay1 + instance.y, b.ax2 + instance.x, b.ay2 + instance.y) <= hitRadius) {
+                            return { boneId: b.id, point: 'body', instanceId: instance.id, offsetX: instance.x, offsetY: instance.y };
+                        }
                     }
                 }
                 return null;
@@ -3906,8 +4958,9 @@
                 for (let i = 0; i < studio.parts.length; i++) {
                     const p = studio.parts[i];
                     if (!p.visible || !p.anchor || p.anchor.parentBone === 'none') continue;
-                    const ax = p.anchor.nx * RefWidth;
-                    const ay = p.anchor.ny * RefHeight;
+                    const characterOffset = getCharacterOffset(getPartInstanceId(p));
+                    const ax = characterOffset.x + p.anchor.nx * RefWidth + (p.instanceOffset ? p.instanceOffset.x || 0 : 0);
+                    const ay = characterOffset.y + p.anchor.ny * RefHeight + (p.instanceOffset ? p.instanceOffset.y || 0 : 0);
                     if (Math.hypot(wx - ax, wy - ay) <= hitRadius) {
                         return p.id;
                     }
@@ -3927,9 +4980,18 @@
             });
 
             window.addEventListener('keydown', (e) => {
-                if (e.code === 'Space' && document.activeElement.tagName !== 'INPUT') {
+                const active = document.activeElement;
+                const isEditing = active && (
+                    active.tagName === 'INPUT' ||
+                    active.tagName === 'TEXTAREA' ||
+                    active.tagName === 'SELECT' ||
+                    active.isContentEditable
+                );
+                if (e.code === 'Space' && !isEditing) {
+                    e.preventDefault();
                     studio.camera.spacePressed = true;
                 }
+                if (isEditing) return;
                 if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
                     e.preventDefault();
                     if (e.shiftKey) performRedo();
@@ -3952,9 +5014,6 @@
 
                 if (e.button === 2 || e.button === 1 || studio.camera.spacePressed || studio.activeTool === 'pan') {
                     e.preventDefault();
-                    studio.camera.isPanning = true;
-                    studio.camera.panStartX = pos.x - studio.camera.x;
-                    studio.camera.panStartY = pos.y - studio.camera.y;
                     return;
                 }
 
@@ -3965,8 +5024,11 @@
                     studio.draggingAnchorPartId = hitAnchorPart;
                     const p = studio.parts.find(x => x.id === hitAnchorPart);
                     if (p && p.anchor) {
-                        p.anchor.nx = Math.max(0.02, Math.min(0.98, world.x / RefWidth));
-                        p.anchor.ny = Math.max(0.02, Math.min(0.98, world.y / RefHeight));
+                        const characterOffset = getCharacterOffset(getPartInstanceId(p));
+                        const offsetX = characterOffset.x + (p.instanceOffset ? p.instanceOffset.x || 0 : 0);
+                        const offsetY = characterOffset.y + (p.instanceOffset ? p.instanceOffset.y || 0 : 0);
+                        p.anchor.nx = Math.max(0.02, Math.min(0.98, (world.x - offsetX) / RefWidth));
+                        p.anchor.ny = Math.max(0.02, Math.min(0.98, (world.y - offsetY) / RefHeight));
                         computePartSmoothWeights(p);
                     }
                     return;
@@ -4010,7 +5072,11 @@
                         const p = studio.parts[i];
                         if (!p.visible) continue;
                         const b = p.mesh.bounds;
-                        if (world.x >= b.minX && world.x <= b.maxX && world.y >= b.minY && world.y <= b.maxY) {
+                        const characterOffset = getCharacterOffset(getPartInstanceId(p));
+                        const partOffsetX = characterOffset.x + (p.instanceOffset ? p.instanceOffset.x || 0 : 0) + (p.x || 0);
+                        const partOffsetY = characterOffset.y + (p.instanceOffset ? p.instanceOffset.y || 0 : 0) + (p.y || 0);
+                        if (world.x >= b.minX + partOffsetX && world.x <= b.maxX + partOffsetX &&
+                            world.y >= b.minY + partOffsetY && world.y <= b.maxY + partOffsetY) {
                             hitPartId = p.id;
                             break;
                         }
@@ -4022,6 +5088,10 @@
                     pushUndoState();
                     selectPartById(hitPartId);
                     studio.draggingPart = true;
+                    const hitPart = studio.parts.find(p => p.id === hitPartId);
+                    studio.draggingPartGroupId = getPartInstanceId(hitPart);
+                    studio.selectedCharacterId = studio.draggingPartGroupId;
+                    syncCharacterTransformUI();
                     return;
                 }
 
@@ -4029,6 +5099,8 @@
                 if (hit) {
                     pushUndoState();
                     selectBoneById(hit.boneId);
+                    studio.selectedCharacterId = hit.instanceId || 'primary';
+                    syncCharacterTransformUI();
                     studio.draggingEndpoint = hit;
                 } else {
                     triggerPhysicsImpulse();
@@ -4081,13 +5153,15 @@
                 }
 
                 if (studio.draggingPart) {
-                    const part = studio.parts.find(p => p.id === studio.selectedPartId);
-                    if (part) {
-                        part.x = Math.round(part.x + (world.x - studio.lastPointerWorld.x));
-                        part.y = Math.round(part.y + (world.y - studio.lastPointerWorld.y));
-                        syncPartInspectorUI();
-                        buildSinglePartMesh(part);
-                    }
+                    const groupId = studio.draggingPartGroupId || 'primary';
+                    const dx = Math.round(world.x - studio.lastPointerWorld.x);
+                    const dy = Math.round(world.y - studio.lastPointerWorld.y);
+                    const groupOffset = getCharacterOffset(groupId);
+                    studio.characterOffsets[groupId] = {
+                        x: groupOffset.x + dx,
+                        y: groupOffset.y + dy
+                    };
+                    syncPartInspectorUI();
                     studio.lastPointerWorld = world;
                     return;
                 }
@@ -4134,6 +5208,7 @@
                 studio.draggingAnchorPartId = null;
                 studio.draggingVertex = null;
                 studio.draggingPart = false;
+                studio.draggingPartGroupId = null;
                 studio.draggingEndpoint = null;
 
                 if (studio.creatingBoneOrigin && studio.creatingBoneCursor) {
@@ -4184,16 +5259,25 @@
             window.addEventListener('mouseup', () => { dragging = false; });
         }
 
+        function escapeHtml(value) {
+            return String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
         function renderPartTreeUI() {
             const container = document.getElementById('partTreeContainer');
             container.innerHTML = studio.parts.map((p, idx) => {
-                const isSel = (p.id === studio.selectedPartId);
+                const isSel = (studio.selectedPartIds || []).includes(p.id);
                 return `
-                    <div onclick="selectPartById('${p.id}')" class="px-2 py-1.5 rounded border border-[#22293c] bg-[#131826] hover:border-slate-600 flex items-center justify-between gap-1 cursor-pointer transition ${isSel ? 'item-selected' : ''}">
+                    <div onclick="selectPartById('${p.id}', event)" class="px-2 py-1.5 rounded border border-[#22293c] bg-[#131826] hover:border-slate-600 flex items-center justify-between gap-1 cursor-pointer transition ${isSel ? 'item-selected' : ''}">
                         <div class="flex items-center gap-1.5 truncate">
                             <span class="mono text-[9px] text-slate-500 w-3.5">${idx + 1}</span>
                             <span class="w-2 h-2 rounded-full shrink-0" style="background:${p.color}"></span>
-                            <span class="truncate text-[11px] font-medium">${p.name}</span>
+                            <span class="truncate text-[11px] font-medium">${escapeHtml(p.name)}</span>
                         </div>
                         <div class="flex items-center gap-1 shrink-0" onclick="event.stopPropagation()">
                             <button onclick="movePartZOrder(${idx}, -1)" title="Subir Capa (Adelante)" class="w-5 h-5 rounded bg-[#0d1018] hover:bg-sky-500/20 text-slate-300 flex items-center justify-center">
@@ -4226,10 +5310,10 @@
                     <div onclick="selectBoneById('${b.id}')" class="px-2 py-1.5 rounded border border-[#22293c] bg-[#131826] hover:border-slate-600 flex items-center justify-between cursor-pointer transition ${isSel ? 'item-selected' : ''}">
                         <div class="flex items-center gap-2 truncate">
                             <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:${b.color}"></span>
-                            <span class="truncate text-[11px] font-medium">${b.label}</span>
+                            <span class="truncate text-[11px] font-medium">${escapeHtml(b.label)}</span>
                         </div>
                         <div class="flex items-center gap-1.5 shrink-0" onclick="event.stopPropagation()">
-                            <span class="mono text-[9px] text-slate-400">${b.role}</span>
+                            <span class="mono text-[9px] text-slate-400">${escapeHtml(b.role)}</span>
                             <button onclick="deleteBoneById('${b.id}')" title="Eliminar Hueso" class="w-5 h-5 rounded bg-[#0d1018] hover:bg-rose-500/25 text-rose-400 flex items-center justify-center font-bold text-[10px]">
                                 X
                             </button>
@@ -4251,9 +5335,9 @@
                         <div class="flex items-center gap-1.5 truncate">
                             <input type="checkbox" ${checked ? 'checked' : ''} onchange="toggleBoneForSelectedPart('${b.id}', this.checked)" class="accent-sky-400">
                             <span class="w-2 h-2 rounded-full" style="background:${b.color}"></span>
-                            <span class="truncate text-slate-200">${b.label}</span>
+                            <span class="truncate text-slate-200">${escapeHtml(b.label)}</span>
                         </div>
-                        <span class="mono text-[9px] text-slate-500">${b.id}</span>
+                        <span class="mono text-[9px] text-slate-500">${escapeHtml(b.id)}</span>
                     </label>
                 `;
             }).join('');
@@ -4284,10 +5368,96 @@
         }
 
         function selectPartById(id) {
-            studio.selectedPartId = id;
+            const event = arguments[1];
+            const current = new Set(studio.selectedPartIds || []);
+            if (studio.multiSelectMode || (event && (event.ctrlKey || event.metaKey))) {
+                if (current.has(id)) current.delete(id);
+                else current.add(id);
+            } else {
+                current.clear();
+                if (id) current.add(id);
+            }
+            studio.selectedPartIds = Array.from(current);
+            studio.selectedPartId = studio.selectedPartIds[0] || null;
             renderPartTreeUI();
             syncPartInspectorUI();
             renderPartBoneMaskUI();
+        }
+
+        function clearPartSelection() {
+            studio.selectedPartIds = [];
+            studio.selectedPartId = null;
+            renderPartTreeUI();
+            syncPartInspectorUI();
+            renderPartBoneMaskUI();
+        }
+
+        function toggleMultiSelectMode() {
+            studio.multiSelectMode = !studio.multiSelectMode;
+            const button = document.getElementById('btnMultiSelect');
+            if (button) {
+                button.className = studio.multiSelectMode
+                    ? 'px-2 py-0.5 rounded bg-sky-500/20 text-sky-300 border border-sky-500/40 text-[10px]'
+                    : 'px-2 py-0.5 rounded bg-[#141926] text-slate-300 border border-[#28324e] text-[10px]';
+            }
+        }
+
+        function addV6LayerFromMenu() {
+            const type = document.getElementById('v6LayerType')?.value || 'Tela';
+            createNewEmptyPart(type);
+            const part = studio.parts[0];
+            if (part) {
+                const heuristic = assignBonesAndAnchorByPartNameHeuristic(type);
+                if (heuristic) {
+                    part.allowedBones = heuristic.allowedBones;
+                    part.anchor = heuristic.anchor;
+                    computePartSmoothWeights(part);
+                }
+                part.name = type;
+                renderPartTreeUI();
+                syncPartInspectorUI();
+            }
+            showV6Toast(`Capa "${type}" añadida.`);
+        }
+
+        function addV6BoneFromMenu() {
+            const type = document.getElementById('v6LayerType')?.value || 'Extra';
+            addNewBoneImmediate();
+            const bone = studio.bones.find(item => item.id === studio.selectedBoneId);
+            if (bone) {
+                bone.label = type;
+                bone.role = type.toLowerCase().replace(/\s+/g, '_');
+                renderBoneTreeUI();
+                syncBoneInspectorUI();
+            }
+            showV6Toast(`Hueso "${type}" añadido.`);
+        }
+
+        function importV6TextureMode(event) {
+            const file = event.target.files && event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = () => {
+                const image = new Image();
+                image.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = RefWidth;
+                    canvas.height = RefHeight;
+                    canvas.getContext('2d').drawImage(image, 0, 0, RefWidth, RefHeight);
+                    const mode = document.querySelector('input[name="v6TextureMode"]:checked')?.value || 'parts';
+                    if (mode === 'single') {
+                        createNewEmptyPart('Imagen Unica', canvas);
+                    } else if (studio.selectedPartId) {
+                        importTextureForPartId(studio.selectedPartId, file);
+                    } else {
+                        createNewEmptyPart('Textura', canvas);
+                    }
+                    showV6Toast(mode === 'single' ? 'Imagen única preparada para deformación.' : 'Textura asignada a la capa.');
+                };
+                image.src = reader.result;
+            };
+            reader.readAsDataURL(file);
+            event.target.value = '';
         }
 
         function togglePartVisibility(id) {
@@ -4323,7 +5493,7 @@
             document.getElementById('val_partRot').textContent = p.rot + ' deg';
 
             const selAnchor = document.getElementById('selPartAnchorBone');
-            const optionsHtml = studio.bones.map(b => `<option value="${b.id}">${b.id} (${b.label})</option>`).join('') + `<option value="none">Sin Anclaje Fijo</option>`;
+            const optionsHtml = studio.bones.map(b => `<option value="${escapeHtml(b.id)}">${escapeHtml(b.id)} (${escapeHtml(b.label)})</option>`).join('') + `<option value="none">Sin Anclaje Fijo</option>`;
             selAnchor.innerHTML = optionsHtml;
 
             const anc = p.anchor || { parentBone: 'none', nx: 0.5, ny: 0.3, radiusPct: 12, strength: 0 };
@@ -4618,7 +5788,7 @@
         }
 
         function buildSmartTextureAtlas() {
-            const pad = 6;
+            const pad = 2;
             const items = [];
 
             studio.parts.forEach((part, orderIdx) => {
@@ -4644,7 +5814,7 @@
                     minX = 0; minY = 0; maxX = 32; maxY = 32;
                 }
 
-                const margin = 8;
+                const margin = 2;
                 minX = Math.max(0, minX - margin);
                 minY = Math.max(0, minY - margin);
                 maxX = Math.min(w, maxX + margin);
@@ -4668,9 +5838,7 @@
             const sorted = items.slice().sort((a, b) => b.cropH - a.cropH);
             const totalArea = sorted.reduce((acc, it) => acc + (it.cropW + pad * 2) * (it.cropH + pad * 2), 0);
             const maxSingleW = Math.max(64, ...sorted.map(it => it.cropW + pad * 2));
-            let targetWidth = Math.max(maxSingleW, Math.ceil(Math.sqrt(totalArea * 1.15)));
-            const pow2 = Math.pow(2, Math.ceil(Math.log2(targetWidth)));
-            if (pow2 <= 4096 && pow2 / targetWidth < 1.35) targetWidth = pow2;
+            let targetWidth = Math.max(maxSingleW, Math.ceil(Math.sqrt(totalArea * 1.03)));
 
             let curX = pad;
             let curY = pad;
@@ -4797,14 +5965,48 @@
                         uMax: Number(u1.toFixed(5)),
                         vMax: Number(v1.toFixed(5))
                     },
-                    weightGrid: buildPaintedWeightGridExport(p)
+                    weightGrid: buildPaintedWeightGridExport(p),
+                    characterId: p.instanceId === 'companion' ? 'companion' : 'primary',
+                    sourcePartId: p.sourcePartId || p.id,
+                    instanceOffset: p.instanceId === 'companion'
+                        ? { x: Number((p.instanceOffset && p.instanceOffset.x || 0).toFixed(2)), y: Number((p.instanceOffset && p.instanceOffset.y || 0).toFixed(2)) }
+                        : { x: 0, y: 0 }
                 };
             });
 
+            const bonesData = studio.bones.map(b => ({
+                name: b.id,
+                label: b.label,
+                role: b.role,
+                restStart: { x: Number(b.nx1.toFixed(4)), y: Number((1 - b.ny1).toFixed(4)) },
+                restEnd: { x: Number(b.nx2.toFixed(4)), y: Number((1 - b.ny2).toFixed(4)) },
+                envelope: b.envelope,
+                rigidity: getBoneRigidity(b)
+            }));
+            const characterIds = studio.coupleMode ? ['primary', 'companion'] : ['primary'];
+
             const exportData = {
                 avatarName: avatarName,
-                exporter: 'LiamToolAvatar2Unity V5.1',
+                exporter: 'LiamToolAvatar2Unity V6',
                 preset: studio.activeLayerPreset,
+                formatVersion: 2,
+                characterCount: characterIds.length,
+                characters: characterIds.map((id, index) => ({
+                    id,
+                    name: id === 'primary' ? avatarName : (studio.coupleName || 'Companion'),
+                    skeletonId: id === 'primary' ? 'primarySkeleton' : 'companionSkeleton',
+                    partIds: layersData.filter(layer => layer.characterId === id).map(layer => layer.id),
+                    offset: id === 'companion'
+                        ? {
+                            x: Number((RefWidth * (Number(studio.coupleGap) || 0.62) + getCharacterOffset('companion').x).toFixed(2)),
+                            y: Number(getCharacterOffset('companion').y.toFixed(2))
+                        }
+                        : {
+                            x: Number(getCharacterOffset('primary').x.toFixed(2)),
+                            y: Number(getCharacterOffset('primary').y.toFixed(2))
+                        },
+                    scale: 1
+                })),
                 skeleton: {
                     width: w,
                     height: h,
@@ -4812,6 +6014,11 @@
                     atlasHeight: meta.atlasH,
                     fps: 60
                 },
+                skeletons: characterIds.map(id => ({
+                    id: id === 'primary' ? 'primarySkeleton' : 'companionSkeleton',
+                    instanceOf: 'sharedRig',
+                    bones: bonesData
+                })),
                 animation: {
                     cycleSpeed: studio.anim.speed,
                     breathAmount: studio.anim.breath,
@@ -4824,15 +6031,7 @@
                     weightRigidity: Number(studio.weightRigidity.toFixed(3)),
                     lockFeetIK: studio.flags.footIK
                 },
-                bones: studio.bones.map(b => ({
-                    name: b.id,
-                    label: b.label,
-                    role: b.role,
-                    restStart: { x: Number(b.nx1.toFixed(4)), y: Number((1 - b.ny1).toFixed(4)) },
-                    restEnd: { x: Number(b.nx2.toFixed(4)), y: Number((1 - b.ny2).toFixed(4)) },
-                    envelope: b.envelope,
-                    rigidity: getBoneRigidity(b)
-                })),
+                bones: bonesData,
                 layers: layersData,
                 animations: studio.anim.keyframes
             };
@@ -6277,15 +7476,20 @@ ${defaultLayersCode}
             const selHeight = document.getElementById('selGifHeight');
             const selFps = document.getElementById('selGifFps');
             const rowStab = document.getElementById('rowGifStabilize');
+            const rowDepth = document.getElementById('rowApngDepth');
             const extLabel = document.getElementById('lblAnimExt');
             const fmtBadge = document.getElementById('lblFormatBadge');
+            const formatHelp = document.getElementById('lblAnimFormatHelp');
             const btnGenText = document.getElementById('lblBtnGenerateText');
             const btnDownText = document.getElementById('lblBtnDownloadText');
 
             if (fmt === 'apng') {
+                if (rowDepth) rowDepth.classList.remove('hidden');
+                if (formatHelp) formatHelp.textContent = 'El lienzo del navegador procesa color RGBA de 8 bits por canal.';
                 if (extLabel) extLabel.textContent = '.png';
                 if (fmtBadge) {
-                    fmtBadge.textContent = " APNG 32-bit";
+                    const depth = document.getElementById('selApngDepth')?.value || '32';
+                    fmtBadge.textContent = ` APNG ${depth}-bit`;
                     fmtBadge.className = "text-[10px] text-pink-400 font-bold";
                 }
                 if (rowStab) rowStab.classList.add('hidden');
@@ -6325,7 +7529,30 @@ ${defaultLayersCode}
                     }
                 }
 
+            } else if (fmt === 'webm') {
+                if (rowDepth) rowDepth.classList.add('hidden');
+                if (formatHelp) formatHelp.textContent = 'Vídeo rápido mediante MediaRecorder; VP9 puede conservar transparencia.';
+                if (extLabel) extLabel.textContent = '.webm';
+                if (fmtBadge) {
+                    fmtBadge.textContent = " Video WebM";
+                    fmtBadge.className = "text-[10px] text-sky-400 font-bold";
+                }
+                if (rowStab) rowStab.classList.add('hidden');
+                if (btnGenText) btnGenText.textContent = " Generar Video WebM";
+                if (btnDownText) btnDownText.textContent = "Descargar .WEBM";
+                if (selHeight) {
+                    const currentH = selHeight.value;
+                    selHeight.innerHTML = '<option value="240">240p (Muy rápido)</option><option value="360">360p (Ligero)</option><option value="480" selected>480p (Recomendado)</option><option value="720">720p HD</option><option value="1080">1080p Full HD</option>';
+                    selHeight.value = ['240', '360', '480', '720', '1080'].includes(currentH) ? currentH : '480';
+                }
+                if (selFps) {
+                    const currentFps = selFps.value;
+                    selFps.innerHTML = '<option value="15">15 FPS (Ligero)</option><option value="24" selected>24 FPS (Cinemático)</option><option value="30">30 FPS (Fluido)</option><option value="60">60 FPS</option>';
+                    selFps.value = ['15', '24', '30', '60'].includes(currentFps) ? currentFps : '24';
+                }
             } else { // gif
+                if (rowDepth) rowDepth.classList.add('hidden');
+                if (formatHelp) formatHelp.textContent = 'GIF usa una paleta indexada y es compatible con navegadores antiguos.';
                 if (extLabel) extLabel.textContent = '.gif';
                 if (fmtBadge) {
                     fmtBadge.textContent = " GIF Universal";
@@ -6684,6 +7911,7 @@ ${defaultLayersCode}
             studio.currentGifDataUrl = null;
 
             const resultImg = document.getElementById('gifResultImg');
+            const resultVideo = document.getElementById('gifResultVideo');
             const placeholder = document.getElementById('gifPlaceholder');
             const resultActions = document.getElementById('gifResultActions');
             const sandboxNotice = document.getElementById('gifSandboxNotice');
@@ -6694,7 +7922,12 @@ ${defaultLayersCode}
 
             if (resultImg) {
                 resultImg.src = url;
-                resultImg.classList.remove('hidden');
+                resultImg.classList.toggle('hidden', format === 'webm');
+            }
+            if (resultVideo) {
+                resultVideo.src = format === 'webm' ? url : '';
+                resultVideo.classList.toggle('hidden', format !== 'webm');
+                if (format === 'webm') resultVideo.play().catch(() => {});
             }
 
             const sizeKb = (blob.size / 1024).toFixed(1);
@@ -6703,12 +7936,12 @@ ${defaultLayersCode}
             const infoSize = document.getElementById('gifInfoSize');
             const infoDetails = document.getElementById('gifInfoDetails');
             if (infoSize) infoSize.textContent = sizeStr;
-            const formatName = (format === 'apng') ? 'APNG 32-bit' : 'GIF';
+            const formatName = format === 'apng' ? `APNG ${document.getElementById('selApngDepth')?.value || 32}-bit` : (format === 'webm' ? 'Video WebM' : 'GIF');
             if (infoDetails) infoDetails.textContent = formatName + ' • ' + targetW + 'x' + targetH + ' px • ' + totalFrames + ' frames @ ' + fps + ' FPS (' + dur.toFixed(2) + 's)';
 
             const btnDownText = document.getElementById('lblBtnDownloadText');
             if (btnDownText) {
-                btnDownText.textContent = (format === 'apng') ? "Descargar .PNG (APNG)" : "Descargar .GIF";
+                btnDownText.textContent = format === 'apng' ? "Descargar .PNG (APNG)" : (format === 'webm' ? "Descargar .WEBM" : "Descargar .GIF");
             }
         }
 
@@ -6830,7 +8063,8 @@ ${defaultLayersCode}
 
             try {
                 if (format === 'apng') {
-                    progressText.textContent = "Preparando renderizado APNG en 32-bit...";
+                    const apngDepth = document.getElementById('selApngDepth')?.value || '32';
+                    progressText.textContent = `Preparando renderizado APNG (${apngDepth}-bit)...`;
                     progressPct.textContent = "0%";
                     progressBar.style.width = "0%";
                     await new Promise(r => setTimeout(r, 0));
@@ -6856,15 +8090,52 @@ ${defaultLayersCode}
 
                     if (studio.gifCancel) return;
 
-                    progressText.textContent = "Empaquetando APNG de 32-bit sin compresión con pérdida...";
+                    progressText.textContent = `Empaquetando APNG (${apngDepth}-bit)...`;
                     await new Promise(r => setTimeout(r, 0));
 
                     const apngBytes = buildApng(frameBytesList, targetW, targetH, fps, isLoop);
                     const apngBlob = new Blob([apngBytes], { type: 'image/png' });
 
                     finalizeAnimationOutput(apngBlob, 'apng', targetW, targetH, totalFrames, fps, dur);
+                } else if (format === 'webm') {
+                    if (!window.MediaRecorder || typeof offCanvas.captureStream !== 'function') {
+                        throw new Error('Este navegador no soporta exportación WebM directa. Prueba Chrome o Edge actualizado.');
+                    }
+                    const mimeTypes = ['video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm'];
+                    const mimeType = mimeTypes.find(type => MediaRecorder.isTypeSupported(type));
+                    if (!mimeType) throw new Error('No hay un codificador WebM compatible disponible.');
 
-                } else {
+                    progressText.textContent = 'Renderizando video WebM...';
+                    progressPct.textContent = '0%';
+                    progressBar.style.width = '0%';
+                    const stream = offCanvas.captureStream(fps);
+                    const recorder = new MediaRecorder(stream, {
+                        mimeType,
+                        videoBitsPerSecond: Math.min(12000000, Math.max(2500000, targetW * targetH * fps * 0.08))
+                    });
+                    const chunks = [];
+                    recorder.ondataavailable = event => {
+                        if (event.data && event.data.size) chunks.push(event.data);
+                    };
+                    const stopped = new Promise((resolve, reject) => {
+                        recorder.onstop = resolve;
+                        recorder.onerror = event => reject(event.error || new Error('Falló el codificador WebM.'));
+                    });
+                    recorder.start(250);
+                    for (let f = 0; f < totalFrames; f++) {
+                        if (studio.gifCancel) break;
+                        renderAnimationSnapshot(offCtx, targetW, targetH, cropBox, bgMode, (f / totalFrames) * dur);
+                        progressBar.style.width = Math.round(((f + 1) / totalFrames) * 90) + '%';
+                        progressPct.textContent = Math.round(((f + 1) / totalFrames) * 90) + '%';
+                        progressText.textContent = `Renderizando video ${f + 1} de ${totalFrames}...`;
+                        await new Promise(resolve => setTimeout(resolve, frameDelayMs));
+                    }
+                    recorder.stop();
+                    await stopped;
+                    if (studio.gifCancel) return;
+                    const webmBlob = new Blob(chunks, { type: 'video/webm' });
+                    finalizeAnimationOutput(webmBlob, 'webm', targetW, targetH, totalFrames, fps, dur);
+                } else {
                     if (!window.gifenc || !window.gifenc.GIFEncoder) {
                         throw new Error("El codificador de GIF no está disponible.");
                     }
@@ -7007,7 +8278,7 @@ ${defaultLayersCode}
             }
             const blob = studio.currentAnimBlob || studio.currentGifBlob;
             const format = studio.currentAnimFormat || 'apng';
-            const ext = (format === 'apng') ? 'png' : 'gif';
+            const ext = format === 'apng' ? 'png' : (format === 'webm' ? 'webm' : 'gif');
             const avatarName = getSanitizedAvatarName();
             const fileName = avatarName + '_anim.' + ext;
             const blobUrl = URL.createObjectURL(blob);
@@ -7041,7 +8312,7 @@ ${defaultLayersCode}
             const blob = studio.currentAnimBlob || studio.currentGifBlob;
             const targetUrl = studio.currentAnimUrl || studio.currentGifUrl || URL.createObjectURL(blob);
             const format = studio.currentAnimFormat || 'apng';
-            const ext = (format === 'apng') ? 'png' : 'gif';
+            const ext = format === 'apng' ? 'png' : (format === 'webm' ? 'webm' : 'gif');
             const avatarName = getSanitizedAvatarName();
             const fileName = avatarName + '_anim.' + ext;
             const win = window.open();
@@ -7055,13 +8326,13 @@ ${defaultLayersCode}
                         <meta name="viewport" content="width=device-width, initial-scale=1">
                     </head>
                     <body style="margin:0;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#0c0f18;background-image:linear-gradient(45deg,#151b29 25%,transparent 25%),linear-gradient(-45deg,#151b29 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#151b29 75%),linear-gradient(-45deg,transparent 75%,#151b29 75%);background-size:20px 20px;font-family:sans-serif;color:#e2e8f0;padding:20px;box-sizing:border-box;">
-                        <img src="${targetUrl}" style="max-height:75vh;max-width:90vw;object-fit:contain;border-radius:8px;filter:drop-shadow(0 10px 25px rgba(0,0,0,0.6));" alt="${avatarName}">
+                        ${format === 'webm' ? `<video src="${targetUrl}" autoplay loop muted controls style="max-height:75vh;max-width:90vw;object-fit:contain;border-radius:8px;filter:drop-shadow(0 10px 25px rgba(0,0,0,0.6));"></video>` : `<img src="${targetUrl}" style="max-height:75vh;max-width:90vw;object-fit:contain;border-radius:8px;filter:drop-shadow(0 10px 25px rgba(0,0,0,0.6));" alt="${avatarName}">`}
                         <div style="margin-top:20px;display:flex;flex-direction:column;align-items:center;gap:10px;">
                             <a href="${targetUrl}" download="${fileName}" style="display:inline-block;padding:10px 22px;background:linear-gradient(135deg,#db2777,#9333ea);color:white;text-decoration:none;border-radius:8px;font-weight:bold;font-size:14px;box-shadow:0 4px 14px rgba(219,39,119,0.4);">
                                  Descargar ${fileName}
                             </a>
                             <span style="font-size:12px;color:#94a3b8;text-align:center;">
-                                O haz clic derecho sobre la animación y elige <b>"Guardar imagen como..."</b>
+                                O haz clic derecho sobre la vista previa y elige <b>"Guardar como..."</b>
                             </span>
                         </div>
                     </body>
@@ -7078,6 +8349,11 @@ ${defaultLayersCode}
             const blob = studio.currentAnimBlob || studio.currentGifBlob;
             if (!blob) return;
             const format = studio.currentAnimFormat || 'apng';
+
+            if (format === 'webm') {
+                downloadCurrentAnimation();
+                return;
+            }
 
             try {
                 if (format === 'apng') {
