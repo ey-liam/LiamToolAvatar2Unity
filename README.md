@@ -1,14 +1,19 @@
-# LiamToolAvatar2Unity V6.1
+# LiamToolAvatar2Unity V6.2
 
 Herramienta web profesional para crear, configurar rig, animar avatares 2D en alta resolucion y exportarlos directamente a Unity y al juego.
 
 - Google Sites: https://sites.google.com/view/liamtoolavatar2unity/home
 - GitHub Pages: https://ey-liam.github.io/LiamToolAvatar2Unity/
 
+## Novedades en V6.2
+
+- Codec VP8 prioritario y transmision sin audio: Salida WebM optimizada utilizando el codec VP8 como opcion primordial para maxima fluidez y compatibilidad nativa en navegadores web y reproductores de video, empaquetado como stream de video puro libre de pistas de audio redundantes.
+- Bitrate reforzado de alta fidelidad: Calibracion de tasa de bits incrementada (entre 1.8 Mbps y 8.0 Mbps segun la resolucion seleccionada, con ~2.5 Mbps para 480p y ~5.5 Mbps para 720p), proporcionando siluetas perfectamente nitidas y colores limpios sin inflar excesivamente el tamano del archivo.
+
 ## Novedades en V6.1
 
 - Sincronizacion de velocidad de video independiente de FPS: El exportador de video WebM ahora utiliza un bucle temporalizado en tiempo real mediante performance.now(), sincronizando de forma exacta la duracion del clip con la duracion de la animacion. La velocidad de reproduccion es 100% identica y natural sin importar si se exporta a 15, 24, 30 o 60 FPS, eliminando por completo la ralentizacion a altas tasas de fotogramas.
-- Bitrate optimizado y video ligero: Se recalibro la tasa de bits (bitrate) para generar archivos de video sustancialmente mas ligeros y agiles de reproducir, manteniendo contornos nitidos y colores limpios sin inflar innecesariamente el peso del archivo.
+- Bitrate optimizado y video ligero: Recalibracion de la tasa de bits para generar archivos de video mas agiles de reproducir y almacenar.
 
 ## Novedades en V6
 
@@ -24,7 +29,7 @@ Herramienta web profesional para crear, configurar rig, animar avatares 2D en al
   - Ventana modal centralizada para exportar por lotes o de forma selectiva:
     - Texturas estaticas para DancerCardCatalog (Banner, Cursor, DancerCard, Full, Hud, Portrait, Square).
     - Atlas empaquetado PNG de alta resolucion.
-    - Archivo descriptor Spine/Unity JSON V6.1.
+    - Archivo descriptor Spine/Unity JSON V6.2.
     - Script MonoBehaviour C# para Unity.
     - Exportador de animaciones en APNG de 32 bits y formato GIF.
 - Sistema de Notificaciones Flotantes (V6 Toasts):

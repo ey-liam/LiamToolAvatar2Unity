@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Editor de avatares 2D con rigging, animación y exportación para Unity.">
     <meta name="theme-color" content="#090b10">
-    <title>LiamToolAvatar2Unity V6.1 - Avatar Studio</title>
+    <title>LiamToolAvatar2Unity V6.2 - Avatar Studio</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -309,7 +309,7 @@
                 </div>
                 <div class="flex items-center gap-1.5">
                     <span class="font-extrabold tracking-tight text-xs sm:text-sm bg-gradient-to-r from-white via-slate-100 to-slate-300 bg-clip-text text-transparent">LiamTool <span class="bg-gradient-to-r from-cyan-400 to-sky-300 bg-clip-text text-transparent font-bold">Avatar2Unity</span></span>
-                    <span class="mono text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/30">V6.1</span>
+                    <span class="mono text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/30">V6.2</span>
                 </div>
             </div>
 
@@ -1322,7 +1322,7 @@
                 <div class="flex items-center gap-3">
                     <span class="px-2 py-0.5 rounded bg-gradient-to-r from-pink-500/20 to-purple-500/20 border border-pink-500/40 text-pink-300 mono text-xs font-bold flex items-center gap-1.5">
                         <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="2" width="20" height="20" rx="4"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
-                        ANIMATION EXPORTER V6.1
+                        ANIMATION EXPORTER V6.2
                     </span>
                     <span class="text-sm font-bold text-white">Exportador de Animación (APNG • GIF)</span>
                 </div>
@@ -2011,7 +2011,7 @@
                     showV6Toast('El auto-guardado no está disponible en este navegador.', 'error');
                 }
             }, 8000);
-            showV6Toast('Avatar Studio V6.1 listo · Ctrl+K para comandos');
+            showV6Toast('Avatar Studio V6.2 listo · Ctrl+K para comandos');
         }
 
                 const DEFAULT_STUDIO_SETTINGS = {
@@ -4469,7 +4469,7 @@
 
         function drawTexturedTriangleAffine(c, img, u0, v0, u1, v1, u2, v2, x0, y0, x1, y1, x2, y2) {
             c.save();
-            c.beginPath();
+            c.beginPath();
             let currentScale = 1;
             if (c.getTransform) {
                 const m = c.getTransform();
@@ -5987,7 +5987,7 @@
 
             const exportData = {
                 avatarName: avatarName,
-                exporter: 'LiamToolAvatar2Unity V6.1',
+                exporter: 'LiamToolAvatar2Unity V6.2',
                 preset: studio.activeLayerPreset,
                 formatVersion: 2,
                 characterCount: characterIds.length,
@@ -7531,7 +7531,7 @@ ${defaultLayersCode}
 
             } else if (fmt === 'webm') {
                 if (rowDepth) rowDepth.classList.add('hidden');
-                if (formatHelp) formatHelp.textContent = 'Vídeo rápido mediante MediaRecorder; VP9 puede conservar transparencia.';
+                if (formatHelp) formatHelp.textContent = 'Video WebM (VP8) sin audio optimizado para reproduccion web fluida.';
                 if (extLabel) extLabel.textContent = '.webm';
                 if (fmtBadge) {
                     fmtBadge.textContent = " Video WebM";
@@ -8101,17 +8101,18 @@ ${defaultLayersCode}
                     if (!window.MediaRecorder || typeof offCanvas.captureStream !== 'function') {
                         throw new Error('Este navegador no soporta exportación WebM directa. Prueba Chrome o Edge actualizado.');
                     }
-                    const mimeTypes = ['video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm'];
+                    const mimeTypes = ['video/webm;codecs=vp8', 'video/webm', 'video/webm;codecs=vp9'];
                     const mimeType = mimeTypes.find(type => MediaRecorder.isTypeSupported(type));
                     if (!mimeType) throw new Error('No hay un codificador WebM compatible disponible.');
 
-                    progressText.textContent = 'Renderizando video WebM...';
+                    progressText.textContent = 'Renderizando video WebM (VP8)...';
                     progressPct.textContent = '0%';
                     progressBar.style.width = '0%';
 
-                    const videoBitsPerSecond = Math.min(3200000, Math.max(700000, Math.round(targetW * targetH * 2.2)));
-                    const stream = offCanvas.captureStream(fps);
-                    const recorder = new MediaRecorder(stream, {
+                    const videoBitsPerSecond = Math.min(8000000, Math.max(1800000, Math.round(targetW * targetH * 6.0)));
+                    const rawStream = offCanvas.captureStream(fps);
+                    const videoOnlyStream = new MediaStream(rawStream.getVideoTracks());
+                    const recorder = new MediaRecorder(videoOnlyStream, {
                         mimeType,
                         videoBitsPerSecond
                     });
