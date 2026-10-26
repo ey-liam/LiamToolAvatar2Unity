@@ -1,9 +1,14 @@
-# LiamToolAvatar2Unity V6
+# LiamToolAvatar2Unity V6.1
 
 Herramienta web profesional para crear, configurar rig, animar avatares 2D en alta resolucion y exportarlos directamente a Unity y al juego.
 
 - Google Sites: https://sites.google.com/view/liamtoolavatar2unity/home
 - GitHub Pages: https://ey-liam.github.io/LiamToolAvatar2Unity/
+
+## Novedades en V6.1
+
+- Sincronizacion de velocidad de video independiente de FPS: El exportador de video WebM ahora utiliza un bucle temporalizado en tiempo real mediante performance.now(), sincronizando de forma exacta la duracion del clip con la duracion de la animacion. La velocidad de reproduccion es 100% identica y natural sin importar si se exporta a 15, 24, 30 o 60 FPS, eliminando por completo la ralentizacion a altas tasas de fotogramas.
+- Bitrate optimizado y video ligero: Se recalibro la tasa de bits (bitrate) para generar archivos de video sustancialmente mas ligeros y agiles de reproducir, manteniendo contornos nitidos y colores limpios sin inflar innecesariamente el peso del archivo.
 
 ## Novedades en V6
 
@@ -19,7 +24,7 @@ Herramienta web profesional para crear, configurar rig, animar avatares 2D en al
   - Ventana modal centralizada para exportar por lotes o de forma selectiva:
     - Texturas estaticas para DancerCardCatalog (Banner, Cursor, DancerCard, Full, Hud, Portrait, Square).
     - Atlas empaquetado PNG de alta resolucion.
-    - Archivo descriptor Spine/Unity JSON V6.
+    - Archivo descriptor Spine/Unity JSON V6.1.
     - Script MonoBehaviour C# para Unity.
     - Exportador de animaciones en APNG de 32 bits y formato GIF.
 - Sistema de Notificaciones Flotantes (V6 Toasts):

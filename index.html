@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Editor de avatares 2D con rigging, animación y exportación para Unity.">
     <meta name="theme-color" content="#090b10">
-    <title>LiamToolAvatar2Unity V6 - Avatar Studio</title>
+    <title>LiamToolAvatar2Unity V6.1 - Avatar Studio</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -309,7 +309,7 @@
                 </div>
                 <div class="flex items-center gap-1.5">
                     <span class="font-extrabold tracking-tight text-xs sm:text-sm bg-gradient-to-r from-white via-slate-100 to-slate-300 bg-clip-text text-transparent">LiamTool <span class="bg-gradient-to-r from-cyan-400 to-sky-300 bg-clip-text text-transparent font-bold">Avatar2Unity</span></span>
-                    <span class="mono text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/30">V6</span>
+                    <span class="mono text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/30">V6.1</span>
                 </div>
             </div>
 
@@ -1322,7 +1322,7 @@
                 <div class="flex items-center gap-3">
                     <span class="px-2 py-0.5 rounded bg-gradient-to-r from-pink-500/20 to-purple-500/20 border border-pink-500/40 text-pink-300 mono text-xs font-bold flex items-center gap-1.5">
                         <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="2" width="20" height="20" rx="4"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
-                        ANIMATION EXPORTER V6
+                        ANIMATION EXPORTER V6.1
                     </span>
                     <span class="text-sm font-bold text-white">Exportador de Animación (APNG • GIF)</span>
                 </div>
@@ -2011,7 +2011,7 @@
                     showV6Toast('El auto-guardado no está disponible en este navegador.', 'error');
                 }
             }, 8000);
-            showV6Toast('Avatar Studio V6 listo · Ctrl+K para comandos');
+            showV6Toast('Avatar Studio V6.1 listo · Ctrl+K para comandos');
         }
 
                 const DEFAULT_STUDIO_SETTINGS = {
@@ -4469,7 +4469,7 @@
 
         function drawTexturedTriangleAffine(c, img, u0, v0, u1, v1, u2, v2, x0, y0, x1, y1, x2, y2) {
             c.save();
-            c.beginPath();
+            c.beginPath();
             let currentScale = 1;
             if (c.getTransform) {
                 const m = c.getTransform();
@@ -5987,7 +5987,7 @@
 
             const exportData = {
                 avatarName: avatarName,
-                exporter: 'LiamToolAvatar2Unity V6',
+                exporter: 'LiamToolAvatar2Unity V6.1',
                 preset: studio.activeLayerPreset,
                 formatVersion: 2,
                 characterCount: characterIds.length,
@@ -7494,7 +7494,7 @@ ${defaultLayersCode}
                 }
                 if (rowStab) rowStab.classList.add('hidden');
                 if (btnGenText) btnGenText.textContent = " Generar Animación (APNG)";
-                if (btnDownText) btnDownText.textContent = "Descargar .PNG (APNG)";
+                if (btnDownText) btnDownText.textContent = "Descargar .PNG (APNG)";
                 if (selHeight) {
                     const currentH = selHeight.value;
                     selHeight.innerHTML = `
@@ -7512,7 +7512,7 @@ ${defaultLayersCode}
                     } else {
                         selHeight.value = '1080';
                     }
-                }
+                }
                 if (selFps) {
                     const currentFps = selFps.value;
                     selFps.innerHTML = `
@@ -7560,7 +7560,7 @@ ${defaultLayersCode}
                 }
                 if (rowStab) rowStab.classList.remove('hidden');
                 if (btnGenText) btnGenText.textContent = " Generar GIF Animado";
-                if (btnDownText) btnDownText.textContent = "Descargar .GIF";
+                if (btnDownText) btnDownText.textContent = "Descargar .GIF";
                 if (selHeight) {
                     const currentH = selHeight.value;
                     selHeight.innerHTML = `
@@ -7574,7 +7574,7 @@ ${defaultLayersCode}
                     } else {
                         selHeight.value = '480';
                     }
-                }
+                }
                 if (selFps) {
                     const currentFps = selFps.value;
                     selFps.innerHTML = `
@@ -7589,7 +7589,7 @@ ${defaultLayersCode}
                     }
                 }
             }
-        }
+        }
         const apngCrcTable = new Uint32Array(256);
         for (let n = 0; n < 256; n++) {
             let c = n;
@@ -8023,7 +8023,7 @@ ${defaultLayersCode}
             }
 
             const aspect = cropBox.width / cropBox.height;
-            let targetW = Math.round(targetH * aspect);
+            let targetW = Math.round(targetH * aspect);
             if (targetW > 4096) {
                 targetW = 4096;
                 targetH = Math.round(targetW / aspect);
@@ -8062,7 +8062,7 @@ ${defaultLayersCode}
             studio.anim.gustVel = 0;
 
             try {
-                if (format === 'apng') {
+                if (format === 'apng') {
                     const apngDepth = document.getElementById('selApngDepth')?.value || '32';
                     progressText.textContent = `Preparando renderizado APNG (${apngDepth}-bit)...`;
                     progressPct.textContent = "0%";
@@ -8108,10 +8108,12 @@ ${defaultLayersCode}
                     progressText.textContent = 'Renderizando video WebM...';
                     progressPct.textContent = '0%';
                     progressBar.style.width = '0%';
+
+                    const videoBitsPerSecond = Math.min(3200000, Math.max(700000, Math.round(targetW * targetH * 2.2)));
                     const stream = offCanvas.captureStream(fps);
                     const recorder = new MediaRecorder(stream, {
                         mimeType,
-                        videoBitsPerSecond: Math.min(12000000, Math.max(2500000, targetW * targetH * fps * 0.08))
+                        videoBitsPerSecond
                     });
                     const chunks = [];
                     recorder.ondataavailable = event => {
@@ -8121,20 +8123,46 @@ ${defaultLayersCode}
                         recorder.onstop = resolve;
                         recorder.onerror = event => reject(event.error || new Error('Falló el codificador WebM.'));
                     });
-                    recorder.start(250);
-                    for (let f = 0; f < totalFrames; f++) {
+
+                    const totalDurationMs = dur * 1000;
+                    const frameIntervalMs = 1000 / fps;
+                    recorder.start(100);
+                    const tStart = performance.now();
+                    let frameIndex = 0;
+
+                    renderAnimationSnapshot(offCtx, targetW, targetH, cropBox, bgMode, 0);
+
+                    while (true) {
                         if (studio.gifCancel) break;
-                        renderAnimationSnapshot(offCtx, targetW, targetH, cropBox, bgMode, (f / totalFrames) * dur);
-                        progressBar.style.width = Math.round(((f + 1) / totalFrames) * 90) + '%';
-                        progressPct.textContent = Math.round(((f + 1) / totalFrames) * 90) + '%';
-                        progressText.textContent = `Renderizando video ${f + 1} de ${totalFrames}...`;
-                        await new Promise(resolve => setTimeout(resolve, frameDelayMs));
+
+                        const elapsedMs = performance.now() - tStart;
+                        if (elapsedMs >= totalDurationMs) break;
+
+                        const pct = Math.min(95, Math.round((elapsedMs / totalDurationMs) * 95));
+                        progressBar.style.width = pct + '%';
+                        progressPct.textContent = pct + '%';
+                        progressText.textContent = `Renderizando video (${(elapsedMs / 1000).toFixed(1)}s / ${dur.toFixed(1)}s)...`;
+
+                        const animTime = (elapsedMs / totalDurationMs) * dur;
+                        renderAnimationSnapshot(offCtx, targetW, targetH, cropBox, bgMode, animTime);
+
+                        frameIndex++;
+                        const nextTargetMs = frameIndex * frameIntervalMs;
+                        const remainingMs = (tStart + nextTargetMs) - performance.now();
+
+                        if (remainingMs > 2) {
+                            await new Promise(r => setTimeout(r, remainingMs));
+                        } else {
+                            await new Promise(r => setTimeout(r, 0));
+                        }
                     }
+
+                    renderAnimationSnapshot(offCtx, targetW, targetH, cropBox, bgMode, dur);
                     recorder.stop();
                     await stopped;
                     if (studio.gifCancel) return;
                     const webmBlob = new Blob(chunks, { type: 'video/webm' });
-                    finalizeAnimationOutput(webmBlob, 'webm', targetW, targetH, totalFrames, fps, dur);
+                    finalizeAnimationOutput(webmBlob, 'webm', targetW, targetH, Math.max(frameIndex, totalFrames), fps, dur);
                 } else {
                     if (!window.gifenc || !window.gifenc.GIFEncoder) {
                         throw new Error("El codificador de GIF no está disponible.");
@@ -8280,7 +8308,7 @@ ${defaultLayersCode}
             const format = studio.currentAnimFormat || 'apng';
             const ext = format === 'apng' ? 'png' : (format === 'webm' ? 'webm' : 'gif');
             const avatarName = getSanitizedAvatarName();
-            const fileName = avatarName + '_anim.' + ext;
+            const fileName = avatarName + '_anim.' + ext;
             const blobUrl = URL.createObjectURL(blob);
 
             try {
