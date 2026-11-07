@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Editor de avatares 2D con rigging, animación y exportación para Unity.">
     <meta name="theme-color" content="#090b10">
-    <title>LiamToolAvatar2Unity V7 - Avatar Studio & Multi-Engine Suite</title>
+    <title>LiamToolAvatar2Unity V7.1 - Avatar Studio & Multi-Engine Suite</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -309,7 +309,7 @@
                 </div>
                 <div class="flex items-center gap-1.5">
                     <span class="font-extrabold tracking-tight text-xs sm:text-sm bg-gradient-to-r from-white via-slate-100 to-slate-300 bg-clip-text text-transparent">LiamTool <span class="bg-gradient-to-r from-cyan-400 to-sky-300 bg-clip-text text-transparent font-bold">Avatar2Unity</span></span>
-                    <span class="mono text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/30">V7</span>
+                    <span class="mono text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/30">V7.1</span>
                 </div>
             </div>
 
@@ -636,6 +636,15 @@
                     <button id="toggleBtn_ik" onclick="toggleViewFlag('footIK')" class="px-2 py-1 rounded border border-emerald-500/40 bg-emerald-500/15 text-emerald-300 text-[10px] font-medium">
                         Pies IK
                     </button>
+                    <button id="toggleBtn_outline" onclick="toggleViewFlag('showCoachOutline')" class="px-2 py-1 rounded border border-cyan-500/40 bg-cyan-500/15 text-cyan-300 text-[10px] font-medium" title="Borde Coach Neon (Efecto Just Dance)">
+                        Borde Coach
+                    </button>
+                    <button id="toggleBtn_stage" onclick="toggleViewFlag('showStageNeon')" class="px-2 py-1 rounded border border-[#28324e] bg-[#161b29] text-slate-400 text-[10px] font-medium" title="Escenario Neon Just Dance">
+                        Pista Neon
+                    </button>
+                    <button id="toggleBtn_gizmo" onclick="toggleViewFlag('showRotationGizmo')" class="px-2 py-1 rounded border border-amber-500/40 bg-amber-500/15 text-amber-300 text-[10px] font-medium" title="Gizmo interactivo de rotacion">
+                        Gizmo
+                    </button>
                 </div>
 
                 <div class="flex items-center gap-2 mono text-[10px] text-slate-400">
@@ -647,7 +656,7 @@
             <div id="viewportContainer" class="flex-1 relative overflow-hidden bg-[#0a0d14]">
                 <canvas id="viewportCanvas" class="w-full h-full block" role="img" aria-label="Lienzo interactivo del avatar"></canvas>
 
-                <div id="weightLegendOverlay" class="hidden absolute top-3 right-3 bg-[#10141f]/95 border border-[#26304a] rounded p-2.5 w-52 space-y-1.5 pointer-events-none shadow-xl">
+                <div id="weightLegendOverlay" class="hidden absolute top-3 right-3 bg-[#10141f]/95 border border-[#26304a] rounded p-2.5 w-52 space-y-1.5 pointer-events-none shadow-xl z-20">
                     <div class="flex items-center justify-between text-[10px] font-semibold">
                         <span class="text-slate-300">Peso Hueso:</span>
                         <span id="weightActiveBoneLabel" class="mono text-sky-300">torso</span>
@@ -660,6 +669,24 @@
                         <span>0.75</span>
                         <span>1.00</span>
                     </div>
+                </div>
+
+                <div id="viewportHud" class="absolute bottom-3 left-1/2 -translate-x-1/2 bg-[#0c101c]/90 backdrop-blur border border-[#242e47] rounded-full px-3 py-1 flex items-center gap-2 shadow-2xl z-10 text-[10px]">
+                    <div class="flex items-center gap-1.5">
+                        <span class="text-slate-400 font-semibold text-[9px]">Borde:</span>
+                        <button onclick="setCoachOutlineColor('#00f0ff')" class="w-3.5 h-3.5 rounded-full bg-[#00f0ff] border border-white/40 hover:scale-125 transition" title="Cyan Neon"></button>
+                        <button onclick="setCoachOutlineColor('#ffd700')" class="w-3.5 h-3.5 rounded-full bg-[#ffd700] border border-white/40 hover:scale-125 transition" title="Oro Just Dance"></button>
+                        <button onclick="setCoachOutlineColor('#ec4899')" class="w-3.5 h-3.5 rounded-full bg-[#ec4899] border border-white/40 hover:scale-125 transition" title="Magenta Neon"></button>
+                        <button onclick="setCoachOutlineColor('#10b981')" class="w-3.5 h-3.5 rounded-full bg-[#10b981] border border-white/40 hover:scale-125 transition" title="Verde Esmeralda"></button>
+                    </div>
+                    <div class="h-3 w-px bg-[#222c42]"></div>
+                    <button onclick="triggerGoldMoveFlash()" class="px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-500/20 to-yellow-500/20 hover:from-amber-500/30 hover:to-yellow-500/30 border border-amber-500/40 text-amber-300 font-bold transition flex items-center gap-1 text-[9px]">
+                        Gold Move FX
+                    </button>
+                    <div class="h-3 w-px bg-[#222c42]"></div>
+                    <button onclick="resetCameraView()" class="text-slate-300 hover:text-white transition font-medium text-[9px]">
+                        Centrar
+                    </button>
                 </div>
             </div>
 
@@ -865,7 +892,23 @@
                                 <span class="text-slate-400">Resolucion Subdivison</span>
                                 <span id="val_meshDensity" class="mono text-indigo-300">22</span>
                             </div>
-                            <input type="range" id="sl_meshDensity" min="12" max="36" step="2" value="22" onchange="pushUndoState()" oninput="rebuildAllPartMeshes()">
+                            <input type="range" id="sl_meshDensity" min="12" max="38" step="2" value="22" onchange="pushUndoState()" oninput="rebuildAllPartMeshes()">
+                            <div class="flex items-center gap-1 pt-1.5">
+                                <span class="text-[9px] text-slate-400">Presets:</span>
+                                <button onclick="setMeshDensityPreset(14)" class="px-1.5 py-0.5 rounded bg-[#101420] hover:bg-[#1a2236] border border-[#26314d] text-[9px] text-slate-300">Rapida (14)</button>
+                                <button onclick="setMeshDensityPreset(22)" class="px-1.5 py-0.5 rounded bg-[#101420] hover:bg-[#1a2236] border border-[#26314d] text-[9px] text-slate-300">Media (22)</button>
+                                <button onclick="setMeshDensityPreset(30)" class="px-1.5 py-0.5 rounded bg-[#101420] hover:bg-[#1a2236] border border-[#26314d] text-[9px] text-slate-300">Alta (30)</button>
+                                <button onclick="setMeshDensityPreset(38)" class="px-1.5 py-0.5 rounded bg-[#101420] hover:bg-[#1a2236] border border-[#26314d] text-[9px] text-slate-300">Ultra (38)</button>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-1.5 pt-1">
+                            <button onclick="relaxSelectedPartMesh()" class="py-1.5 px-2 rounded bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-500/40 text-indigo-200 text-[10px] font-semibold">
+                                Relajar Vertices
+                            </button>
+                            <button onclick="pushUndoState(); rebuildAllPartMeshes()" class="py-1.5 px-2 rounded bg-sky-500/20 hover:bg-sky-500/30 border border-sky-500/40 text-sky-200 text-[10px] font-semibold">
+                                Reconstruir Malla
+                            </button>
                         </div>
 
                         <div>
@@ -1008,14 +1051,20 @@
                         </label>
 
                         <div class="grid grid-cols-2 gap-1.5 pt-1">
-                            <button onclick="recomputeAllPartsWeights(true, true)" class="py-1.5 px-2 rounded bg-sky-500/20 hover:bg-sky-500/30 border border-sky-500/40 text-sky-300 text-[10px] font-semibold">
-                                Auto-Pesos + Anclaje
+                            <button onclick="autoHarmonicWeights()" class="py-1.5 px-2 rounded bg-sky-500/20 hover:bg-sky-500/30 border border-sky-500/40 text-sky-300 text-[10px] font-semibold">
+                                Auto-Pesos Armonicos
                             </button>
-                            <button onclick="pushUndoState(); relaxAllPartWeights(3)" class="py-1.5 px-2 rounded bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 text-[10px] font-semibold">
-                                Suavizar Fronteras
+                            <button onclick="smoothActiveBoneWeights(3)" class="py-1.5 px-2 rounded bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 text-[10px] font-semibold">
+                                Suavizar Hueso (3x)
                             </button>
-                            <button onclick="clearPaintedWeightsAll()" class="col-span-2 py-1.5 px-2 rounded bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/40 text-rose-300 text-[10px] font-semibold">
-                                Borrar Pesos Pintados
+                            <button onclick="normalizeActivePartWeights()" class="py-1.5 px-2 rounded bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-emerald-300 text-[10px] font-semibold">
+                                Normalizar 100%
+                            </button>
+                            <button onclick="invertActiveBoneWeights()" class="py-1.5 px-2 rounded bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-500/40 text-indigo-300 text-[10px] font-semibold">
+                                Invertir Pesos
+                            </button>
+                            <button onclick="clearActiveBoneWeights()" class="col-span-2 py-1.5 px-2 rounded bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/40 text-rose-300 text-[10px] font-semibold">
+                                Limpiar Influencia de este Hueso
                             </button>
                         </div>
                     </div>
@@ -1329,7 +1378,7 @@
                 <div class="flex items-center gap-3">
                     <span class="px-2 py-0.5 rounded bg-gradient-to-r from-pink-500/20 to-purple-500/20 border border-pink-500/40 text-pink-300 mono text-xs font-bold flex items-center gap-1.5">
                         <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="2" width="20" height="20" rx="4"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
-                        ANIMATION EXPORTER V7
+                        ANIMATION EXPORTER V7.1
                     </span>
                     <span class="text-sm font-bold text-white">Exportador de Animación (APNG • GIF)</span>
                 </div>
@@ -1686,8 +1735,13 @@
                 showBones: true,
                 showAnchors: true,
                 showWeights: false,
-                footIK: false
+                footIK: false,
+                showCoachOutline: true,
+                showStageNeon: false,
+                showRotationGizmo: true
             },
+            coachOutlineColor: '#00f0ff',
+            draggingGizmo: null,
 
             weightRigidity: 0.7,
 
@@ -2023,7 +2077,7 @@
                     showV6Toast('El auto-guardado no está disponible en este navegador.', 'error');
                 }
             }, 8000);
-            showV6Toast('Avatar Studio V7 listo · Ctrl+K para comandos');
+            showV6Toast('Avatar Studio V7.1 listo · Controles, Malla y Pesos mejorados');
         }
 
                 const DEFAULT_STUDIO_SETTINGS = {
@@ -4615,7 +4669,41 @@
             const camX = studio.camera.x;
             const camY = studio.camera.y;
             const canvasBg = cfg.canvasBg || 'grid';
-            if (canvasBg === 'black' || canvasBg === 'green' || canvasBg === 'blue') {
+            if (studio.flags.showStageNeon || canvasBg === 'stage_neon') {
+                // Escenario Neon Just Dance con degradado y pista en perspectiva
+                const grad = ctx.createLinearGradient(0, 0, 0, ch);
+                grad.addColorStop(0, '#06040d');
+                grad.addColorStop(0.55, '#120b24');
+                grad.addColorStop(1.0, '#030208');
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, 0, cw, ch);
+
+                const horizonY = ch * 0.65;
+                ctx.save();
+                ctx.strokeStyle = 'rgba(168, 85, 247, 0.22)';
+                ctx.lineWidth = 1;
+                for (let i = 1; i <= 8; i++) {
+                    const y = horizonY + Math.pow(i / 8, 2) * (ch - horizonY);
+                    ctx.beginPath();
+                    ctx.moveTo(0, y);
+                    ctx.lineTo(cw, y);
+                    ctx.stroke();
+                }
+                const centerX = cw * 0.5;
+                for (let ang = -0.7; ang <= 0.7; ang += 0.14) {
+                    ctx.beginPath();
+                    ctx.moveTo(centerX, horizonY);
+                    ctx.lineTo(centerX + Math.tan(ang) * (ch - horizonY) * 2.2, ch);
+                    ctx.stroke();
+                }
+                const spotGrad = ctx.createRadialGradient(centerX, horizonY * 0.9, 10, centerX, horizonY * 0.9, cw * 0.45);
+                spotGrad.addColorStop(0, 'rgba(236, 72, 153, 0.20)');
+                spotGrad.addColorStop(0.5, 'rgba(56, 189, 248, 0.08)');
+                spotGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+                ctx.fillStyle = spotGrad;
+                ctx.fillRect(0, 0, cw, ch);
+                ctx.restore();
+            } else if (canvasBg === 'black' || canvasBg === 'green' || canvasBg === 'blue') {
                 ctx.fillStyle = canvasBg === 'black' ? '#000000' : (canvasBg === 'green' ? '#00ff00' : '#0000ff');
                 ctx.fillRect(0, 0, cw, ch);
             } else if (canvasBg === 'checker') {
@@ -4667,6 +4755,33 @@
                 frameOrigins.forEach(origin => ctx.strokeRect(origin.x, origin.y, RefWidth, RefHeight));
             }
 
+            const isGoldMove = (studio.anim.clip === 'gold_move');
+            if (isGoldMove) {
+                // Rayos y aura de energia Gold Move detras del personaje
+                const time = performance.now() * 0.003;
+                const pulse = 1.0 + Math.sin(time * 3) * 0.12;
+                ctx.save();
+                const torsoB = studio.bones.find(b => b.id === 'torso');
+                const cx = torsoB ? torsoB.nx1 * RefWidth : RefWidth * 0.5;
+                const cy = torsoB ? torsoB.ny1 * RefHeight : RefHeight * 0.45;
+                const numRays = 18;
+                for (let r = 0; r < numRays; r++) {
+                    const ang = (r / numRays) * Math.PI * 2 + time * 0.4;
+                    const len1 = (RefWidth * 0.22) * pulse;
+                    const len2 = (RefWidth * 0.48) * pulse;
+                    const grad = ctx.createLinearGradient(cx + Math.cos(ang) * len1, cy + Math.sin(ang) * len1, cx + Math.cos(ang) * len2, cy + Math.sin(ang) * len2);
+                    grad.addColorStop(0, 'rgba(255, 215, 0, 0.45)');
+                    grad.addColorStop(1, 'rgba(255, 215, 0, 0.0)');
+                    ctx.strokeStyle = grad;
+                    ctx.lineWidth = (4 / z);
+                    ctx.beginPath();
+                    ctx.moveTo(cx + Math.cos(ang) * len1, cy + Math.sin(ang) * len1);
+                    ctx.lineTo(cx + Math.cos(ang) * len2, cy + Math.sin(ang) * len2);
+                    ctx.stroke();
+                }
+                ctx.restore();
+            }
+
             for (let pIdx = studio.parts.length - 1; pIdx >= 0; pIdx--) {
                 const part = studio.parts[pIdx];
                 if (!part.visible) continue;
@@ -4699,6 +4814,32 @@
                         ctx.closePath();
                         ctx.fill();
                     }
+                }
+
+                if (studio.flags.showCoachOutline || isGoldMove) {
+                    // Delineado exterior de Coach (Efecto Just Dance Glow)
+                    const outlineColor = isGoldMove ? '#ffd700' : (studio.coachOutlineColor || '#00f0ff');
+                    ctx.save();
+                    ctx.lineCap = 'round';
+                    ctx.lineJoin = 'round';
+                    // Pase 1: Resplandor bloom suave
+                    ctx.shadowColor = outlineColor;
+                    ctx.shadowBlur = (isGoldMove ? 26 : 16);
+                    ctx.strokeStyle = outlineColor;
+                    ctx.lineWidth = (isGoldMove ? 5.2 : 3.4) / z;
+                    ctx.beginPath();
+                    for (let i = 0; i < md.hullEdges.length; i++) {
+                        const [a, b] = md.hullEdges[i];
+                        ctx.moveTo(md.vertices[a].dx, md.vertices[a].dy);
+                        ctx.lineTo(md.vertices[b].dx, md.vertices[b].dy);
+                    }
+                    ctx.stroke();
+                    // Pase 2: Nucleo brillante
+                    ctx.shadowBlur = 4;
+                    ctx.strokeStyle = isGoldMove ? '#fffbeb' : '#ffffff';
+                    ctx.lineWidth = 1.4 / z;
+                    ctx.stroke();
+                    ctx.restore();
                 }
 
                 if (studio.flags.showWire) {
@@ -4835,15 +4976,126 @@
                 }
             }
 
+            // Gizmo interactivo de rotacion en pantalla para el hueso activo
+            if (studio.flags.showRotationGizmo && studio.selectedBoneId && studio.flags.showBones && frame.posedBones) {
+                const targetBone = frame.posedBones.find(b => b.id === studio.selectedBoneId);
+                if (targetBone) {
+                    const ox = targetBone.ax1;
+                    const oy = targetBone.ay1;
+                    const tipX = targetBone.ax2;
+                    const tipY = targetBone.ay2;
+                    const curAngle = Math.atan2(tipY - oy, tipX - ox);
+                    const restAngle = Math.atan2((targetBone.ny2 * RefHeight) - (targetBone.ny1 * RefHeight), (targetBone.nx2 * RefWidth) - (targetBone.nx1 * RefWidth));
+                    const gizmoRadius = 42 / z;
+
+                    ctx.save();
+                    // Anillo exterior guia
+                    ctx.strokeStyle = 'rgba(56, 189, 248, 0.32)';
+                    ctx.lineWidth = 1.6 / z;
+                    ctx.setLineDash([3 / z, 3 / z]);
+                    ctx.beginPath();
+                    ctx.arc(ox, oy, gizmoRadius, 0, Math.PI * 2);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+
+                    // Arco de rotacion diferencial
+                    ctx.fillStyle = 'rgba(250, 204, 21, 0.20)';
+                    ctx.strokeStyle = '#facc15';
+                    ctx.lineWidth = 2.4 / z;
+                    ctx.beginPath();
+                    ctx.moveTo(ox, oy);
+                    ctx.arc(ox, oy, gizmoRadius, restAngle, curAngle, false);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.stroke();
+
+                    // Manija interactiva circular
+                    const knobX = ox + Math.cos(curAngle) * gizmoRadius;
+                    const knobY = oy + Math.sin(curAngle) * gizmoRadius;
+                    ctx.fillStyle = '#facc15';
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.lineWidth = 2 / z;
+                    ctx.beginPath();
+                    ctx.arc(knobX, knobY, 6.5 / z, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.stroke();
+
+                    // Etiqueta numerica de angulo
+                    const diffDeg = ((curAngle - restAngle) * 180 / Math.PI);
+                    const degText = (diffDeg >= 0 ? '+' : '') + diffDeg.toFixed(1) + '°';
+                    ctx.font = `bold ${Math.max(9, 11 / z)}px JetBrains Mono, monospace`;
+                    const textW = ctx.measureText(degText).width;
+                    const pillX = ox + Math.cos(curAngle + 0.35) * (gizmoRadius + 15 / z);
+                    const pillY = oy + Math.sin(curAngle + 0.35) * (gizmoRadius + 15 / z);
+
+                    ctx.fillStyle = 'rgba(10, 13, 22, 0.92)';
+                    ctx.strokeStyle = '#facc15';
+                    ctx.lineWidth = 1 / z;
+                    ctx.beginPath();
+                    ctx.roundRect(pillX - textW * 0.5 - 4 / z, pillY - 7 / z, textW + 8 / z, 14 / z, 3 / z);
+                    ctx.fill();
+                    ctx.stroke();
+
+                    ctx.fillStyle = '#facc15';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(degText, pillX, pillY);
+                    ctx.textAlign = 'start';
+                    ctx.textBaseline = 'alphabetic';
+                    ctx.restore();
+                }
+            }
+
             if (studio.activeTool === 'weights') {
                 const brushRadPx = ((studio.weightBrush.radiusPct || 8) / 100) * RefWidth;
+                const wx = studio.pointerWorld.x;
+                const wy = studio.pointerWorld.y;
+
+                ctx.save();
+                // Anillo exterior limite de decaimiento
                 ctx.strokeStyle = '#facc15';
-                ctx.fillStyle = 'rgba(250, 204, 21, 0.10)';
-                ctx.lineWidth = 1.5 / z;
+                ctx.lineWidth = 1.2 / z;
+                ctx.setLineDash([4 / z, 3 / z]);
                 ctx.beginPath();
-                ctx.arc(studio.pointerWorld.x, studio.pointerWorld.y, brushRadPx, 0, Math.PI * 2);
+                ctx.arc(wx, wy, brushRadPx, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                // Anillo interior de fuerza central (35% radio)
+                ctx.strokeStyle = 'rgba(250, 204, 21, 0.85)';
+                ctx.fillStyle = 'rgba(250, 204, 21, 0.08)';
+                ctx.lineWidth = 1.8 / z;
+                ctx.beginPath();
+                ctx.arc(wx, wy, brushRadPx * 0.35, 0, Math.PI * 2);
                 ctx.fill();
                 ctx.stroke();
+
+                // Indicador flotante bajo el cursor
+                const bone = studio.bones.find(b => b.id === studio.selectedBoneId);
+                const bName = bone ? (bone.label || bone.id) : (studio.selectedBoneId || 'Ninguno');
+                const modeLabel = studio.weightBrush.mode === 'add' ? 'Sumar' : (studio.weightBrush.mode === 'sub' ? 'Sustraer' : 'Suavizar');
+                const strengthPct = Math.round((studio.weightBrush.strength || 0.4) * 100) + '%';
+                const hudText = `${bName} | ${modeLabel} | ${strengthPct}`;
+
+                ctx.font = `600 ${Math.max(9, 10 / z)}px Inter, sans-serif`;
+                const pillW = ctx.measureText(hudText).width + 12 / z;
+                const pillH = 16 / z;
+                const pillX = wx + 12 / z;
+                const pillY = wy - 18 / z;
+
+                ctx.fillStyle = 'rgba(12, 16, 28, 0.90)';
+                ctx.strokeStyle = '#facc15';
+                ctx.lineWidth = 1 / z;
+                ctx.beginPath();
+                ctx.roundRect(pillX, pillY - pillH + 2 / z, pillW, pillH, 3 / z);
+                ctx.fill();
+                ctx.stroke();
+
+                ctx.fillStyle = '#f8fafc';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(hudText, pillX + 6 / z, pillY - pillH * 0.5 + 2 / z);
+                ctx.textBaseline = 'alphabetic';
+                ctx.restore();
             }
 
             ctx.restore();
@@ -5186,6 +5438,36 @@
                     return;
                 }
 
+                // Comprobar interaccion directa con el Gizmo de rotacion
+                if (studio.flags.showRotationGizmo && studio.selectedBoneId && studio.flags.showBones) {
+                    const posedBones = solveSkeletonAndDeformParts(0).posedBones;
+                    const targetBone = posedBones?.find(b => b.id === studio.selectedBoneId);
+                    if (targetBone) {
+                        const ox = targetBone.ax1;
+                        const oy = targetBone.ay1;
+                        const tipX = targetBone.ax2;
+                        const tipY = targetBone.ay2;
+                        const curAng = Math.atan2(tipY - oy, tipX - ox);
+                        const restAng = Math.atan2((targetBone.ny2 * RefHeight) - (targetBone.ny1 * RefHeight), (targetBone.nx2 * RefWidth) - (targetBone.nx1 * RefWidth));
+                        const gizmoRadius = 42 / studio.camera.zoom;
+                        const dToCenter = Math.hypot(world.x - ox, world.y - oy);
+                        const knobX = ox + Math.cos(curAng) * gizmoRadius;
+                        const knobY = oy + Math.sin(curAng) * gizmoRadius;
+                        const dToKnob = Math.hypot(world.x - knobX, world.y - knobY);
+
+                        if (dToKnob < 15 / studio.camera.zoom || Math.abs(dToCenter - gizmoRadius) < 14 / studio.camera.zoom) {
+                            pushUndoState();
+                            studio.draggingGizmo = {
+                                boneId: targetBone.id,
+                                originX: ox,
+                                originY: oy,
+                                restAngle: restAng
+                            };
+                            return;
+                        }
+                    }
+                }
+
                 const hit = findNearestBoneEndpoint(world.x, world.y);
                 if (hit) {
                     pushUndoState();
@@ -5209,6 +5491,18 @@
                 if (studio.camera.isPanning) {
                     studio.camera.x = pos.x - studio.camera.panStartX;
                     studio.camera.y = pos.y - studio.camera.panStartY;
+                    return;
+                }
+
+                if (studio.draggingGizmo) {
+                    const bId = studio.draggingGizmo.boneId;
+                    const ox = studio.draggingGizmo.originX;
+                    const oy = studio.draggingGizmo.originY;
+                    const curAngle = Math.atan2(world.y - oy, world.x - ox);
+                    const dAngle = curAngle - studio.draggingGizmo.restAngle;
+                    if (!studio.anim.poseOverrides[bId]) studio.anim.poseOverrides[bId] = { dAngle: 0, dx: 0, dy: 0 };
+                    studio.anim.poseOverrides[bId].dAngle = dAngle;
+                    syncBoneInspectorUI();
                     return;
                 }
 
@@ -5294,6 +5588,7 @@
             });
 
             window.addEventListener('mouseup', () => {
+                if (studio.draggingGizmo) studio.draggingGizmo = null;
                 studio.camera.isPanning = false;
                 studio.weightBrush.isPainting = false;
                 studio.draggingAnchorPartId = null;
@@ -5853,7 +6148,10 @@
                 showBones: 'toggleBtn_bones',
                 showAnchors: 'toggleBtn_anchors',
                 showWeights: 'toggleBtn_weights',
-                footIK: 'toggleBtn_ik'
+                footIK: 'toggleBtn_ik',
+                showCoachOutline: 'toggleBtn_outline',
+                showStageNeon: 'toggleBtn_stage',
+                showRotationGizmo: 'toggleBtn_gizmo'
             };
             const btn = document.getElementById(map[flagKey]);
             if (btn) {
@@ -5867,6 +6165,148 @@
             } else {
                 legend.classList.add('hidden');
             }
+        }
+
+
+        function setCoachOutlineColor(color) {
+            studio.coachOutlineColor = color;
+            studio.flags.showCoachOutline = true;
+            const btn = document.getElementById('toggleBtn_outline');
+            if (btn) btn.className = 'px-2 py-1 rounded border border-cyan-500/40 bg-cyan-500/15 text-cyan-300 text-[10px] font-medium';
+            showV6Toast('Color del Borde Coach actualizado.');
+        }
+
+        function triggerGoldMoveFlash() {
+            selectAnimationClip('gold_move');
+            showV6Toast('Gold Move activado: Aura y destellos en el visor.');
+        }
+
+        function relaxSelectedPartMesh(iterations = 2) {
+            const part = studio.parts.find(p => p.id === studio.selectedPartId);
+            if (!part || !part.mesh || !part.mesh.vertices || !part.mesh.vertices.length) {
+                showV6Toast('Selecciona una parte con malla para relajar.', 'error');
+                return;
+            }
+            pushUndoState();
+            const verts = part.mesh.vertices;
+            const neighbors = part.mesh.neighbors;
+            const hullSet = new Set();
+            part.mesh.hullEdges.forEach(([a, b]) => { hullSet.add(a); hullSet.add(b); });
+
+            const lambda = 0.35;
+            for (let it = 0; it < iterations; it++) {
+                const nextOffsets = verts.map(v => ({ ox: v.ox || 0, oy: v.oy || 0 }));
+                for (let i = 0; i < verts.length; i++) {
+                    if (hullSet.has(i)) continue;
+                    const nList = neighbors[i];
+                    if (!nList || nList.length === 0) continue;
+                    let avgOx = 0, avgOy = 0;
+                    nList.forEach(ni => {
+                        avgOx += (verts[ni].ox || 0);
+                        avgOy += (verts[ni].oy || 0);
+                    });
+                    avgOx /= nList.length;
+                    avgOy /= nList.length;
+                    nextOffsets[i].ox += (avgOx - (verts[i].ox || 0)) * lambda;
+                    nextOffsets[i].oy += (avgOy - (verts[i].oy || 0)) * lambda;
+                }
+                for (let i = 0; i < verts.length; i++) {
+                    verts[i].ox = nextOffsets[i].ox;
+                    verts[i].oy = nextOffsets[i].oy;
+                }
+            }
+            solveSkeletonAndDeformParts(0);
+            showV6Toast('Malla relajada y suavizada mediante Laplacian smoothing.');
+        }
+
+        function setMeshDensityPreset(cols) {
+            const sl = document.getElementById('sl_meshDensity');
+            if (sl) {
+                sl.value = cols;
+                rebuildAllPartMeshes();
+                showV6Toast(`Densidad de malla configurada en ${cols} subdivisiones.`);
+            }
+        }
+
+        function autoHarmonicWeights() {
+            pushUndoState();
+            studio.parts.forEach(p => {
+                computePartSmoothWeights(p, true);
+            });
+            showV6Toast('Pesos armonicos y decaimiento inteligente recalculados.');
+        }
+
+        function smoothActiveBoneWeights(iterations = 3) {
+            const part = studio.parts.find(p => p.id === studio.selectedPartId);
+            const targetBone = studio.selectedBoneId;
+            if (!part || !targetBone) {
+                showV6Toast('Selecciona una parte y un hueso para suavizar.', 'error');
+                return;
+            }
+            pushUndoState();
+            const verts = part.mesh.vertices;
+            const neighbors = part.mesh.neighbors;
+            for (let it = 0; it < iterations; it++) {
+                const newWeights = verts.map(v => (v.weights[targetBone] || 0));
+                for (let i = 0; i < verts.length; i++) {
+                    const nList = neighbors[i];
+                    if (!nList || !nList.length) continue;
+                    let sum = 0;
+                    nList.forEach(ni => { sum += (verts[ni].weights[targetBone] || 0); });
+                    newWeights[i] = newWeights[i] * 0.4 + (sum / nList.length) * 0.6;
+                }
+                for (let i = 0; i < verts.length; i++) {
+                    verts[i].weights[targetBone] = newWeights[i];
+                }
+            }
+            normalizeActivePartWeights(part);
+            solveSkeletonAndDeformParts(0);
+            showV6Toast(`Pesos del hueso "${targetBone}" suavizados.`);
+        }
+
+        function normalizeActivePartWeights(targetPart) {
+            const part = targetPart || studio.parts.find(p => p.id === studio.selectedPartId);
+            if (!part || !part.mesh || !part.mesh.vertices) return;
+            pushUndoState();
+            part.mesh.vertices.forEach(v => {
+                const entries = Object.entries(v.weights).filter(([k, w]) => w > 0.001);
+                entries.sort((a, b) => b[1] - a[1]);
+                const top4 = entries.slice(0, 4);
+                let sum = 0;
+                top4.forEach(([k, w]) => { sum += w; });
+                v.weights = {};
+                if (sum > 0) {
+                    top4.forEach(([k, w]) => { v.weights[k] = Number((w / sum).toFixed(4)); });
+                } else {
+                    v.weights['torso'] = 1.0;
+                }
+            });
+            solveSkeletonAndDeformParts(0);
+            showV6Toast('Pesos normalizados a 100% (maximo 4 influencias).');
+        }
+
+        function clearActiveBoneWeights() {
+            const part = studio.parts.find(p => p.id === studio.selectedPartId);
+            const targetBone = studio.selectedBoneId;
+            if (!part || !targetBone) return;
+            pushUndoState();
+            part.mesh.vertices.forEach(v => {
+                delete v.weights[targetBone];
+            });
+            normalizeActivePartWeights(part);
+            showV6Toast(`Pesos del hueso "${targetBone}" limpiados en la capa.`);
+        }
+
+        function invertActiveBoneWeights() {
+            const part = studio.parts.find(p => p.id === studio.selectedPartId);
+            const targetBone = studio.selectedBoneId;
+            if (!part || !targetBone) return;
+            pushUndoState();
+            part.mesh.vertices.forEach(v => {
+                v.weights[targetBone] = Math.max(0, 1.0 - (v.weights[targetBone] || 0));
+            });
+            normalizeActivePartWeights(part);
+            showV6Toast(`Pesos del hueso "${targetBone}" invertidos.`);
         }
 
         function switchRightTab(tab) {
@@ -6160,7 +6600,7 @@
 
             const exportData = {
                 avatarName: avatarName,
-                exporter: 'LiamToolAvatar2Unity V7',
+                exporter: 'LiamToolAvatar2Unity V7.1',
                 preset: studio.activeLayerPreset,
                 formatVersion: 2,
                 characterCount: characterIds.length,

@@ -1,10 +1,31 @@
-# LiamToolAvatar2Unity V7 - Multi-Engine Studio Suite
+# LiamToolAvatar2Unity V7.1 - Multi-Engine Studio Suite
 
-Herramienta profesional para crear, posar, animar avatares 2D en alta resolucion y exportarlos directamente a Unity y modding de Just Dance con un ecosistema multi-lenguaje (ShaderLab, C#, Python, Java, JavaScript y FFmpeg).
+Herramienta profesional para crear, posar, animar avatares 2D en alta resolucion y exportarlos directamente a Unity y modding de Just Dance con efectos de shader en tiempo real, gizmo de rotacion en pantalla, mallas relajadas y herramientas avanzadas de pesos.
 
 - Google Sites: https://sites.google.com/view/liamtoolavatar2unity/home
 - GitHub Pages: https://ey-liam.github.io/LiamToolAvatar2Unity/
 - Repositorio GitHub: https://github.com/ey-liam/LiamToolAvatar2Unity
+
+## Novedades en V7.1
+
+- Efectos de Shader en Tiempo Real en la Pagina Web:
+  - Borde Coach Neon (Coach Outline): Renderizado de resplandor bloom y contorno brillante estilo Just Dance alrededor de la silueta deformada del personaje en el visor web.
+  - Selector de Color de Borde: Paleta rapida con Cyan Neon (#00f0ff), Oro Just Dance (#ffd700), Magenta Neon (#ec4899) y Verde Esmeralda (#10b981).
+  - Efecto Gold Move VFX en el Visor: Halo de 18 rayos dorados pulsantes y destellos de energia sincronizados con la pose de baile.
+  - Escenario Neon (Pista de Baile Just Dance): Fondo interactivo con piso reflectante, lineas en perspectiva y reflector dinamico tras el avatar.
+- Controles Interactivos en Pantalla Pulidos:
+  - Gizmo de Rotacion Directo en Lienzo: Anillo circular interactivo que aparece al seleccionar un hueso, con manija de arrastre tactil, arco diferencial y lectura instantanea de grados (+00.0 grados).
+  - Barra Flotante de Acceso Rapido (HUD): Control rapido en la parte inferior del visor con conmutadores de color de borde, activador rapido de Gold Move y centrado de camara.
+  - Pincel de Pesos de Doble Anillo: Anillo interior solido de fuerza 100% y anillo exterior punteado de radio de decaimiento, con indicador flotante bajo el cursor que muestra el hueso activo, modo y porcentaje.
+- Herramientas de Malla Mejoradas:
+  - Presets de Densidad con Un Clic: Rapida (14), Media (22), Alta (30) y Ultra-HD (38 subdivisiones).
+  - Relajacion y Suavizado Laplaciano de Malla: Algoritmo de suavizado laplaciano para nivelar triangulos internos sin distorsionar la silueta exterior, eliminando arrugas y pellizcos.
+- Herramientas de Pesos Avanzadas:
+  - Auto-Pesos Armonicos: Calculo con decaimiento exponencial inteligente y envolventes rigidas.
+  - Suavizado de Hueso en 3 Pasadas: Suaviza transiciones entre vertices vecinos en codos, rodillas y hombros.
+  - Normalizacion Estricta a 100%: Garantiza que la suma de influencias sea exactamente 1.0 con tope de 4 huesos.
+  - Invertir y Limpiar Pesos: Operaciones instantaneas para aislar o revertir influencias por capa.
+- Cero emojis en toda la plataforma y documentacion.
 
 ## Novedades en V7
 
@@ -31,7 +52,7 @@ Herramienta profesional para crear, posar, animar avatares 2D en alta resolucion
 - Herramienta de validacion por lotes en Java:
   - Tools/AvatarBatchCLI.java: Herramienta de consola sin dependencias externas para validar catalogos masivos de DancerCards en segundos, compatible con Java 8+.
 - Nuevos clips de animacion integrados:
-  - Gold Move: Pose iconica y energica con freeze dramático estilo Just Dance.
+  - Gold Move: Pose iconica y energica con freeze dramatico estilo Just Dance.
   - Groove: Balanceo ritmico de caderas y torso para canciones funky.
   - Cheer: Movimiento festivo con brazos elevados y rebote elastico.
 - Regla de diseno estricta: Cero emojis en toda la documentacion, interfaz y codigo.
