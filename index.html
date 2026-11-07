@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Editor de avatares 2D con rigging, animación y exportación para Unity.">
     <meta name="theme-color" content="#090b10">
-    <title>LiamToolAvatar2Unity V6.2 - Avatar Studio</title>
+    <title>LiamToolAvatar2Unity V7 - Avatar Studio & Multi-Engine Suite</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -309,7 +309,7 @@
                 </div>
                 <div class="flex items-center gap-1.5">
                     <span class="font-extrabold tracking-tight text-xs sm:text-sm bg-gradient-to-r from-white via-slate-100 to-slate-300 bg-clip-text text-transparent">LiamTool <span class="bg-gradient-to-r from-cyan-400 to-sky-300 bg-clip-text text-transparent font-bold">Avatar2Unity</span></span>
-                    <span class="mono text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/30">V6.2</span>
+                    <span class="mono text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/30">V7</span>
                 </div>
             </div>
 
@@ -680,6 +680,9 @@
                             <option value="walk">Walk Ciclo Caminata</option>
                             <option value="jump">Jump Impulso Salto</option>
                             <option value="wave">Wave Saludo Brazo</option>
+                            <option value="gold_move">Gold Move (Pose Especial Just Dance)</option>
+                            <option value="groove">Groove (Ritmo y Cadera)</option>
+                            <option value="cheer">Cheer (Celebracion y Manos Arriba)</option>
                         </select>
                         <span id="lblTimelineTime" class="mono text-[10px] text-sky-400 ml-2">0.00s / 2.00s</span>
                     </div>
@@ -1301,6 +1304,10 @@
                         <input id="v6ExportCs" type="checkbox" checked class="accent-emerald-400">
                         <span><b class="block text-xs text-white">C#</b><small class="text-[10px] text-slate-400">Runtime Unity</small></span>
                     </label>
+                    <label class="flex items-center gap-2 p-3 rounded-lg border border-[#28324e] bg-[#141a29] cursor-pointer hover:border-emerald-400/50">
+                        <input id="v6ExportShader" type="checkbox" checked class="accent-emerald-400">
+                        <span><b class="block text-xs text-white">ShaderLab</b><small class="text-[10px] text-slate-400">Shaders Gold Move</small></span>
+                    </label>
                 </div>
                 <div class="p-3 rounded-lg border border-fuchsia-500/30 bg-fuchsia-500/5">
                     <label class="flex items-center gap-2 cursor-pointer">
@@ -1322,7 +1329,7 @@
                 <div class="flex items-center gap-3">
                     <span class="px-2 py-0.5 rounded bg-gradient-to-r from-pink-500/20 to-purple-500/20 border border-pink-500/40 text-pink-300 mono text-xs font-bold flex items-center gap-1.5">
                         <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="2" width="20" height="20" rx="4"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
-                        ANIMATION EXPORTER V6.2
+                        ANIMATION EXPORTER V7
                     </span>
                     <span class="text-sm font-bold text-white">Exportador de Animación (APNG • GIF)</span>
                 </div>
@@ -1837,6 +1844,7 @@
             { label: 'Rehacer cambio', hint: 'Ctrl+Y', run: () => performRedo() },
             { label: 'Enfocar composición', hint: 'F', run: () => resetCameraView() },
             { label: 'Activar modo pareja', hint: 'P', run: () => setCoupleMode(!studio.coupleMode) },
+            { label: 'Auto-adaptar esqueleto a silueta', hint: 'Alt+A', run: () => autoDetectPoseFromAllParts() },
             { label: 'Recalcular pesos y anclajes', hint: '', run: () => recomputeAllPartsWeights(true, true) },
             { label: 'Auto-detectar pose', hint: '', run: () => autoDetectPoseFromAllParts() },
             { label: 'Abrir ajustes', hint: '', run: () => openSettingsModal() }
@@ -1921,6 +1929,10 @@
             }
             if (document.getElementById('v6ExportCs')?.checked) {
                 files.push({ name: `${avatarName}2UnityRuntime.cs`, blob: new Blob([buildUnityCSharpScript()], { type: 'text/plain' }) });
+            }
+            if (document.getElementById('v6ExportShader')?.checked) {
+                const shaderSrc = "Shader \"LiamTool/Avatar2D_CustomCard\"\n{\n    Properties\n    {\n        [PerRendererData] _MainTex (\"Sprite Atlas / Texture\", 2D) = \"white\" {}\n        _Color (\"Main Tint\", Color) = (1, 1, 1, 1)\n\n        [Header(Gold Move Aura)]\n        _GoldAuraColor (\"Gold Move Color\", Color) = (1.0, 0.84, 0.15, 1.0)\n        _GoldAuraIntensity (\"Gold Move Intensity\", Range(0.0, 5.0)) = 0.0\n        _GoldPulseSpeed (\"Gold Pulse Speed\", Range(0.0, 10.0)) = 3.0\n\n        [Header(Coach Outline)]\n        _OutlineColor (\"Coach Outline Color\", Color) = (0.2, 0.85, 1.0, 1.0)\n        _OutlineWidth (\"Outline Width\", Range(0.0, 0.04)) = 0.0\n\n        [Header(Color Grading)]\n        _HueShift (\"Hue Shift (Degrees)\", Range(0.0, 360.0)) = 0.0\n        _Brightness (\"Brightness\", Range(0.0, 3.0)) = 1.0\n        _Contrast (\"Contrast\", Range(0.1, 3.0)) = 1.0\n        _Saturation (\"Saturation\", Range(0.0, 3.0)) = 1.0\n\n        [Header(Alpha and Blending)]\n        _Cutoff (\"Alpha Cutoff\", Range(0.0, 1.0)) = 0.01\n    }\n\n    SubShader\n    {\n        Tags\n        {\n            \"Queue\" = \"Transparent\"\n            \"IgnoreProjector\" = \"True\"\n            \"RenderType\" = \"Transparent\"\n            \"PreviewType\" = \"Plane\"\n            \"CanUseSpriteAtlas\" = \"True\"\n        }\n\n        Cull Off\n        Lighting Off\n        ZWrite Off\n        Blend SrcAlpha OneMinusSrcAlpha\n\n        Pass\n        {\n            CGPROGRAM\n            #pragma vertex vert\n            #pragma fragment frag\n            #pragma target 3.0\n            #include \"UnityCG.cginc\"\n\n            struct appdata_t\n            {\n                float4 vertex   : POSITION;\n                float4 color    : COLOR;\n                float2 texcoord : TEXCOORD0;\n            };\n\n            struct v2f\n            {\n                float4 vertex   : SV_POSITION;\n                fixed4 color    : COLOR;\n                float2 texcoord : TEXCOORD0;\n                float4 screenPos : TEXCOORD1;\n            };\n\n            sampler2D _MainTex;\n            float4 _MainTex_ST;\n            float4 _MainTex_TexelSize;\n            fixed4 _Color;\n            fixed4 _GoldAuraColor;\n            float _GoldAuraIntensity;\n            float _GoldPulseSpeed;\n            fixed4 _OutlineColor;\n            float _OutlineWidth;\n            float _HueShift;\n            float _Brightness;\n            float _Contrast;\n            float _Saturation;\n            float _Cutoff;\n\n            v2f vert(appdata_t IN)\n            {\n                v2f OUT;\n                OUT.vertex = UnityObjectToClipPos(IN.vertex);\n                OUT.texcoord = TRANSFORM_TEX(IN.texcoord, _MainTex);\n                OUT.color = IN.color * _Color;\n                OUT.screenPos = ComputeScreenPos(OUT.vertex);\n                return OUT;\n            }\n\n            float3 rgbToHsv(float3 c)\n            {\n                float4 K = float4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);\n                float4 p = lerp(float4(c.bg, K.wz), float4(c.gb, K.xy), step(c.b, c.g));\n                float4 q = lerp(float4(p.xyw, c.r), float4(c.r, p.yzx), step(p.x, c.r));\n                float d = q.x - min(q.w, q.y);\n                float e = 1.0e-10;\n                return float3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);\n            }\n\n            float3 hsvToRgb(float3 c)\n            {\n                float4 K = float4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);\n                float3 p = abs(frac(c.xxx + K.xyz) * 6.0 - K.www);\n                return c.z * lerp(K.xxx, saturate(p - K.xxx), c.y);\n            }\n\n            fixed4 frag(v2f IN) : SV_Target\n            {\n                fixed4 col = tex2D(_MainTex, IN.texcoord) * IN.color;\n\n                if (col.a <= _Cutoff)\n                {\n                    if (_OutlineWidth > 0.001)\n                    {\n                        float2 offsets[8] = {\n                            float2(-1,  0), float2(1,  0), float2(0, -1), float2(0,  1),\n                            float2(-1, -1), float2(1, -1), float2(-1,  1), float2(1,  1)\n                        };\n\n                        float outlineAlpha = 0.0;\n                        for (int i = 0; i < 8; i++)\n                        {\n                            float2 sampleUV = IN.texcoord + offsets[i] * _MainTex_TexelSize.xy * (_OutlineWidth * 100.0);\n                            float a = tex2D(_MainTex, sampleUV).a;\n                            outlineAlpha = max(outlineAlpha, a);\n                        }\n\n                        if (outlineAlpha > 0.15)\n                        {\n                            return fixed4(_OutlineColor.rgb, outlineAlpha * _OutlineColor.a);\n                        }\n                    }\n                    discard;\n                }\n\n                if (_HueShift > 0.001 || _Saturation != 1.0 || _Brightness != 1.0 || _Contrast != 1.0)\n                {\n                    float3 hsv = rgbToHsv(col.rgb);\n                    hsv.x = frac(hsv.x + _HueShift / 360.0);\n                    hsv.y = saturate(hsv.y * _Saturation);\n                    hsv.z = saturate(hsv.z * _Brightness);\n                    col.rgb = hsvToRgb(hsv);\n\n                    col.rgb = saturate(((col.rgb - 0.5) * _Contrast) + 0.5);\n                }\n\n                if (_GoldAuraIntensity > 0.01)\n                {\n                    float pulse = 0.75 + 0.25 * sin(_Time.y * _GoldPulseSpeed * 3.14159);\n                    float edge = 1.0 - saturate(col.a);\n                    float3 goldEffect = _GoldAuraColor.rgb * _GoldAuraIntensity * pulse;\n                    col.rgb += goldEffect * (1.0 - col.r * 0.3);\n                }\n\n                return col;\n            }\n            ENDCG\n        }\n    }\n    FallBack \"Sprites/Default\"\n}\n";
+                files.push({ name: `${avatarName}_CustomCard.shader`, blob: new Blob([shaderSrc], { type: 'text/plain' }) });
             }
             if (!files.length) {
                 if (staticTextures) {
@@ -2011,7 +2023,7 @@
                     showV6Toast('El auto-guardado no está disponible en este navegador.', 'error');
                 }
             }, 8000);
-            showV6Toast('Avatar Studio V6.2 listo · Ctrl+K para comandos');
+            showV6Toast('Avatar Studio V7 listo · Ctrl+K para comandos');
         }
 
                 const DEFAULT_STUDIO_SETTINGS = {
@@ -3431,8 +3443,9 @@
             const bw = Math.max(32, maxX - minX);
             const bh = Math.max(32, maxY - minY);
 
-            const cols = Math.max(10, Math.min(baseCols, Math.round(baseCols * (bw / RefWidth) + 8)));
-            const rows = Math.max(10, Math.min(Math.round(baseCols * 1.45), Math.round(baseCols * 1.45 * (bh / RefHeight) + 8)));
+            const targetCellSize = Math.max(16, Math.max(bw, bh) / baseCols);
+            const cols = Math.max(8, Math.round(bw / targetCellSize));
+            const rows = Math.max(8, Math.round(bh / targetCellSize));
 
             const vertices = [];
             for (let r = 0; r <= rows; r++) {
@@ -3822,6 +3835,37 @@
             renderPartBoneMaskUI();
         }
 
+        function adaptSkeletonToBoundingBox(minX, minY, maxX, maxY) {
+            const bw = maxX - minX;
+            const bh = maxY - minY;
+            if (bw < 30 || bh < 30) return;
+
+            const mapBones = {
+                torso:     { rx1: 0.50, ry1: 0.56, rx2: 0.50, ry2: 0.32 },
+                neck:      { rx1: 0.50, ry1: 0.32, rx2: 0.50, ry2: 0.22 },
+                head:      { rx1: 0.50, ry1: 0.22, rx2: 0.50, ry2: 0.05 },
+                upperArmR: { rx1: 0.38, ry1: 0.33, rx2: 0.22, ry2: 0.46 },
+                forearmR:  { rx1: 0.22, ry1: 0.46, rx2: 0.12, ry2: 0.60 },
+                upperArmL: { rx1: 0.62, ry1: 0.33, rx2: 0.78, ry2: 0.46 },
+                forearmL:  { rx1: 0.78, ry1: 0.46, rx2: 0.88, ry2: 0.60 },
+                strap:     { rx1: 0.50, ry1: 0.56, rx2: 0.50, ry2: 0.68 },
+                upperLegR: { rx1: 0.40, ry1: 0.60, rx2: 0.38, ry2: 0.80 },
+                lowerLegR: { rx1: 0.38, ry1: 0.80, rx2: 0.36, ry2: 0.98 },
+                upperLegL: { rx1: 0.60, ry1: 0.60, rx2: 0.62, ry2: 0.80 },
+                lowerLegL: { rx1: 0.62, ry1: 0.80, rx2: 0.64, ry2: 0.98 }
+            };
+
+            studio.bones.forEach(b => {
+                const target = mapBones[b.id];
+                if (target) {
+                    b.nx1 = (minX + target.rx1 * bw) / RefWidth;
+                    b.ny1 = (minY + target.ry1 * bh) / RefHeight;
+                    b.nx2 = (minX + target.rx2 * bw) / RefWidth;
+                    b.ny2 = (minY + target.ry2 * bh) / RefHeight;
+                }
+            });
+        }
+
         function autoDetectPoseFromAllParts() {
             pushUndoState();
             const comp = document.createElement('canvas');
@@ -3835,13 +3879,35 @@
             }
             const data = g.getImageData(0, 0, RefWidth, RefHeight).data;
 
-            const scanBand = (ny0, ny1) => {
-                const y0 = Math.max(0, Math.floor(ny0 * RefHeight));
-                const y1 = Math.min(RefHeight - 1, Math.ceil(ny1 * RefHeight));
+            // 1. Detect actual bounding box of character silhouette
+            let bMinX = RefWidth, bMinY = RefHeight, bMaxX = 0, bMaxY = 0, found = false;
+            const stepScan = Math.max(2, Math.floor(Math.min(RefWidth, RefHeight) / 300));
+            for (let y = 0; y < RefHeight; y += stepScan) {
+                for (let x = 0; x < RefWidth; x += stepScan) {
+                    if (data[(y * RefWidth + x) * 4 + 3] > 15) {
+                        if (x < bMinX) bMinX = x;
+                        if (x > bMaxX) bMaxX = x;
+                        if (y < bMinY) bMinY = y;
+                        if (y > bMaxY) bMaxY = y;
+                        found = true;
+                    }
+                }
+            }
+
+            if (!found) {
+                bMinX = RefWidth * 0.25; bMaxX = RefWidth * 0.75;
+                bMinY = RefHeight * 0.10; bMaxY = RefHeight * 0.90;
+            }
+
+            const charW = Math.max(30, bMaxX - bMinX);
+            const charH = Math.max(30, bMaxY - bMinY);
+
+            const scanBandRel = (r0, r1) => {
+                const y0 = Math.max(0, Math.floor(bMinY + r0 * charH));
+                const y1 = Math.min(RefHeight - 1, Math.ceil(bMinY + r1 * charH));
                 let l = RefWidth, r = 0, sumX = 0, cnt = 0;
-                const step = Math.max(2, Math.floor(RefWidth / 300));
-                for (let y = y0; y <= y1; y += step) {
-                    for (let x = 0; x < RefWidth; x += step) {
+                for (let y = y0; y <= y1; y += stepScan) {
+                    for (let x = 0; x < RefWidth; x += stepScan) {
                         if (data[(y * RefWidth + x) * 4 + 3] > 15) {
                             if (x < l) l = x;
                             if (x > r) r = x;
@@ -3850,44 +3916,59 @@
                         }
                     }
                 }
-                if (cnt === 0) return { l: 0.3, r: 0.7, m: 0.5 };
+                if (cnt === 0) return { l: (bMinX + 0.2 * charW) / RefWidth, r: (bMinX + 0.8 * charW) / RefWidth, m: (bMinX + 0.5 * charW) / RefWidth };
                 return { l: l / RefWidth, r: r / RefWidth, m: (sumX / cnt) / RefWidth };
             };
 
-            const headB = scanBand(0.06, 0.20);
-            const chestB = scanBand(0.24, 0.35);
-            const armB = scanBand(0.28, 0.45);
-            const hipB = scanBand(0.45, 0.55);
+            const headB = scanBandRel(0.00, 0.20);
+            const chestB = scanBandRel(0.20, 0.40);
+            const armB = scanBandRel(0.28, 0.55);
+            const hipB = scanBandRel(0.45, 0.62);
 
             const findB = (id) => studio.bones.find(b => b.id === id);
             const torso = findB('torso'), neck = findB('neck'), head = findB('head');
             if (torso && neck && head) {
-                torso.nx1 = hipB.m; torso.ny1 = 0.48;
-                torso.nx2 = chestB.m; torso.ny2 = 0.29;
-                neck.nx1 = chestB.m; neck.ny1 = 0.29;
-                neck.nx2 = (chestB.m + headB.m) * 0.5; neck.ny2 = 0.22;
-                head.nx1 = neck.nx2; head.ny1 = 0.22;
-                head.nx2 = headB.m; head.ny2 = 0.11;
+                torso.nx1 = hipB.m; torso.ny1 = (bMinY + charH * 0.56) / RefHeight;
+                torso.nx2 = chestB.m; torso.ny2 = (bMinY + charH * 0.32) / RefHeight;
+                neck.nx1 = chestB.m; neck.ny1 = torso.ny2;
+                neck.nx2 = (chestB.m + headB.m) * 0.5; neck.ny2 = (bMinY + charH * 0.22) / RefHeight;
+                head.nx1 = neck.nx2; head.ny1 = neck.ny2;
+                head.nx2 = headB.m; head.ny2 = (bMinY + charH * 0.05) / RefHeight;
             }
 
             const uR = findB('upperArmR'), fR = findB('forearmR');
             const uL = findB('upperArmL'), fL = findB('forearmL');
             if (uR && fR && uL && fL) {
-                uR.nx1 = Math.max(0.25, chestB.m - 0.08); uR.ny1 = 0.28;
-                uR.nx2 = (uR.nx1 + armB.l) * 0.52; uR.ny2 = 0.36;
-                fR.nx1 = uR.nx2; fR.ny1 = 0.36;
-                fR.nx2 = Math.max(0.05, armB.l + 0.02); fR.ny2 = 0.45;
+                uR.nx1 = Math.max((bMinX) / RefWidth, chestB.m - 0.08); uR.ny1 = (bMinY + charH * 0.32) / RefHeight;
+                uR.nx2 = (uR.nx1 + armB.l) * 0.52; uR.ny2 = (bMinY + charH * 0.46) / RefHeight;
+                fR.nx1 = uR.nx2; fR.ny1 = uR.ny2;
+                fR.nx2 = Math.max(0.02, armB.l); fR.ny2 = (bMinY + charH * 0.60) / RefHeight;
 
-                uL.nx1 = Math.min(0.75, chestB.m + 0.08); uL.ny1 = 0.28;
-                uL.nx2 = (uL.nx1 + armB.r) * 0.52; uL.ny2 = 0.35;
-                fL.nx1 = uL.nx2; fL.ny1 = 0.35;
-                fL.nx2 = Math.min(0.95, armB.r - 0.02); fL.ny2 = 0.28;
+                uL.nx1 = Math.min((bMaxX) / RefWidth, chestB.m + 0.08); uL.ny1 = (bMinY + charH * 0.32) / RefHeight;
+                uL.nx2 = (uL.nx1 + armB.r) * 0.52; uL.ny2 = (bMinY + charH * 0.46) / RefHeight;
+                fL.nx1 = uL.nx2; fL.ny1 = uL.ny2;
+                fL.nx2 = Math.min(0.98, armB.r); fL.ny2 = (bMinY + charH * 0.60) / RefHeight;
+            }
+
+            const upR = findB('upperLegR'), loR = findB('lowerLegR');
+            const upL = findB('upperLegL'), loL = findB('lowerLegL');
+            if (upR && loR && upL && loL) {
+                upR.nx1 = (bMinX + charW * 0.40) / RefWidth; upR.ny1 = (bMinY + charH * 0.58) / RefHeight;
+                upR.nx2 = (bMinX + charW * 0.38) / RefWidth; upR.ny2 = (bMinY + charH * 0.78) / RefHeight;
+                loR.nx1 = upR.nx2; loR.ny1 = upR.ny2;
+                loR.nx2 = (bMinX + charW * 0.36) / RefWidth; loR.ny2 = (bMinY + charH * 0.98) / RefHeight;
+
+                upL.nx1 = (bMinX + charW * 0.60) / RefWidth; upL.ny1 = (bMinY + charH * 0.58) / RefHeight;
+                upL.nx2 = (bMinX + charW * 0.62) / RefWidth; upL.ny2 = (bMinY + charH * 0.78) / RefHeight;
+                loL.nx1 = upL.nx2; loL.ny1 = upL.ny2;
+                loL.nx2 = (bMinX + charW * 0.64) / RefWidth; loL.ny2 = (bMinY + charH * 0.98) / RefHeight;
             }
 
             syncAnchorsWithSkeleton();
             recomputeAllPartsWeights(false);
             renderBoneTreeUI();
             syncBoneInspectorUI();
+            showV6Toast('Esqueleto calibrado proporcionalmente a la silueta.');
         }
 
         function movePartZOrder(index, direction) {
@@ -4209,6 +4290,12 @@
                 clipMulHipY = 3.2; clipMulArm = 2.4;
             } else if (studio.anim.clip === 'wave') {
                 clipWaveBoost = Math.sin(phase * 2) * 16;
+            } else if (studio.anim.clip === 'gold_move') {
+                clipMulHipX = 0.45; clipMulHipY = 0.35; clipMulArm = 2.9;
+            } else if (studio.anim.clip === 'groove') {
+                clipMulHipX = 2.3; clipMulHipY = 1.7; clipMulArm = 1.6;
+            } else if (studio.anim.clip === 'cheer') {
+                clipMulHipX = 0.75; clipMulHipY = 2.5; clipMulArm = 2.7;
             }
 
             const hipDX = (studio.systemState === 'animate') ? (cosP * studio.anim.hipX * resScaleX * clipMulHipX) : 0;
@@ -4304,7 +4391,9 @@
                         const shoulderAnchor = evalTorsoSpace(rx1, ry1);
                         ax1 = shoulderAnchor.x;
                         ay1 = shoulderAnchor.y;
-                        const deg = (-Math.sin(phase - 0.35) * studio.anim.armSwing * clipMulArm + gust * 0.2);
+                        let deg = (-Math.sin(phase - 0.35) * studio.anim.armSwing * clipMulArm + gust * 0.2);
+                        if (studio.anim.clip === 'gold_move') deg += 52 + Math.sin(phase) * 8;
+                        else if (studio.anim.clip === 'cheer') deg += -64 + Math.sin(phase * 2) * 12;
                         localAngle += torsoAngle * 0.7 + deg * Math.PI / 180;
                     }
                 } else if (b.role === 'armL') {
@@ -4318,7 +4407,9 @@
                         const shoulderAnchor = evalTorsoSpace(rx1, ry1);
                         ax1 = shoulderAnchor.x;
                         ay1 = shoulderAnchor.y;
-                        const deg = (Math.sin(phase - 0.35) * studio.anim.armSwing * clipMulArm + clipWaveBoost * 0.4 + gust * 0.2);
+                        let deg = (Math.sin(phase - 0.35) * studio.anim.armSwing * clipMulArm + clipWaveBoost * 0.4 + gust * 0.2);
+                        if (studio.anim.clip === 'gold_move') deg += -38 + Math.cos(phase) * 6;
+                        else if (studio.anim.clip === 'cheer') deg += 64 + Math.sin(phase * 2) * 12;
                         localAngle += torsoAngle * 0.7 + deg * Math.PI / 180;
                     }
                 } else if (b.role === 'pendulum') {
@@ -5433,6 +5524,84 @@
             showV6Toast(`Hueso "${type}" añadido.`);
         }
 
+        function importSingleFullAvatarImage(image, fileName) {
+            pushUndoState();
+            const canvas = document.createElement('canvas');
+            canvas.width = RefWidth;
+            canvas.height = RefHeight;
+            const ctx = canvas.getContext('2d');
+
+            // Preservar relacion de aspecto exacta (sin estirar imagenes cuadradas o no estandar)
+            const padding = 0.92;
+            const maxW = RefWidth * padding;
+            const maxH = RefHeight * padding;
+            const scale = Math.min(maxW / image.width, maxH / image.height);
+            const drawW = Math.round(image.width * scale);
+            const drawH = Math.round(image.height * scale);
+            const drawX = Math.round((RefWidth - drawW) / 2);
+            const drawY = Math.round((RefHeight - drawH) / 2);
+
+            ctx.clearRect(0, 0, RefWidth, RefHeight);
+            ctx.drawImage(image, drawX, drawY, drawW, drawH);
+
+            // Escanear silueta real
+            const imgData = ctx.getImageData(0, 0, RefWidth, RefHeight);
+            const data = imgData.data;
+            let minX = RefWidth, minY = RefHeight, maxX = 0, maxY = 0, found = false;
+            const step = 2;
+            for (let y = 0; y < RefHeight; y += step) {
+                for (let x = 0; x < RefWidth; x += step) {
+                    if (data[(y * RefWidth + x) * 4 + 3] > 10) {
+                        if (x < minX) minX = x;
+                        if (x > maxX) maxX = x;
+                        if (y < minY) minY = y;
+                        if (y > maxY) maxY = y;
+                        found = true;
+                    }
+                }
+            }
+
+            if (!found) {
+                minX = drawX; minY = drawY; maxX = drawX + drawW; maxY = drawY + drawH;
+            }
+
+            // Calibrar esqueleto a la silueta del personaje
+            adaptSkeletonToBoundingBox(minX, minY, maxX, maxY);
+
+            const cleanName = fileName ? fileName.replace(/\.[^/.]+$/, '').replace(/[^\w.-]+/g, '_') : 'AvatarCompleto';
+            studio.avatarName = cleanName;
+            const inpName = document.getElementById('inpHeaderAvatarName');
+            if (inpName) inpName.value = cleanName;
+
+            const singlePart = {
+                id: 'Avatar_Single_' + Date.now().toString().slice(-4),
+                name: 'Avatar Completo',
+                color: '#38bdf8',
+                visible: true,
+                x: 0,
+                y: 0,
+                scaleX: 1.0,
+                scaleY: 1.0,
+                rot: 0,
+                allowedBones: studio.bones.map(b => b.id),
+                anchor: { parentBone: 'none', nx: 0.5, ny: 0.5, radiusPct: 50, strength: 0 },
+                rawSourceCanvas: canvas,
+                bakedCanvas: cloneCanvas(canvas),
+                mesh: { bounds: {}, vertices: [], triangles: [], hullEdges: [], neighbors: [] }
+            };
+
+            // Sustituir maniqui por el personaje unico
+            studio.parts = [singlePart];
+            studio.selectedPartId = singlePart.id;
+
+            buildSinglePartMesh(singlePart, true);
+            renderPartTreeUI();
+            syncPartInspectorUI();
+            syncBoneInspectorUI();
+            solveSkeletonAndDeformParts(0);
+            showV6Toast('Avatar importado proporcionalmente (1:1 preservado) y esqueleto auto-calibrado.');
+        }
+
         function importV6TextureMode(event) {
             const file = event.target.files && event.target.files[0];
             if (!file) return;
@@ -5440,19 +5609,23 @@
             reader.onload = () => {
                 const image = new Image();
                 image.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    canvas.width = RefWidth;
-                    canvas.height = RefHeight;
-                    canvas.getContext('2d').drawImage(image, 0, 0, RefWidth, RefHeight);
                     const mode = document.querySelector('input[name="v6TextureMode"]:checked')?.value || 'parts';
                     if (mode === 'single') {
-                        createNewEmptyPart('Imagen Unica', canvas);
+                        importSingleFullAvatarImage(image, file.name);
                     } else if (studio.selectedPartId) {
                         importTextureForPartId(studio.selectedPartId, file);
+                        showV6Toast('Textura asignada a la capa seleccionada.');
                     } else {
-                        createNewEmptyPart('Textura', canvas);
+                        const canvas = document.createElement('canvas');
+                        canvas.width = RefWidth;
+                        canvas.height = RefHeight;
+                        const scale = Math.min(RefWidth / image.width, RefHeight / image.height);
+                        const dw = Math.round(image.width * scale);
+                        const dh = Math.round(image.height * scale);
+                        canvas.getContext('2d').drawImage(image, Math.round((RefWidth - dw) / 2), Math.round((RefHeight - dh) / 2), dw, dh);
+                        createNewEmptyPart(file.name.replace(/\.[^/.]+$/, ''), canvas);
+                        showV6Toast('Nueva capa creada con ajuste proporcional.');
                     }
-                    showV6Toast(mode === 'single' ? 'Imagen única preparada para deformación.' : 'Textura asignada a la capa.');
                 };
                 image.src = reader.result;
             };
@@ -5987,7 +6160,7 @@
 
             const exportData = {
                 avatarName: avatarName,
-                exporter: 'LiamToolAvatar2Unity V6.2',
+                exporter: 'LiamToolAvatar2Unity V7',
                 preset: studio.activeLayerPreset,
                 formatVersion: 2,
                 characterCount: characterIds.length,

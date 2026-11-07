@@ -1,9 +1,40 @@
-# LiamToolAvatar2Unity V6.2
+# LiamToolAvatar2Unity V7 - Multi-Engine Studio Suite
 
-Herramienta web profesional para crear, configurar rig, animar avatares 2D en alta resolucion y exportarlos directamente a Unity y al juego.
+Herramienta profesional para crear, posar, animar avatares 2D en alta resolucion y exportarlos directamente a Unity y modding de Just Dance con un ecosistema multi-lenguaje (ShaderLab, C#, Python, Java, JavaScript y FFmpeg).
 
 - Google Sites: https://sites.google.com/view/liamtoolavatar2unity/home
 - GitHub Pages: https://ey-liam.github.io/LiamToolAvatar2Unity/
+- Repositorio GitHub: https://github.com/ey-liam/LiamToolAvatar2Unity
+
+## Novedades en V7
+
+- Correccion integral de importacion de imagen unica cuadrada (1:1):
+  - Solucionado el problema donde las imagenes cuadradas o de proporcion no estandar eran forzadas y estiradas a 1536x2752.
+  - Implementado ajuste proporcional estricto con centrado automatico y preservacion de aspect ratio nativo sin distorsion.
+  - Eliminacion de anclaje forzado central (strength: 0, parentBone: none) para avatares de una sola pieza, garantizando deformacion natural por pesos sin pellizcos.
+- Auto-adaptacion y calibracion del esqueleto a la silueta:
+  - Nuevo modulo adaptSkeletonToBoundingBox que escanea el cuadro delimitador no transparente real del personaje.
+  - Reescritura de autoDetectPoseFromAllParts eliminando rangos porcentuales verticales fijos; ahora la deteccion de torso, cabeza, cuello y extremidades se calcula de forma proporcional y relativa a la altura y anchura efectivas de la figura.
+  - Nuevo comando en la Paleta de Comandos (Ctrl+K): "Auto-adaptar esqueleto a silueta" (Alt+A).
+- Mallas poligonales isotropicas:
+  - Generacion de mallas basada en tamano de celda uniforme (targetCellSize), produciendo quads y triangulos uniformes y regulares independientemente de si la imagen es 1:1, 16:9 o 9:16.
+- Ecosistema ShaderLab para Unity:
+  - Shaders/LiamAvatar2D_CustomCard.shader: Shader para deformacion 2D, soporte de aura dorada pulsante Gold Move, delineado de coach (Coach Outline) con compatibilidad Bloom, gradientes HSV y recorte alfa.
+  - Shaders/LiamAvatar_StageNeon.shader: Efectos de escenario interactivo neon estilo Just Dance con lineas de barrido y aberracion cromatica.
+  - Opcion de exportacion ShaderLab integrada directamente en el Export Hub modal.
+- Runtime y Editor Unity en C#:
+  - Unity/Runtime/LiamAvatarController.cs: Controlador runtime de avatar con soporte para 7 clips de animacion (Idle, Walk, Jump, Wave, GoldMove, Groove, Cheer), sway procedural, respiracion organica y dinamica de muelles.
+  - Unity/Editor/LiamAvatarImporterWindow.cs: Ventana de importacion drag-and-drop en Unity (Tools > LiamTool > Avatar & Card Importer) para generar prefabs y materiales listos con un solo clic.
+- Herramientas CLI en Python:
+  - Tools/avatar_processor.py: CLI con comandos fit (ajuste sin deformacion), segment (segmentacion anatomica automatica en 6 capas) y validate (verificacion de integridad Spine JSON).
+  - Tools/ffmpeg_video_converter.py: Transcodificacion automatizada con FFmpeg para WebM VP8 sin audio, MP4 H.264 para Unity VideoPlayer y GIF optimizado de 2 pasadas mediante palettegen.
+- Herramienta de validacion por lotes en Java:
+  - Tools/AvatarBatchCLI.java: Herramienta de consola sin dependencias externas para validar catalogos masivos de DancerCards en segundos, compatible con Java 8+.
+- Nuevos clips de animacion integrados:
+  - Gold Move: Pose iconica y energica con freeze dramático estilo Just Dance.
+  - Groove: Balanceo ritmico de caderas y torso para canciones funky.
+  - Cheer: Movimiento festivo con brazos elevados y rebote elastico.
+- Regla de diseno estricta: Cero emojis en toda la documentacion, interfaz y codigo.
 
 ## Novedades en V6.2
 
@@ -29,55 +60,69 @@ Herramienta web profesional para crear, configurar rig, animar avatares 2D en al
   - Ventana modal centralizada para exportar por lotes o de forma selectiva:
     - Texturas estaticas para DancerCardCatalog (Banner, Cursor, DancerCard, Full, Hud, Portrait, Square).
     - Atlas empaquetado PNG de alta resolucion.
-    - Archivo descriptor Spine/Unity JSON V6.2.
+    - Archivo descriptor Spine/Unity JSON.
     - Script MonoBehaviour C# para Unity.
+    - Shaders ShaderLab para efectos y delineados.
     - Exportador de animaciones en APNG de 32 bits y formato GIF.
 - Sistema de Notificaciones Flotantes (V6 Toasts):
   - Mensajes de estado visuales y reactivos para confirmar guardados, acciones de rigging y avisos del sistema sin bloquear la interaccion.
-- Interfaz Responsiva Adaptativa:
-  - Soporte mejorado para pantallas compactas y dispositivos moviles con paneles laterales desplegables y sombreado dinamico.
-- Motor de Rigging y Mallas Optimizado:
-  - Normalizacion rigurosa de pesos con maximo de 4 influencias por vertice y suma exacta de 1.0 para compatibilidad absoluta con Unity.
-  - Mascara estricta de huesos permitidos por pieza que evita dispersion no deseada en el pincel de pesos.
-  - Radio de celda adaptativo mas ajustado para un delineado limpio de siluetas.
-- Cero emojis y documentacion limpia en todo el codigo fuente.
 
-## Novedades en V5.1
+## Estructura del Repositorio
 
-- Normalizacion estandar de pesos: Limitacion automatica a un maximo de 4 influencias oseas por vertice con suma normalizada exacta (1.0), garantizando compatibilidad nativa total con el sistema de skinning de Unity.
-- Mallas poligonales mas fieles: Reduccion del radio de celda adaptativo en la generacion de mallas para contornear los bordes y siluetas de cada sprite sin distorsiones marginales.
-- Mascara estricta de huesos permitidos: Las funciones de pintura de pesos y relajacion respetan de forma estricta los huesos asignados a cada pieza, evitando fugas de influencia entre capas y extremidades.
-- Seleccion fluida en el visor: Correccion en la deteccion de clics sobre el lienzo cuando existen capas invisibles u ocultas, permitiendo seleccionar cualquier pieza visible sin bloqueos.
-- Optimizacion y accesibilidad: Preconexiones de fuentes web, metadatos de entorno y roles de accesibilidad integrados en los lienzos interactivos.
-- Postura inicial predeterminada: Inicio automatico en postura Casual con parametros de amortiguacion y rigidez equilibrados.
+- index.html: Aplicacion web principal y estudio interactivo completo.
+- Shaders/:
+  - LiamAvatar2D_CustomCard.shader: Shader 2D de deformacion, skinning, Gold Move y Coach Outline.
+  - LiamAvatar_StageNeon.shader: Shader de fondo y escenario interactivo con scanlines y gradientes neon.
+- Unity/:
+  - Runtime/LiamAvatarController.cs: Script de control procedural y ejecucion de animaciones en Unity.
+  - Editor/LiamAvatarImporterWindow.cs: Ventana de importacion y generacion automatica de prefabs.
+- Tools/:
+  - avatar_processor.py: Preprocesamiento de imagenes, auto-ajuste y segmentacion anatomica.
+  - ffmpeg_video_converter.py: Pipeline de transcodificacion para WebM VP8, MP4 y GIF optimizado.
+  - AvatarBatchCLI.java: Validador de catalogos de avatares por lotes.
 
-## Novedades en V5
+## Guia de Uso de las Herramientas
 
-- Nueva interfaz moderna y estilizada: Barra superior redisenada con logotipo vectorial original, distribucion equilibrada de herramientas y jerarquia visual mejorada.
-- Apartado de Configuracion del Estudio: Panel dedicado para personalizar el entorno de trabajo:
-  - Fondos de lienzo: Estudio con rejilla, patron checkerboard para transparencia, negro profundo OLED (#000000), pantalla verde chroma (#00FF00) y azul chroma (#0000FF).
-  - Parametros de rigging: Ajuste de grosor de huesos (1.0x a 2.4x), nivel de opacidad, radio de nodos articulares y conmutador para mostrar u ocultar etiquetas de huesos sobre el visor.
-  - Valores predeterminados de exportacion: Configuracion de nombre inicial de avatar y ruta base del sistema.
-  - Persistencia local: Todas las preferencias se guardan automaticamente en el navegador.
-- Template de inicio optimizado: Maniqui generico limpio estilo Just Dance listo para posar y animar.
-- Exportacion directa a CustomAvatars (Atlas PNG, archivo JSON, script C# y 7 texturas estaticas del juego).
-- Exportador de animaciones en APNG 32-bit y formato GIF.
+### Preprocesamiento con Python
+```bash
+# Ajustar una textura cuadrada sin distorsion a 1536x2752
+python Tools/avatar_processor.py fit --input mi_personaje.png --output personaje_ajustado.png
 
-## Caracteristicas Principales
+# Segmentar automaticamente una imagen en 6 capas anatomicas
+python Tools/avatar_processor.py segment --input mi_personaje.png --outdir capas_personaje/
 
-- Resolucion nativa para preservacion de detalle en todas las capas.
+# Validar integridad de un archivo Spine JSON exportado
+python Tools/avatar_processor.py validate --json Avatar.json --atlas Avatar_Atlas.png
+```
+
+### Transcodificacion con FFmpeg
+```bash
+# Convertir video a WebM VP8 transparente optimizado para web
+python Tools/ffmpeg_video_converter.py webm --input animacion.mp4 --output animacion.webm --bitrate 3500k
+
+# Convertir a MP4 H.264 para Unity VideoPlayer
+python Tools/ffmpeg_video_converter.py mp4 --input animacion.webm --output animacion.mp4
+
+# Generar GIF con paleta de 2 pasadas de alta fidelidad
+python Tools/ffmpeg_video_converter.py gif --input animacion.mp4 --output animacion.gif --fps 30
+```
+
+### Validacion por lotes con Java
+```bash
+# Compilar CLI (compatible con Java 8 o superior)
+javac --release 8 Tools/AvatarBatchCLI.java
+
+# Validar una carpeta de catalogos de avatares
+java -cp Tools AvatarBatchCLI ruta/a/mis_avatares
+```
+
+## Caracteristicas Principales del Estudio Web
+
+- Resolucion nativa de lienzo para maxima fidelidad en cada sprite.
 - Empaquetador de Atlas sin espacios vacios: Detecta pixeles visibles de cada parte y genera un unico archivo PNG optimizado.
-- Generacion de esqueleto JSON y script C# para Unity: Coordenadas de atlas, puntos de anclaje y jerarquia listos para renderizado.
-- Rigging 2D y animacion: Sistema de huesos, pesos, envolventes, fisicas y presets de movimiento.
-- Formato de proyecto .L2U: Guardado y apertura de proyectos para continuar el trabajo posteriormente.
-
-## Estructura de Archivos Exportados
-
-Archivos generados:
-- <AvatarName>_Atlas.png: Atlas con todas las partes visibles recortadas y empaquetadas.
-- <AvatarName>.json: Definicion del esqueleto, puntos de anclaje, mallas y animaciones.
-- <NombreClase>.cs: Script Runtime para Unity.
-- <AvatarName>_<Variante>_<Tipo>.png: Texturas estaticas para juego (Banner, Cursor, DancerCard, Full, Hud, Portrait, Square).
+- Generacion de esqueleto JSON y scripts C# para Unity: Jerarquias, puntos de anclaje, mallas y deformacion por skinning listas para el juego.
+- Rigging 2D y animacion: Sistema de huesos, pesos suaves, amortiguacion, fisicas de brisa y presets de movimiento Just Dance.
+- Formato de proyecto .L2U: Guardado y apertura rapida de proyectos en formato JSON local.
 
 ## Licencia y Creditos
 
